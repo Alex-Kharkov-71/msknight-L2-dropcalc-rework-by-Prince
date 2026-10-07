@@ -3,6 +3,7 @@ echo "<p class=\"dropmain\">&nbsp;</p>
 <p class=\"dropmain\">&nbsp;</p>
 <p class=\"dropmain\">&nbsp;</p>
 <h2 class=\"dropmain\">Welcome to Michelle's L2J drop calc.</h2>
+<h2 class=\"dropmain\">Reworked by Prince.</h2>
 <center><hr width=\"30%\"</center>
 <h2 class=\"dropmain\">Lineage 2</h2>
 <center><hr width=\"30%\"</center>	

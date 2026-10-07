@@ -3,10 +3,11 @@ echo "<p class=\"dropmain\">&nbsp;</p>
 <p class=\"dropmain\">&nbsp;</p>
 <p class=\"dropmain\">&nbsp;</p>
 <h2 class=\"dropmain\">Welcome to Michelle's L2J drop calc.</h2>
+<h2 class=\"dropmain\">Reworked by Prince.</h2>
 <center><hr width=\"30%\"</center>
 <h2 class=\"dropmain\">Lineage 2</h2>
 <center><hr width=\"30%\"</center>	
-<p class=\"maincenter\">Dropcalc Engine - V4</p>
+<p class=\"maincenter\">Dropcalc Engine - V5</p>
 <p class=\"maincenter\">Programmed by Michelle Knight of <a href=\"http://www.msknight.com\" target=\"new\" class=\"mainmenu\">MSKnight.com</a>
 <br>Default skin by Jam of <a href=\"http://www.borntwisted.com\" target=\"new\" class=\"mainmenu\">BornTwisted.com</a><br>with help from PCPro32
 <br>Seven Signs \"clock\" by Daedalus.
