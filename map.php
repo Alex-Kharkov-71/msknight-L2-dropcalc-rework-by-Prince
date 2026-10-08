@@ -38,7 +38,12 @@ function in to this code to make it totally freestanding.
 ----------------------------------------------------------
 */
 
-function map($points, $images_dir, $map_nudge, $map_num)
+// $zones (необязательно) - зоны спавна из L2JMobius, рисуются как SVG-полигон
+// поверх карты вместо одной точки в центре. Формат одного элемента:
+// array('points' => array(array($x1,$y1), array($x2,$y2), ...), 'color' => '#rrggbb')
+// Те же game-координаты и тот же scale/offset, что и у точечных маркеров -
+// полигон и маркеры всегда совпадают по месту на карте.
+function map($points, $images_dir, $map_nudge, $map_num, $zones = [])
 {
 
 	$map_right = 229388;
@@ -107,6 +112,31 @@ function map($points, $images_dir, $map_nudge, $map_num)
 	$y_scale = $y_scale / $graphic_height;
 
 	echo "\n<div style=\"position: relative;\"><table><tr><td><img src=\"$map_file\" alt=\"\" width=\"$graphic_width\" height=\"$graphic_height\" border=\"0\"><div>";
+
+	if (!empty($zones))
+	{
+		echo "<svg style=\"position: absolute; top: 0; left: 0; pointer-events: none;\" width=\"$graphic_width\" height=\"$graphic_height\">";
+		foreach ($zones as $zone)
+		{
+			$color = $zone['color'] ?? '#ffcc00';
+			$svgPoints = [];
+			foreach ($zone['points'] as $node)
+			{
+				$zx_co = $node[0];
+				$zy_co = $node[1];
+				if (($zx_co > $map_right) || ($zx_co < $map_left) || ($zy_co > $map_bottom) || ($zy_co < $map_top))
+				{	continue;	}	// узел вне границ карты - пропускаем, не ломаем остальной полигон
+				$zx_px = (intval(difnums($zx_co, $base_x) / $x_scale)) + $offset_x;
+				$zy_px = (intval(difnums($zy_co, $base_y) / $y_scale)) + $offset_y;
+				$svgPoints[] = "$zx_px,$zy_px";
+			}
+			if (count($svgPoints) >= 3)
+			{
+				echo "<polygon points=\"" . implode(' ', $svgPoints) . "\" fill=\"$color\" fill-opacity=\"0.35\" stroke=\"$color\" stroke-width=\"1.5\" />";
+			}
+		}
+		echo "</svg>";
+	}
 
 	$num = count($points);
 	$i = 0;

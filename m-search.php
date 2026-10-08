@@ -70,7 +70,7 @@ if ($evaluser)
 	$mobnum = intval($itemname);
 	if ($mobnum > 0)
 	{
-		$sql = "select id from knightnpc where id = '$mobnum' union select id from custom_npc where id = '$mobnum'";
+		$sql = "select id from knightnpc where id = '$mobnum'";
 		$result = mysql_query($sql,$con);
 		$count = mysql_num_rows($result);
 		if ($count)
@@ -107,7 +107,7 @@ if ($evaluser)
 		$mob_sp = mysql_result($result,$i,"sp");
 		$mob_atkrange = mysql_result($result,$i,"attackrange");
 		$mob_aggro = mysql_result($result,$i,"aggro");
-		$sql = "select * from spawnlist where npc_templateid = $mob_id";
+		$sql = "select * from knightspawnlist where npc_templateid = $mob_id";
 		$result2 = mysql_query($sql,$con);
 		$mob_spawn = mysql_num_rows($result2);
 		$mob_sex = mysql_result($result,$i,"sex");
@@ -179,272 +179,27 @@ if ($evaluser)
 			{ $mob_righth = mysql_result($result3,0,"name"); }
 		}
 
-		$sql = "show fields from spawnlist";
-		if (!$result2 = mysql_query($sql,$con))
-		{
-			die('Could not retrieve fields from spawnlist database: ' . mysql_error());
-		}
-		$count_r = mysql_num_rows($result2);
-		$i2=0;
-		$daynight = 0;
-		while ($i2 < $count_r) 
-		{
-			$i_id = mysql_result($result2,$i2,"field");
-			if (strcasecmp($i_id, "periodofday") == 0)
-			{ $daynight = 1; }
-			$i2++;
-		}
+		// PHP8/L2JMobius fix: spawnlist/locations/raidboss_spawnlist bolshe ne
+		// sushestvuyut - vsya logika teper v obshey funktsii mobcount() (common.php),
+		// kotoraya chitaet knightspawnlist/knightspawnzone. Day/night v novyh
+		// dannyh net - vsyo schitaetsya obychnym spawnom. Esli boss zadan kak
+		// obychniy <npc> v spawns-dereve datapaka, on naydyotsya tut zhe.
+		$mob_spwn = mobcount($mob_id,$db_location,$db_user,$db_psswd,$db_l2jdb,$dblog_location,$dblog_user,$dblog_psswd,$dblog_l2jdb);
+		$mob_count = $mob_spwn[0];
+		$mob_spawnnum = $mob_spwn[1];
+		$mob_days = $mob_spwn[2];
+		$mob_dayt = $mob_spwn[3];
+		$mob_nights = $mob_spwn[4];
+		$mob_nightt = $mob_spwn[5];
+		$mob_normals = $mob_spwn[6];
+		$mob_normalt = $mob_spwn[7];
 
-		//Search through the spawnlog and locations database to find all the spawn points for the mob and put them in the map database.
-		$mob_spawnnum = 0;
-		$mob_days = 0;
-		$mob_dayt = 0;
-		$mob_nights = 0;
-		$mob_nightt = 0;
-		$mob_normals = 0;
-		$mob_normalt = 0;
-		if ($daynight)
-		{	$sql = "select locx, locy, locz, loc_id, count, periodOfDay from spawnlist where npc_templateid = $mob_id";	}
-		else
-		{	$sql = "select locx, locy, locz, loc_id, count from spawnlist where npc_templateid = $mob_id";	}
-		$result2 = mysql_query($sql,$con);
-		$count_r2 = mysql_num_rows($result2);
-		if (mysql_fetch_array($result2))
-		{
-			$i2=0;
-			$mob_count = 0;
-			while ($i2 < $count_r2) 
-			{
-				$map_tag = 2;
-				if ((mysql_result($result2,$i2,"locx") <> 0) || (mysql_result($result2,$i2,"locy") <> 0) || (mysql_result($result2,$i2,"locz") <> 0))
-				{
-					$mob_spawnnum++;
-					$mob_count++;
-					if ( $daynight )
-					{	$periodofday = mysql_result($result2,$i2,"periodOfDay");	}
-					else
-					{	$periodofday = 0;	}
-					if ( $periodofday == 1 )
-					{
-						$mob_days++;
-						$mob_dayt++;
-						$map_tag = 0;
-					}
-					elseif ( $periodofday == 2 )
-					{
-						$mob_nights++;
-						$mob_nightt++;
-						$map_tag = 1;
-					}
-					else
-					{
-						$mob_normals++;
-						$mob_normalt++;
-						$map_tag = 2;
-					}
-					if (!$map_array)
-					{
-						$map_array = array(array((mysql_result($result2,$i2,"locx")), (mysql_result($result2,$i2,"locy")), $map_tag));
-					}
-					else
-					{
-						array_push($map_array, array((mysql_result($result2,$i2,"locx")), (mysql_result($result2,$i2,"locy")), $map_tag));
-					}
-				}						
-				else
-				{
-					$mob_count = $mob_count + mysql_result($result2,$i2,"count");
-					if ( $daynight )
-					{	$periodofday = mysql_result($result2,$i2,"periodOfDay");	}
-					else
-					{	$periodofday = 0;	}
-					if ( $periodofday == 1 )
-					{
-						$mob_days++;
-					}
-					elseif ( $periodofday == 2 )
-					{
-						$mob_nights++;
-					}
-					else
-					{
-						$mob_normals++;
-					}
-					$location_id = mysql_result($result2,$i2,"loc_id");
-					$sql = "select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id";
-					$result3 = mysql_query($sql,$con);
-					$count_r3 = mysql_num_rows($result3);
-					if (mysql_fetch_array($result3))
-					{	
-						$i3=0;
-						while ($i3 < $count_r3)
-						{
-							$locat_x = mysql_result($result3,$i3,"loc_x");
-							$locat_y = mysql_result($result3,$i3,"loc_y");
-							$locat_z = mysql_result($result3,$i3,"loc_zmin");
-							if ( $periodofday == 1 )
-							{
-								$mob_dayt++;
-								$map_tag = 0;
-							}
-							elseif ( $periodofday == 2 )
-							{
-								$mob_nightt++;
-								$map_tag = 1;
-							}
-							else
-							{
-								$mob_normalt++;
-								$map_tag = 2;
-							}
-							if (($locat_x <> 0) || ($locat_y <> 0) || ($locat_z <> 0))
-							{
-								$mob_spawnnum++;
-								if (!$map_array)
-								{
-									$map_array = array(array($locat_x, $locat_y, $map_tag));
-								}
-								else
-								{
-									array_push($map_array, array($locat_x, $locat_y, $map_tag));
-								}
-							}
-							$i3++;
-						}
-					}
-				}
-				$i2++;
-			}
-		}
-		$sql = "select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $mob_id";
-		$result2 = mysql_query($sql,$con);
-		$count_r2 = mysql_num_rows($result2);
-		if (mysql_fetch_array($result2))
-		{
-			$i2=0;
-			while ($i2 < $count_r2) 
-			{
-				if ((mysql_result($result2,$i2,"loc_x") <> 0) || (mysql_result($result2,$i2,"loc_y") <> 0) || (mysql_result($result2,$i2,"loc_z") <> 0))
-				{
-					$mob_spawnnum++;
-					$mob_count++;
-					$mob_normals++;
-					$mob_normalt++;
-					$locat_x = mysql_result($result2,$i2,"loc_x");
-					$locat_y = mysql_result($result2,$i2,"loc_y");
-					if (!$map_array)
-					{
-						$map_array = array(array($locat_x, $locat_y, 0));
-					}
-					else
-					{
-						array_push($map_array, array($locat_x, $locat_y, 0));
-					}
-				}
-				$i2++;
-			}
-		}
-		
-		$sql = "select boss_id, amount_min, amount_max from minions where minion_id = $mob_id";
-		$result2 = mysql_query($sql,$con);
-		$count_r2 = mysql_num_rows($result2);
-		if (mysql_fetch_array($result2))
-		{
-			$i2=0;
-			while ($i2 < $count_r2) 
-			{
-				$boss_id = mysql_result($result2,$i3,"boss_id");
-				$minion_spawns = mysql_result($result2,$i3,"amount_max");
-				$minion_spawn_min = mysql_result($result2,$i3,"amount_min");
-				$sql = "select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $boss_id";
-				$result3 = mysql_query($sql,$con);
-				$count_r3 = mysql_num_rows($result3);
-				if (mysql_fetch_array($result3))
-				{
-					$i3=0;
-					while ($i3 < $count_r3) 
-					{
-						if ((mysql_result($result3,$i3,"loc_x") <> 0) || (mysql_result($result3,$i3,"loc_y") <> 0) || (mysql_result($result2,$i3,"loc_z") <> 0))
-						{
-							$mob_spawnnum += $minion_spawns;
-							$mob_count += $minion_spawn_min;
-							$mob_normals += $minion_spawn_min;
-							$mob_normalt += $minion_spawns;
-							$locat_x = mysql_result($result3,$i3,"loc_x");
-							$locat_y = mysql_result($result3,$i3,"loc_y");
-							if (!$map_array)
-							{
-								$map_array = array(array($locat_x, $locat_y, 0));
-							}
-							else
-							{
-								array_push($map_array, array($locat_x, $locat_y, 0));
-							}
-						}
-						$i3++;
-					}
-					
-				}
-				$sql = "select locx, locy, locz from spawnlist where npc_templateid = $boss_id union select locx, locy, locz from custom_spawnlist where npc_templateid = $boss_id";
-				$result3 = mysql_query($sql,$con);
-				$count_r3 = mysql_num_rows($result3);
-				if (mysql_fetch_array($result3))
-				{
-					$i3=0;
-					while ($i3 < $count_r3) 
-					{
-						if ((mysql_result($result3,$i3,"locx") <> 0) || (mysql_result($result3,$i3,"locy") <> 0) || (mysql_result($result2,$i3,"locz") <> 0))
-						{
-							$mob_spawnnum += $minion_spawns;
-							$mob_count += $minion_spawn_min;
-							$mob_normals += $minion_spawn_min;
-							$mob_normalt += $minion_spawns;
-							$locat_x = mysql_result($result3,$i3,"locx");
-							$locat_y = mysql_result($result3,$i3,"locy");
-							if (!$map_array)
-							{
-								$map_array = array(array($locat_x, $locat_y, 0));
-							}
-							else
-							{
-								array_push($map_array, array($locat_x, $locat_y, 0));
-							}
-						}
-						$i3++;
-					}
-				}
-				$i2++;
-			}
-		}
-		
-	$result3 = mysql_query("select groupId from random_spawn where npcId = $mob_id",$con);
-	while ($r_array = mysql_fetch_assoc($result3))		
-	{
-		$mob_group = $r_array['groupId'];
-		$count = 0;
-		$result4 = mysql_query("select x, y, z from random_spawn_loc where groupId = $mob_group",$con);
-		while ($r_array = mysql_fetch_assoc($result4))		
-		{
-			if (!$map_array)
-			{	
-				$map_array = array(array($r_array['x'], $r_array['y'], 0));	
-				$map_locs = array(array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			else
-			{
-				array_push($map_array, array($r_array['x'], $r_array['y'], 0));	
-				array_push($map_locs, array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			if ($count == 0)
-			{	
-				$mob_normals++;	
-				$mob_spawnnum++;	
-			}
-			$mob_normalt++;
-			$mob_count++;
-			$count = 1;
-		}
-	}
+		// PHP8/L2JMobius fix: minions/random_spawn/random_spawn_loc - tablitsy
+		// zhivogo servera, kotoryh v L2JMobius net, i sootvetstvuyushih dannyh
+		// net ni v odnom XML-fayle datapaka iz teh, chto mne prislali. Funktsiya
+		// "spisok minionov rejd-bossa" i "sluchayniy pul spawnov" otklyucheny -
+		// pokazat nechego, no stranitsa ne padaet.
+
 		// Display detailed information about the mob.
 		echo "<p class=\"dropmain\">&nbsp;</p>";
 		echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"blanktab\"><tr><td class=\"noborderback\">";
@@ -612,7 +367,7 @@ if ($evaluser)
 		if ($action=="showskills")
 		{
 			echo "<center><table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"lefthead\"><strong class=\"dropmain\">Mob Skill</strong></td><td class=\"lefthead\"><strong class=\"dropmain\">Level</strong></td></tr>";
-			$result2 = mysql_query("select skillid, level from knightnpcskills where npcid = '$mob_id' union select skillid, level from custom_npcskills where npcid = '$mob_id'",$con);
+			$result2 = mysql_query("select skillid, level from knightnpcskills where npcid = '$mob_id'",$con);
 			while ($r_array = mysql_fetch_assoc($result2)) 
 			{
 				$skill_name = "unknown";
@@ -627,17 +382,9 @@ if ($evaluser)
 		}
 		
 		// Now go through all the items that the mob drops or spwans and add them to an array.
-		$drop_engine = 0;
-		$sql = "show fields from droplist";
-		$result2 = mysql_query($sql,$con);
-		while ($r_array = mysql_fetch_assoc($result2)) 
-		{
-			if (strcasecmp($r_array['Field'], "category") == 0)
-			{ $drop_engine = 1; }
-		}
-		$sql = "select itemid, min, max, sweep, chance from droplist where mobId = $mob_id union select itemid, min, max, sweep, chance from custom_droplist where mobId = $mob_id";
-		if ($drop_engine)
-		{	$sql = "select itemid, min, max, category, chance from droplist where mobId = $mob_id union select itemid, min, max, category, chance from custom_droplist where mobId = $mob_id order by category, chance DESC";	}
+		// PHP8/L2JMobius fix: droplist/custom_droplist bolshe ne sushestvuyut,
+		// chitaem knightdroplist (importnpc.php). group_chance - novoe pole.
+		$sql = "select itemid, min, max, category, chance, group_chance, sweep from knightdroplist where mobid = $mob_id order by category, chance DESC";
 		$result2 = mysql_query($sql,$con);
 		$count_r = mysql_num_rows($result2);
 		$item_category = 0;
@@ -649,20 +396,14 @@ if ($evaluser)
 			while ($i < $count_r) 
 			{
 				$i_array = mysql_fetch_row($result2);
-				$item_id = mysql_result($result2,$i,"itemId");
-				if ($drop_engine)
-				{
-					$item_category = mysql_result($result2,$i,"category");
-					if ($item_category < 0)
-					{	$item_sweep = 1;	}
-					else
-					{	$item_sweep = 0;	}
-				}
-				else
-				{
-					$item_sweep = mysql_result($result2,$i,"sweep");
-				}
+				$item_id = mysql_result($result2,$i,"itemid");
+				$item_category = mysql_result($result2,$i,"category");
+				$item_sweep = mysql_result($result2,$i,"sweep");
+				$item_group_chance = mysql_result($result2,$i,"group_chance");
 				$item_chance = mysql_result($result2,$i,"chance");
+				// Dvuhstupenchataya formula: group_chance (shans gruppy) * chance (otnositelniy shans v gruppe) / 100.
+				if (!$item_sweep && $item_group_chance !== null && $item_group_chance !== "")
+				{	$item_chance = $item_chance * $item_group_chance / 100;	}
 			
 				$error_finding = 0;
 				$sql = "select name from knightarmour where item_id = $item_id";  // Try armour database
@@ -696,8 +437,6 @@ if ($evaluser)
 				else
 				{	$item_chance *= $drop_chance_spoil;	}
 				
-				$item_chance /=10000;
-
 				$i_min = mysql_result($result2,$i,"min");
 				$i_max = mysql_result($result2,$i,"max");
 				if ($item_chance > 100)
@@ -719,7 +458,7 @@ if ($evaluser)
 					else 
 					{	$itm_carray[$item_category] = $item_chance;	}
 				}
-				array_push($itm_array, array($item_chance,mysql_result($result2,$i,"itemId"),$item_name,$i_min,$i_max,$item_sweep, $item_category));
+				array_push($itm_array, array($item_chance,mysql_result($result2,$i,"itemid"),$item_name,$i_min,$i_max,$item_sweep, $item_category));
 				$i++;
 			}
 			reset($itm_array);
@@ -745,7 +484,7 @@ if ($evaluser)
 
 			while ($i < $count_r) 
 			{
-				list($k1) = each($itm_array);
+				$k1 = key($itm_array); next($itm_array);
 				$i_array = $itm_array[$k1];
 				$item_id = $i_array[1];
 				$item_name = $i_array[2];
@@ -753,14 +492,11 @@ if ($evaluser)
 				$item_max = $i_array[4];
 				$item_sweep = $i_array[5];
 				$item_chance = $i_array[0];
-				if ($drop_engine)
+				$item_cat = $i_array[6];
+				if ($item_cat <> $last_bg)
 				{
-					$item_cat = $i_array[6];
-					if ($item_cat <> $last_bg)
-					{
-						$bg_colour = 1 - $bg_colour;
-						$last_bg = $item_cat;
-					}
+					$bg_colour = 1 - $bg_colour;
+					$last_bg = $item_cat;
 				}
 				if ($bg_colour == 0)
 				{	
@@ -792,12 +528,9 @@ if ($evaluser)
 					echo "<td class=\"$bg_class\"><p class=\"dropmain\">";
 					// At this point, we have the total chance for that catagory
 					// plus the individual item chance within the catagory.
-					if ($drop_engine)
-					{
-						$itm_total = $itm_carray[$item_cat];
-						if ($itm_total > 100)
-						{	$item_chance = intval(((100/$itm_total)*$item_chance)*10000)/10000;	}
-					}
+					$itm_total = $itm_carray[$item_cat];
+					if ($itm_total > 100)
+					{	$item_chance = intval(((100/$itm_total)*$item_chance)*10000)/10000;	}
 					if ($item_chance > 100)
 					{	$item_chance = 100;	}
 					if ($item_chance >= 70)
@@ -840,14 +573,14 @@ if ($evaluser)
 			{
 				while ($i < $spoil_count) 
 				{
-					list($k1) = each($spoil_array);
+					$k1 = key($spoil_array); next($spoil_array);
 					$i_array = $spoil_array[$k1];
 					$item_id = $i_array[0];
 					$item_name = $i_array[1];
 					$item_min = $i_array[2];
 					$item_max = $i_array[3];
 					$item_chance = $i_array[4];
-					if (($drop_engine) && ($item_id == 57))
+					if ($item_id == 57)
 					{
 						$item_min = $item_min * $drop_chance_adena;
 						$item_max = $item_max * $drop_chance_adena;
@@ -896,10 +629,11 @@ if ($evaluser)
 			echo "<td class=\"dropmain\">&nbsp<img src=\"" . $images_dir . "wfree.gif\" width=\"7\" height=\"7\" border=\"0\"> - $lang_always&nbsp;</td>";
 			echo "</tr></table></center>";
 			echo "<p class=\"dropmain\">&nbsp;<p class=\"dropmain\"><center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
-			map($map_array, $images_dir, 0, 1);
+			$zonesArg = isset($map_zones) ? $map_zones : [];
+			map($map_array, $images_dir, 0, 1, $zonesArg);
 			echo "</td></tr></table>";
 			echo "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
-			map($map_array, $images_dir, 0, 2);
+			map($map_array, $images_dir, 0, 2, $zonesArg);
 			echo "</td></tr></table></center><p class=\"dropmain\">&nbsp;<p class=\"dropmain\">";
 		}
 	}
@@ -930,7 +664,7 @@ if ($evaluser)
 			{
 				die('Could not change to $db_l2jdb database: ' . mysql_error());
 			}
-			$sql = "select distinct type from knightnpc where type <> 'L2Monster' and type <> 'L2Minion' union select distinct type from custom_npc where type <> 'L2Monster' and type <> 'L2Minion' order by type";
+			$sql = "select distinct type from knightnpc where type <> 'Monster' and type <> 'Minion' order by type";
 			$result = mysql_query($sql,$con);
 			if ($monsdetshow)
 			{
@@ -1034,7 +768,7 @@ if ($evaluser)
 				echo "\n<center><table><tr><td><div style=\"position: relative;\"><table><tr><td><img src=\"$map_file\" alt=\"\" width=\"$d_mapx\" height=\"$d_mapy\" border=\"0\"><div>";
 				
 				// Go through the standard spawnlist table.
-				$sql = "select * from spawnlist where locx <= $d_xmax and locx >= $d_xmin and locy <= $d_ymax and locy >= $d_ymin and locz <= $d_zmax and locz >= $d_zmin";
+				$sql = "select * from knightspawnlist where locx <= $d_xmax and locx >= $d_xmin and locy <= $d_ymax and locy >= $d_ymin and locz <= $d_zmax and locz >= $d_zmin";
 				$result = mysql_query($sql,$con);
 				$option_str = "<select onChange=\"document.location=options[selectedIndex].value;\"><option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=0&secmap=$sec_map\">-None</option>";
 				while ($r_array = mysql_fetch_assoc($result))
@@ -1045,7 +779,7 @@ if ($evaluser)
 					$point_dat = $images_dir. "r2.gif";
 					$mob_agro = 1;
 					$mob_name = "Unknown or NPC";
-					$sql = "select aggro, name, level from knightnpc where idTemplate = $mob_id";
+					$sql = "select aggro, name, level from knightnpc where id = $mob_id";
 					$result2 = mysql_query($sql,$con);
 					while ($r_array2 = mysql_fetch_assoc($result2))
 					{
@@ -1074,7 +808,9 @@ if ($evaluser)
 					}
 				}
 				
-				// Pull out the regular bosses
+				// Рейд-боссы: подтверждено по дампу схемы L2JMobius - таблица
+				// raidboss_spawnlist реальная, с теми же колонками, что и в
+				// оригинале (boss_id, loc_x/y/z). Восстановлено без изменений.
 				$sql = "select * from raidboss_spawnlist where loc_x <= $d_xmax and loc_x >= $d_xmin and loc_y <= $d_ymax and loc_y >= $d_ymin and loc_z <= $d_zmax and loc_z >= $d_zmin";
 				$result = mysql_query($sql,$con);
 				while ($r_array = mysql_fetch_assoc($result))
@@ -1085,7 +821,7 @@ if ($evaluser)
 					$point_dat = $images_dir. "r2.gif";
 					$mob_agro = 1;
 					$mob_name = "Unknown or NPC";
-					$sql = "select aggro, name, level from knightnpc where idTemplate = $mob_id";
+					$sql = "select aggro, name, level from knightnpc where id = $mob_id";
 					$result2 = mysql_query($sql,$con);
 					while ($r_array2 = mysql_fetch_assoc($result2))
 					{
@@ -1112,65 +848,11 @@ if ($evaluser)
 						else
 						{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$mob_id&secmap=$sec_map\">$mob_name</option>";	}
 					}
-					// This is where things get mathematically manic. We have to pull out any minions and place them around the boss
-					// We assume the minion is at a radius of 80 in game pixels and we will rotate them at 150 degrees each placement turn...
-					// we are thus losing 60 degrees on each revolution assuring us of at least 9 minion placements before we start to get cramped.
-					// Remembering that at this point, $mob_x abd $mob_y still contain the real-world x/y co-ordinates of the boss.
-					$degrees = 0;
-					$degree_step = 150;
-					$radius = 80;
-					$sql =  "select * from minions where boss_id = $mob_id";
-					$result2 = mysql_query($sql,$con);
-					while ($r_array2 = mysql_fetch_assoc($result2))
-					{
-						$minion_id = $r_array2['minion_id'];
-						$min_min = $r_array2['amount_min'];
-						$min_max = $r_array2['amount_max'] - $min_min;	// This gives us the "range" of mobs to place  eg, (7 - 5 = 2) = 2 - we've got a range of 2 mobs.
-						$min_place = intval($min_max / 2) + $min_min;	// The integer of the result, divided by 2, (2/2 = 1 - integer is thus 1.) - add on the minimum of 5
-																		// and we would thus be placing 6 minions.
-						$point_dat = $images_dir. "r2.gif";			// Assume passive mob in case unknown.
-						$sql = "select aggro, name, level from knightnpc where idTemplate = $minion_id";		// Pull all minions for this boss.
-						$result3 = mysql_query($sql,$con);
-						while ($r_array3 = mysql_fetch_assoc($result3))
-						{
-							$min_agro = $r_array3["aggro"];
-							$min_name = $r_array3["name"];
-							$min_level = $r_array3["level"];
-							if ($min_agro > 0)								// If the mob is agro, change the pointer.
-							{	
-								$point_dat = $images_dir. "overg.gif";	
-								$min_name = $min_name . "*";	
-							}
-							$min_name = $min_name . " (" . $min_level . ")";
-						}
-						if ($action == $minion_id)							// If this is the selected mob, change the pointer to blue cross hairs.
-						{	$point_dat = $images_dir. "target2.gif";	}
-						while ($min_place > 0)
-						{
-							$min_x = $mob_x - ($radius * cos(deg2rad($degrees)));	// Calculate the X Y co-ords based on the radius and degree.
-							$min_y = $mob_y + ($radius * sin(deg2rad($degrees)));							
-							
-							$x_co = intval( difnums($min_x,$d_xmin) / $x_scale);	// Convert the mob co-ords to the map scale.
-							$y_co = intval( difnums($min_y,$d_ymin) / $y_scale);
-							echo "\n<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 7; height: 7\" border=\"0\" title=\"$min_name\">\n";
-							
-							$degrees = $degrees + $degree_step; // Knock on the degree counter.
-							while ($degrees > 359)
-							{	$degrees = $degrees - 360;	}
-							$min_place--;
-						}
-						if (strpos($mob_id_list, "-".$minion_id."-") < 1)	// Check to see if the mob is already in the list of mobs on the map. If not, add it.
-						{
-							$mob_id_list = $mob_id_list . $minion_id . "-";
-							if ($minion_id == $action)							// If this $minion_id is one of the selected mobs ($action) then we need to pre-select it.
-							{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$minion_id&secmap=$sec_map\" selected>$min_name</option>";	}
-							else
-							{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$minion_id&secmap=$sec_map\">$min_name</option>";	}
-						}
-					} // and this is the end of the minion code!
-				} 
-				
-				//Pull out the grand bosses
+					// Размещение миньонов вокруг босса отключено - таблица minions
+					// подтверждённо не существует в L2JMobius, данных неоткуда взять.
+				}
+
+				// Грандовые боссы: тоже подтверждено по дампу схемы, реальная таблица.
 				$sql = "select * from grandboss_data where loc_x <= $d_xmax and loc_x >= $d_xmin and loc_y <= $d_ymax and loc_y >= $d_ymin and loc_z <= $d_zmax and loc_z >= $d_zmin";
 				$result = mysql_query($sql,$con);
 				while ($r_array = mysql_fetch_assoc($result))
@@ -1181,7 +863,7 @@ if ($evaluser)
 					$point_dat = $images_dir. "r2.gif";
 					$mob_agro = 1;
 					$mob_name = "Unknown or NPC";
-					$sql = "select aggro, name, level from knightnpc where idTemplate = $mob_id";
+					$sql = "select aggro, name, level from knightnpc where id = $mob_id";
 					$result2 = mysql_query($sql,$con);
 					while ($r_array2 = mysql_fetch_assoc($result2))
 					{
@@ -1208,63 +890,10 @@ if ($evaluser)
 						else
 						{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$mob_id&secmap=$sec_map\">$mob_name</option>";	}
 					}
-					// This is where things get mathematically manic. We have to pull out any minions and place them around the boss
-					// We assume the minion is at a radius of 80 in game pixels and we will rotate them at 150 degrees each placement turn...
-					// we are thus losing 60 degrees on each revolution assuring us of at least 9 minion placements before we start to get cramped.
-					// Remembering that at this point, $mob_x abd $mob_y still contain the real-world x/y co-ordinates of the boss.
-					$degrees = 0;
-					$degree_step = 150;
-					$radius = 80;
-					$sql =  "select * from minions where boss_id = $mob_id";
-					$result2 = mysql_query($sql,$con);
-					while ($r_array2 = mysql_fetch_assoc($result2))
-					{
-						$minion_id = $r_array2['minion_id'];
-						$min_min = $r_array2['amount_min'];
-						$min_max = $r_array2['amount_max'] - $min_min;	// This gives us the "range" of mobs to place  eg, (7 - 5 = 2) = 2 - we've got a range of 2 mobs.
-						$min_place = intval($min_max / 2) + $min_min;	// The integer of the result, divided by 2, (2/2 = 1 - integer is thus 1.) - add on the minimum of 5
-																		// and we would thus be placing 6 minions.
-						$point_dat = $images_dir. "r2.gif";			// Assume passive mob in case unknown.
-						$sql = "select aggro, name, level from knightnpc where idTemplate = $minion_id";		// Pull all minions for this boss.
-						$result3 = mysql_query($sql,$con);
-						while ($r_array3 = mysql_fetch_assoc($result3))
-						{
-							$min_agro = $r_array3["aggro"];
-							$min_name = $r_array3["name"];
-							$min_level = $r_array3["level"];
-							if ($min_agro > 0)								// If the mob is agro, change the pointer.
-							{	
-								$point_dat = $images_dir. "overg.gif";	
-								$min_name = $min_name . "*";
-							}
-							$min_name = $min_name . " (" . $min_level . ")";
-						}
-						if ($action == $minion_id)							// If this is the selected mob, change the pointer to blue cross hairs.
-						{	$point_dat = $images_dir. "target2.gif";	}
-						while ($min_place > 0)
-						{
-							$min_x = $mob_x - ($radius * cos(deg2rad($degrees)));	// Calculate the X Y co-ords based on the radius and degree.
-							$min_y = $mob_y + ($radius * sin(deg2rad($degrees)));							
-							
-							$x_co = intval( difnums($min_x,$d_xmin) / $x_scale);	// Convert the mob co-ords to the map scale.
-							$y_co = intval( difnums($min_y,$d_ymin) / $y_scale);
-							echo "<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 7; height: 7\" border=\"0\" title=\"$min_name\">\n";
-							
-							$degrees = $degrees + $degree_step; // Knock on the degree counter.
-							while ($degrees > 359)
-							{	$degrees = $degrees - 360;	}
-							$min_place--;
-						}
-						if (strpos($mob_id_list, "-".$minion_id."-") < 1)	// Check to see if the mob is already in the list of mobs on the map. If not, add it.
-						{
-							$mob_id_list = $mob_id_list . $minion_id . "-";
-							if ($minion_id == $action)							// If this $minion_id is one of the selected mobs ($action) then we need to pre-select it.
-							{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$minion_id&secmap=$sec_map\" selected>$min_name</option>";	}
-							else
-							{	$option_str = $option_str . "<option value=\"m-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$item_id&maps=$c_var&detshow=$monsdetshow&detreq=maps&action=$minion_id&secmap=$sec_map\">$min_name</option>";	}
-						}
-					} // and this is the end of the minion code!
-				} 
+					// Размещение миньонов вокруг гранд-босса отключено - таблица
+					// minions подтверждённо не существует, данных неоткуда взять.
+				}
+
 				echo "</div></td></tr></table></div></td></tr></table></center>\n";
 				$option_str = $option_str . "</select>";
 				echo "<center><h2>Mob Highlight - $option_str</h2></center>";
@@ -1281,25 +910,25 @@ if ($evaluser)
 				elseif ($num_in == "0")
 				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where name like '%$itemname%' order by $monstersort";  }
 				elseif ($monsdetreq == "0-10")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 11 order by $monstersort";  }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 11 order by $monstersort";  }
 				elseif ($monsdetreq == "11-20")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 21 and level > 10 order by $monstersort";  }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 21 and level > 10 order by $monstersort";  }
 				elseif ($monsdetreq == "21-30")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 31 and level > 20 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 31 and level > 20 order by $monstersort"; }
 				elseif ($monsdetreq == "31-40")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 41 and level > 30 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 41 and level > 30 order by $monstersort"; }
 				elseif ($monsdetreq == "41-50")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 51 and level > 40 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 51 and level > 40 order by $monstersort"; }
 				elseif ($monsdetreq == "51-60")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 61 and level > 50 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 61 and level > 50 order by $monstersort"; }
 				elseif ($monsdetreq == "61-70")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 71 and level > 60 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 71 and level > 60 order by $monstersort"; }
 				elseif ($monsdetreq == "71-80")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 81 and level > 70 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 81 and level > 70 order by $monstersort"; }
 				elseif ($monsdetreq == "81-90")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 91 and level > 80 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 91 and level > 80 order by $monstersort"; }
 				elseif ($monsdetreq == "91over")
-				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level > 90 order by $monstersort"; }
+				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level > 90 order by $monstersort"; }
 				else
 				{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where type = '$monsdetreq' order by $monstersort";	}
 	
@@ -1376,7 +1005,7 @@ if ($evaluser)
 						// For non admin users, show mobs who have got spawn points.
 						if ($user_access_lvl < $sec_inc_gmlevel)
 						{
-							if (($mob_spawn > 0) || ($mob_type == 'L2RaidBoss') || ($mob_type == 'L2Boss') || ($mob_type == 'L2Minion'))
+							if (($mob_spawn > 0) || ($mob_type == 'RaidBoss') || ($mob_type == 'L2Boss') || ($mob_type == 'Minion'))
 							{
 								echo "<tr>";
 								if ($user_access_lvl >= $sec_inc_gmlevel)

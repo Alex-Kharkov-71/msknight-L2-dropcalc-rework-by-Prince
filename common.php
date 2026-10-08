@@ -465,260 +465,148 @@ function comaise($price)
 
 function mobcount($mob_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb)
 {
-	// Connect to DB
+	global $map_array, $map_locs, $map_zones;
+	// PHP8 fix: если у моба вообще нет точек спавна, эти массивы должны
+	// остаться пустыми, а не null - иначе count(null) в map()/map_2()
+	// фатально падает (TypeError). Такое вполне реально (квестовые мобы,
+	// GM-спавн и т.п.), не только артефакт неполных тестовых данных.
+	if (!isset($map_array)) { $map_array = array(); }
+	if (!isset($map_locs)) { $map_locs = array(); }
+	if (!isset($map_zones)) { $map_zones = array(); }
+
+	// PHP8/L2JMobius fix: spawnlist/custom_spawnlist - таблицы живого сервера,
+	// которых в L2JMobius больше нет (статика только в XML) - заменены на
+	// knightspawnlist/knightspawnzone (importspawns.php).
+	//
+	// raidboss_spawnlist/grandboss_data/random_spawn/random_spawn_loc - ПРОВЕРЕНО
+	// по реальному дампу схемы L2JMobius: эти таблицы всё ещё существуют и с
+	// теми же колонками, что ожидал оригинальный код (это живое состояние -
+	// текущая позиция и респаун конкретного босса, не статика из датапака),
+	// поэтому читаются как и раньше, без изменений схемы.
+	//
+	// Что осознанно потеряно при миграции (честно, без умолчания):
+	// - day/night спавн (periodOfDay) - в новом формате датапака такого
+	//   атрибута нет, всё считается "обычным" (always) спавном;
+	// - таблица minions (группировка "минион при боссе") - подтверждено,
+	//   что в L2JMobius её больше нет, источника данных нет.
+
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	if (!$con)
 	{
 		echo "Could Not Connect";
 		die('Could not connect: ' . mysql_error());
-	}		
+	}
 	if (!mysql_select_db("$db_l2jdb",$con))
 	{	die('Could not change to $db_l2jdb database: ' . mysql_error());	}
 
-	if (!$result2 = mysql_query("show fields from spawnlist",$con))						// Determine if the day/night ability is in the database
-	{	die('Could not retrieve fields from spawnlist database: ' . mysql_error());	}
-	$res = mysql_fetch_array($result2);
-	$daynight = 0;
-	while ($r_array = mysql_fetch_assoc($result2)) 
-	{
-		if (strcasecmp($r_array['Field'], "periodofday") == 0)
-		{ $daynight = 1; }
-	}
-	// Select all occurances of the mob from the standard spawnlist.
-	if ($daynight)
-	{	$sql = "select locx, locy, locz, loc_id, `count`, periodOfDay from spawnlist where npc_templateid = '$mob_id' union select locx, locy, locz, loc_id, `count`, periodOfDay from custom_spawnlist where npc_templateid = '$mob_id'";	}
-	else
-	{	$sql = "select locx, locy, locz, loc_id, `count` from spawnlist where npc_templateid = '$mob_id' union select locx, locy, locz, loc_id, `count` from custom_spawnlist where npc_templateid = '$mob_id'";	}
-	$result2 = mysql_query($sql,$con);
-	$count_r2 = mysql_num_rows($result2);
-	$err_str = mysql_num_rows($result2);
-	$mob_spawnnum=0;
-	$mob_count=0;
+	$mob_spawnnum = 0;
+	$mob_count = 0;
 	$mob_days = 0;
 	$mob_dayt = 0;
 	$mob_nights = 0;
 	$mob_nightt = 0;
 	$mob_normals = 0;
 	$mob_normalt = 0;
-	while ($r_array = mysql_fetch_assoc($result2)) 
-	{
 
-		if (($r_array['locx'] <> 0) || ($r_array['locy'] <> 0) || ($r_array['locz'] <> 0))
-		{
-			$mob_spawnnum++;		// Add the number of total spawns, and add to the number of day, night or always spawns.
-			$mob_count++;
-			$map_loc = 2;
-			if ($daynight)
-			{	$periodofday = $r_array['periodOfDay'];	}
-			else
-			{	$periodofday = 0;	}
-			if ( $periodofday == 1 )
-			{
-				$mob_days++;
-				$mob_dayt++;
-				$map_loc = 0;
-			}
-			elseif ( $periodofday == 2 )
-			{
-				$mob_nights++;
-				$mob_nightt++;
-				$map_loc = 1;
-			}
-			else
-			{
-				$mob_normals++;
-				$mob_normalt++;
-			}
-			if (!$map_array)		// Add the spawn location to the map.
-			{
-				$map_array = array(array(($r_array['locx']), ($r_array['locy']), $map_loc));
-				$map_locs = array(array(($r_array['locx']), ($r_array['locy']), ($r_array['locz'])));
-			}
-			else
-			{
-				array_push($map_array, array($r_array['locx'], $r_array['locy'], $map_loc));
-				array_push($map_locs, array($r_array['locx'], $r_array['locy'], $r_array['locz']));
-			}
-		}						
-		else		// If we are dealing with x=0, y0 and z=0 then we've got a multiple spawn entry to deal with.
-		{
-			$mob_spawnnum = $mob_spawnnum + $r_array['count'];		// Add the total number of spawned occurances to the totals
-			if ($daynight)
-			{	$periodofday = $r_array['periodOfDay'];	}
-			else
-			{	$periodofday = 0;	}
-			if ( $periodofday == 1 )
-			{
-				$mob_days = $mob_days + $r_array['count'];
-			}
-			elseif ( $periodofday == 2 )
-			{
-				$mob_nights = $mob_nights + $r_array['count'];
-			}
-			else
-			{
-				$mob_normals = $mob_normals + $r_array['count'];
-			}
-			$location_id = $r_array['loc_id'];
-			$result3 = mysql_query("select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id",$con);
-			while ($r_array = mysql_fetch_assoc($result3)) // Now we have to go through all the possible locations and add them to 
-			{													//	the map.
-				$locat_x = $r_array['loc_x'];
-				$locat_y = $r_array['loc_y'];
-				$locat_z = $r_array['loc_zmin'];
-				$map_loc = 2;
-				
-				if (($locat_x <> 0) || ($locat_y <> 0) || ($locat_z <> 0))
-				{
-					
-					if ( $periodofday == 1 )
-					{
-						$mob_dayt++;
-						$map_loc = 0;
-					}
-					elseif ( $periodofday == 2 )
-					{
-						$mob_nightt++;
-						$map_loc = 1;
-					}
-					else
-					{
-						$mob_normalt++;
-					}
-					$mob_count++;
-					if (!$map_array)		// Add the spawn location to the map.
-					{
-						$map_array = array(array($locat_x, $locat_y, $map_loc));
-						$map_locs = array(array($locat_x, $locat_y, $locat_z));
-					}
-					else
-					{
-						array_push($map_array, array($locat_x, $locat_y, $map_loc));
-						array_push($map_locs, array($locat_x, $locat_y, $locat_z));
-					}
-				}
-			}
-		}
-	}
-
-	// Check to see if the mob is a raidboss.
-	$result2 = mysql_query("select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $mob_id",$con);
-	while ($r_array = mysql_fetch_assoc($result2)) 		// Add any occurances of the raidboss to the totals and add the points to the map.
-	{
-		if (($r_array['loc_x'] <> 0) || ($r_array['loc_y'] <> 0) || ($r_array['loc_z'] <> 0))
-		{
-			$mob_spawnnum++;
-			$mob_count++;
-			$mob_normals++;
-			$mob_normalt++;
-			$locat_x = $r_array['loc_x'];
-			$locat_y = $r_array['loc_y'];
-			$locat_z = $r_array['loc_z'];
-			if (!$map_array)
-			{	
-				$map_array = array(array($locat_x, $locat_y, 0));	
-				$map_locs = array(array($locat_x, $locat_y, $locat_z));	
-			}
-			else
-			{	
-				array_push($map_array, array($locat_x, $locat_y, 0));	
-				array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
-			}
-		}
-	}
-
-	// Check to see if the mob ID is spawned as a minion.
-	$result2 = mysql_query("select boss_id, amount_min, amount_max from minions where minion_id = $mob_id",$con);
+	$sql = "select locx, locy, locz, loc_id, `count` from knightspawnlist where npc_templateid = '$mob_id'";
+	$result2 = mysql_query($sql,$con);
 	while ($r_array = mysql_fetch_assoc($result2))
 	{
-		$boss_id = $r_array['boss_id']; 			// Add any occurances of the minions to the totals and add the points to the map.
-		$minion_spawns = $r_array['amount_max'];
-		$minion_spawn_min = $r_array['amount_min'];
-		$result3 = mysql_query("select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $boss_id",$con);
-		while ($r_array = mysql_fetch_assoc($result3))		// ... but only add them if the actual raidboss is spawned.
+		$cnt = (int) $r_array['count'];
+		if ($cnt < 1) { $cnt = 1; }
+		$mob_spawnnum++;
+		$mob_count += $cnt;
+		$mob_normals++;
+		$mob_normalt += $cnt;
+
+		if (!$map_array)
 		{
-			if (($r_array['loc_x'] <> 0) || ($r_array['loc_y'] <> 0) || ($r_array['loc_z'] <> 0))
-			{
-				$mob_spawnnum += $minion_spawns;
-				$mob_count += $minion_spawn_min;
-				$mob_normals += $minion_spawn_min;
-				$mob_normalt += $minion_spawns;
-				$locat_x = $r_array['loc_x'];
-				$locat_y = $r_array['loc_y'];
-				$locat_z = $r_array['loc_z'];
-				if (!$map_array)
-				{	
-					$map_array = array(array($locat_x, $locat_y, 0));	
-					$map_locs = array(array($locat_x, $locat_y, $locat_z));	
-				}
-				else
-				{	
-					array_push($map_array, array($locat_x, $locat_y, 0));	
-					array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
-				}
-			}
+			$map_array = array(array($r_array['locx'], $r_array['locy'], 2));
+			$map_locs = array(array($r_array['locx'], $r_array['locy'], $r_array['locz']));
 		}
-		$result3 = mysql_query("select locx, locy, locz from spawnlist where npc_templateid = $boss_id union select locx, locy, locz from custom_spawnlist where npc_templateid = $boss_id",$con);
-		while ($r_array = mysql_fetch_assoc($result3))		// ... or if the raidboss has been spawned using the standard spawnlist.
+		else
 		{
-			if (($r_array['locx'] <> 0) || ($r_array['locy'] <> 0) || ($r_array['locz'] <> 0))
+			array_push($map_array, array($r_array['locx'], $r_array['locy'], 2));
+			array_push($map_locs, array($r_array['locx'], $r_array['locy'], $r_array['locz']));
+		}
+
+		// Полигон зоны - для показа на полной карте контуром вместо точки.
+		if (!empty($r_array['loc_id']))
+		{
+			$resz = mysql_query("select points from knightspawnzone where zone = '" . mysql_real_escape_string($r_array['loc_id'],$con) . "'", $con);
+			if ($rowz = mysql_fetch_assoc($resz))
 			{
-				$mob_spawnnum += $minion_spawns;
-				$mob_count += $minion_spawn_min;
-				$mob_normals += $minion_spawn_min;
-				$mob_normalt += $minion_spawns;
-				$locat_x = $r_array['locx'];
-				$locat_y = $r_array['locy'];
-				$locat_z = $r_array['loc_z'];
-				if (!$map_array)
-				{	
-					$map_array = array(array($locat_x, $locat_y, 0));	
-					$map_locs = array(array($locat_x, $locat_y, $locat_z));	
+				$nodePairs = explode(';', $rowz['points']);
+				$poly = array();
+				foreach ($nodePairs as $pair)
+				{
+					$xy = explode(',', $pair);
+					if (count($xy) == 2)
+					{	$poly[] = array((int) $xy[0], (int) $xy[1]);	}
 				}
-				else
-				{	
-					array_push($map_array, array($locat_x, $locat_y, 0));	
-					array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
+				if (count($poly) >= 3)
+				{
+					if (!$map_zones) { $map_zones = array(); }
+					array_push($map_zones, array('points' => $poly, 'color' => '#ffcc00'));
 				}
 			}
 		}
 	}
 
-	$result3 = mysql_query("select groupId from random_spawn where npcId = $mob_id",$con);
-	while ($r_array = mysql_fetch_assoc($result3))		
+	// Рейд-боссы: живая таблица, реальная текущая точка спавна (точнее, чем
+	// зона из датапака). amount почти всегда 1 для рейд-боссов.
+	$sql = "select loc_x, loc_y, loc_z, amount from raidboss_spawnlist where boss_id = '$mob_id'";
+	$result3 = mysql_query($sql,$con);
+	while ($r_array = mysql_fetch_assoc($result3))
 	{
-		$mob_group = $r_array['groupId'];
-		$count = 0;
-		$result4 = mysql_query("select x, y, z from random_spawn_loc where groupId = $mob_group",$con);
-		while ($r_array = mysql_fetch_assoc($result4))		
+		$cnt = (int) $r_array['amount'];
+		if ($cnt < 1) { $cnt = 1; }
+		$mob_spawnnum++;
+		$mob_count += $cnt;
+		$mob_normals++;
+		$mob_normalt += $cnt;
+		array_push($map_array, array($r_array['loc_x'], $r_array['loc_y'], 2));
+		array_push($map_locs, array($r_array['loc_x'], $r_array['loc_y'], $r_array['loc_z']));
+	}
+
+	// Грандовые боссы: тоже живая таблица, один конкретный босс = одна точка.
+	$sql = "select loc_x, loc_y, loc_z from grandboss_data where boss_id = '$mob_id'";
+	$result4 = mysql_query($sql,$con);
+	while ($r_array = mysql_fetch_assoc($result4))
+	{
+		$mob_spawnnum++;
+		$mob_count += 1;
+		$mob_normals++;
+		$mob_normalt += 1;
+		array_push($map_array, array($r_array['loc_x'], $r_array['loc_y'], 2));
+		array_push($map_locs, array($r_array['loc_x'], $r_array['loc_y'], $r_array['loc_z']));
+	}
+
+	// Случайные пулы спавна: npcId -> groupId -> список возможных точек.
+	// Бот спавнится в ОДНОЙ из точек группы, не во всех сразу - но для карты
+	// показываем все возможные точки (как и было в оригинале).
+	$sql = "select groupId, count from random_spawn where npcId = '$mob_id'";
+	$result5 = mysql_query($sql,$con);
+	while ($rs_array = mysql_fetch_assoc($result5))
+	{
+		$cnt = (int) $rs_array['count'];
+		if ($cnt < 1) { $cnt = 1; }
+		$sql2 = "select x, y, z from random_spawn_loc where groupId = '" . (int) $rs_array['groupId'] . "'";
+		$result6 = mysql_query($sql2,$con);
+		while ($rl_array = mysql_fetch_assoc($result6))
 		{
-			if (!$map_array)
-			{	
-				$map_array = array(array($r_array['x'], $r_array['y'], 0));	
-				$map_locs = array(array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			else
-			{
-				array_push($map_array, array($r_array['x'], $r_array['y'], 0));	
-				array_push($map_locs, array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			if ($count == 0)
-			{	
-				$mob_normals++;	
-				$mob_spawnnum++;	
-			}
-			$mob_normalt++;
-			$mob_count++;
-			$count = 1;
+			$mob_spawnnum++;
+			$mob_count += $cnt;
+			$mob_normals++;
+			$mob_normalt += $cnt;
+			array_push($map_array, array($rl_array['x'], $rl_array['y'], 2));
+			array_push($map_locs, array($rl_array['x'], $rl_array['y'], $rl_array['z']));
 		}
 	}
+
 	$mob_spawn = array($mob_count, $mob_spawnnum, $mob_days, $mob_dayt, $mob_nights, $mob_nightt, $mob_normals, $mob_normalt, $map_locs);
 	return $mob_spawn;
 }
-
-
-// works out the difference between two numbers, regardless of whether one, other or both, are negative.
-// used in the map calculations.
 
 function difnums($small, $big)
 {

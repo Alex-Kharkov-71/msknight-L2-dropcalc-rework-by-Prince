@@ -69,17 +69,10 @@ if ($evaluser)
 		$row = mysql_fetch_array($result);
 		if (!$row)
 		{
-			$sql = "select description, loc_x, loc_y from teleport where description = '$town_id' order by description";
-			if (!$result = mysql_query($sql,$con))
-			{
-				die('Could not retrieve from knightdrop database: ' . mysql_error());
-			}
-			$row = mysql_fetch_array($result);
-			if (!$row)
-			{
-				writeerror("Location data not found!");
-				return 0;
-			}
+			// PHP8/L2JMobius fix: таблицы teleport в L2JMobius больше нет,
+			// замены не нашлось - knightloc остаётся единственным источником.
+			writeerror("Location data not found!");
+			return 0;
 		}
 		echo "<p class=\"dropmain\">&nbsp;</p></p><h2 class=\"dropmain\">$row[0]</h2><center><table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 
@@ -148,17 +141,10 @@ if ($evaluser)
 				$i++;
 			}
 		}
-		// Query for location in the teleporter database
-		if (strlen($itemname) < 0)
-		{	$sql = "select description, loc_x, loc_y from teleport order by description";	}
-		else
-		{	$sql = "select description, loc_x, loc_y from teleport where description like '%$itemname%' order by description";	}
-		if (!$result = mysql_query($sql,$con))
-			{
-			die('Could not retrieve from knightdrop database: ' . mysql_error());
-			}
-		// If return array empty, then no location found.
-		$num = mysql_num_rows($result);
+		// PHP8/L2JMobius fix: таблицы teleport в L2JMobius больше нет, замены
+		// не нашлось - этот дополнительный источник локаций отключён, knightloc
+		// по-прежнему работает как основной (блок выше).
+		$num = 0;
 		if ($num > 0)
 		{
 			if ($found == 0)

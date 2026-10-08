@@ -68,7 +68,7 @@ if ($evaluser)
 			die('Could not change to L2J database: ' . mysql_error());
 		}
 		// Query for user name
-		$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, sex, pdef, mdef, rhand, lhand, walkspd, runspd, atkspd, patk, matk, matkspd from knightnpc where id = '$monsterid'";
+		$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, sex, pdef, mdef, rhand, lhand, walkspd, runspd, atkspd, patk, matk, matkspd, isundead from knightnpc where id = '$monsterid'";
 		if (!$result = mysql_query($sql,$con))
 		{
 			die('Could not retrieve from knightdrop database: ' . mysql_error());
@@ -81,228 +81,44 @@ if ($evaluser)
 				return 0;
 		}
 
-		// Check if the underground tab is enabled in the spawnlist table.  If it is, then we can use this to calculate underground abiliites.
-		$sql = "show fields from spawnlist";
-		if (!$result2 = mysql_query($sql,$con))
-			{
-			die('Could not retrieve from knightdrop database: ' . mysql_error());
-			}
-		$count_r = mysql_num_rows($result2);
-		$res = mysql_fetch_array($result2);
-		$i2=0;
-		$underground = 0;
-		while ($i2 < $count_r) 
-		{
-			$i_id = mysql_result($result2,$i2,"field");
-			if ($i_id == "ugnd")
-			{ $underground = 1; }
-			$i2++;
-		}
-
 		// Retrieve detailed mob informtion and put in variables.
-		$mob_id = mysql_result($result,$i,"id");
-		$mob_name = mysql_result($result,$i,"name");
-		$mob_type = mysql_result($result,$i,"type");
-		$mob_level = mysql_result($result,$i,"level");
-		$mob_hp = mysql_result($result,$i,"hp");
-		$mob_mp = mysql_result($result,$i,"mp");
-		$mob_exp = mysql_result($result,$i,"exp");
-		$mob_sp = mysql_result($result,$i,"sp");
-		$mob_atkrange = mysql_result($result,$i,"attackrange");
-		$mob_aggro = mysql_result($result,$i,"aggro");
-		$sql = "select id from spawnlist where npc_templateid = $mob_id";
-		$result2 = mysql_query($sql,$con);
-		$mob_spawn = mysql_num_rows($result2);
-		$mob_sex = mysql_result($result,$i,"sex");
-		$mob_patk = mysql_result($result,$i,"patk");
-		$mob_matk = mysql_result($result,$i,"matk");
-		$mob_pdef = mysql_result($result,$i,"pdef");
-		$mob_mdef = mysql_result($result,$i,"mdef");
-		$mob_walk = mysql_result($result,$i,"walkspd");
-		$mob_run = mysql_result($result,$i,"runspd");
-		$mob_patks = mysql_result($result,$i,"atkspd");
-		$mob_matks = mysql_result($result,$i,"matkspd");
-		$mob_left = mysql_result($result,$i,"lhand");
-		$mob_right = mysql_result($result,$i,"rhand");
+		$mob_id = mysql_result($result,0,"id");
+		$mob_name = mysql_result($result,0,"name");
+		$mob_type = mysql_result($result,0,"type");
+		$mob_level = mysql_result($result,0,"level");
+		$mob_hp = mysql_result($result,0,"hp");
+		$mob_mp = mysql_result($result,0,"mp");
+		$mob_exp = mysql_result($result,0,"exp");
+		$mob_sp = mysql_result($result,0,"sp");
+		$mob_atkrange = mysql_result($result,0,"attackrange");
+		$mob_aggro = mysql_result($result,0,"aggro");
+		$mob_sex = mysql_result($result,0,"sex");
+		$mob_patk = mysql_result($result,0,"patk");
+		$mob_matk = mysql_result($result,0,"matk");
+		$mob_pdef = mysql_result($result,0,"pdef");
+		$mob_mdef = mysql_result($result,0,"mdef");
+		$mob_walk = mysql_result($result,0,"walkspd");
+		$mob_run = mysql_result($result,0,"runspd");
+		$mob_patks = mysql_result($result,0,"atkspd");
+		$mob_matks = mysql_result($result,0,"matkspd");
+		$mob_left = mysql_result($result,0,"lhand");
+		$mob_right = mysql_result($result,0,"rhand");
+		$mob_undead = mysql_result($result,0,"isundead");
 
-		
-		// Look up the name of what is in the Mob's left hand
-		if (!$mob_left)
-		{ $mob_lefth = "Nothing"; }
-		else
-		{
-			$error_finding = 0;
-			$sql = "select name from armor where item_id = $mob_left";  // Try armour database
-			$result3 = mysql_query($sql,$con);
-			if (!mysql_fetch_array($result3))
-			{
-				$sql = "select name from weapon where item_id = $mob_left"; // Try weapons database
-				$result3 = mysql_query($sql,$con);
-				if (!mysql_fetch_array($result3))
-				{
-					$sql = "select name from etcitem where item_id = $mob_left"; // Try etc_items database
-					$result3 = mysql_query($sql,$con);
-					if (!mysql_fetch_array($result3))
-					{
-						$error_finding = 1;
-					}
-				}
-			}
-			if ($error_finding)
-			{ $mob_lefth = "Unknown"; }
-			else
-			{ $mob_lefth = mysql_result($result3,0,"name"); }
-		}
-		
-		// Lok up the name of what is in the mobs right hand.
-		if (!$mob_right)
-		{ $mob_righth = "Nothing"; }
-		else
-		{
-			$error_finding = 0;
-			$sql = "select name from armor where item_id = $mob_right";  // Try armour database
-			$result3 = mysql_query($sql,$con);
-			if (!mysql_fetch_array($result3))
-			{
-				$sql = "select name from weapon where item_id = $mob_right"; // Try weapons database
-				$result3 = mysql_query($sql,$con);
-				if (!mysql_fetch_array($result3))
-				{
-					$sql = "select name from etcitem where item_id = $mob_right"; // Try etc_items database
-					$result3 = mysql_query($sql,$con);
-					if (!mysql_fetch_array($result3))
-					{
-						$error_finding = 1;
-					}
-				}
-			}
-			if ($error_finding)
-			{ $mob_righth = "Unknown"; }
-			else
-			{ $mob_righth = mysql_result($result3,0,"name"); }
-		}
+		// PHP8/L2JMobius fix: spawnlist/locations больше не существуют на сервере,
+		// вся логика теперь в общей функции mobcount() (common.php), которая
+		// читает knightspawnlist/knightspawnzone. Day/night в новых данных нет -
+		// всё считается обычным спавном, см. комментарий в mobcount().
+		$mob_spwn = mobcount($mob_id,$db_location,$db_user,$db_psswd,$db_l2jdb,$dblog_location,$dblog_user,$dblog_psswd,$dblog_l2jdb);
+		$mob_count = $mob_spwn[0];
+		$mob_spawnnum = $mob_spwn[1];
+		$mob_days = $mob_spwn[2];
+		$mob_dayt = $mob_spwn[3];
+		$mob_nights = $mob_spwn[4];
+		$mob_nightt = $mob_spwn[5];
+		$mob_normals = $mob_spwn[6];
+		$mob_normalt = $mob_spwn[7];
 
-		//Search through the spawnlog and locations database to find all the spawn points for the mob and put them in the map database.
-		$mob_spawnnum = 0;
-		$mob_days = 0;
-		$mob_dayt = 0;
-		$mob_nights = 0;
-		$mob_nightt = 0;
-		$mob_normals = 0;
-		$mob_normalt = 0;
-		if ($underground)
-		{	$sql = "select locx, locy, locz, loc_id, count, ugnd, periodOfDay from spawnlist where npc_templateid = $mob_id";	}
-		else
-		{	$sql = "select locx, locy, locz, loc_id, count, periodOfDay from spawnlist where npc_templateid = $mob_id";	}
-		$result2 = mysql_query($sql,$con);
-		$count_r2 = mysql_num_rows($result2);
-		if (mysql_fetch_array($result2))
-		{
-			$i2=0;
-			$mob_count = 0;
-			while ($i2 < $count_r2) 
-			{
-				$map_tag = 2;
-				if ($underground)   // If dealing with an underground capable database, then adjust the map icons accordingly.
-				{
-					if (mysql_result($result2,$i2,"ugnd") == 2)
-					{ $map_tag = 0; }
-					if (mysql_result($result2,$i2,"ugnd") == 1)
-					{ $map_tag = 1; }
-				}
-				if ((mysql_result($result2,$i2,"locx") <> 0) || (mysql_result($result2,$i2,"locy") <> 0) || (mysql_result($result2,$i2,"locz") <> 0))
-				{
-					$mob_spawnnum++;
-					$mob_count++;
-					if ( mysql_result($result2,$i2,"periodOfDay") == 1 )
-					{
-						$mob_days++;
-						$mob_dayt++;
-						$map_tag = 0;
-					}
-					elseif ( mysql_result($result2,$i2,"periodOfDay") == 2 )
-					{
-						$mob_nights++;
-						$mob_nightt++;
-						$map_tag = 1;
-					}
-					else
-					{
-						$mob_normals++;
-						$mob_normalt++;
-						$map_tag = 2;
-					}
-					if (!$map_array)
-					{
-						$map_array = array(array((mysql_result($result2,$i2,"locx")), (mysql_result($result2,$i2,"locy")), $map_tag));
-					}
-					else
-					{
-						array_push($map_array, array((mysql_result($result2,$i2,"locx")), (mysql_result($result2,$i2,"locy")), $map_tag));
-					}
-				}						
-				else
-				{
-					$mob_count = $mob_count + mysql_result($result2,$i2,"count");
-					if ( mysql_result($result2,$i2,"periodOfDay") == 1 )
-					{
-						$mob_days++;
-					}
-					elseif ( mysql_result($result2,$i2,"periodOfDay") == 2 )
-					{
-						$mob_nights++;
-					}
-					else
-					{
-						$mob_normals++;
-					}
-					$location_id = mysql_result($result2,$i2,"loc_id");
-					$sql = "select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id";
-					$result3 = mysql_query($sql,$con);
-					$count_r3 = mysql_num_rows($result3);
-					if (mysql_fetch_array($result3))
-					{	
-						$i3=0;
-						while ($i3 < $count_r3)
-						{
-							$locat_x = mysql_result($result3,$i3,"loc_x");
-							$locat_y = mysql_result($result3,$i3,"loc_y");
-							$locat_z = mysql_result($result3,$i3,"loc_zmin");
-							if ( mysql_result($result2,$i2,"periodOfDay") == 1 )
-							{
-								$mob_dayt++;
-								$map_tag = 0;
-							}
-							elseif ( mysql_result($result2,$i2,"periodOfDay") == 2 )
-							{
-								$mob_nightt++;
-								$map_tag = 1;
-							}
-							else
-							{
-								$mob_normalt++;
-								$map_tag = 2;
-							}
-							if (($locat_x <> 0) || ($locat_y <> 0) || ($locat_z <> 0))
-							{
-								$mob_spawnnum++;
-								if (!$map_array)
-								{
-									$map_array = array(array($locat_x, $locat_y, $map_tag));
-								}
-								else
-								{
-									array_push($map_array, array($locat_x, $locat_y, $map_tag));
-								}
-							}
-							$i3++;
-						}
-					}
-				}
-				$i2++;
-			}
-		}
-	
 		// Display detailed information about the mob.
 		echo "<p class=\"dropmain\">&nbsp;</p>";
 		echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\">";
@@ -320,7 +136,9 @@ if ($evaluser)
 		if ($user_map_access)
 			{
 				echo "<p class=\"dropmain\">&nbsp;<p class=\"dropmain\"><center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
-				map_2($map_array, $images_dir);
+				// PHP8 fix: не хватало 3-го аргумента (map_num) - ArgumentCountError.
+				map_2($map_array, $images_dir, 1);
+				map_2($map_array, $images_dir, 2);
 				echo "</td></tr></table>";
 				if ($user_access_lvl >= $sec_inc_gmlevel)
 				{ echo "<p class=\"dropmain\"><br>Mob ID - $mob_id</p>"; }
@@ -381,17 +199,9 @@ if ($evaluser)
 		
 		
 		// Now go through all the items that the mob drops or spwans and add them to an array.
-		$drop_engine = 0;
-		$sql = "show fields from droplist";
-		$result2 = mysql_query($sql,$con);
-		while ($r_array = mysql_fetch_assoc($result2)) 
-		{
-			if (strcasecmp($r_array['Field'], "category") == 0)
-			{ $drop_engine = 1; }
-		}
-		$sql = "select itemid, min, max, sweep, chance from droplist where mobId = $mob_id";
-		if ($drop_engine)
-		{	$sql = "select itemid, min, max, category, chance from droplist where mobId = $mob_id";	}
+		// PHP8/L2JMobius fix: таблица droplist сервера больше не существует,
+		// читаем из knightdroplist (заполняется importnpc.php из XML).
+		$sql = "select itemid, min, max, chance, group_chance, sweep from knightdroplist where mobid = $mob_id";
 		$result2 = mysql_query($sql,$con);
 		$count_r = mysql_num_rows($result2);
 		
@@ -401,32 +211,26 @@ if ($evaluser)
 			$i=0;
 			while ($i < $count_r) 
 			{
-				$i_array = mysql_fetch_row($result2);
-				$item_id = mysql_result($result2,$i,"itemId");
-				if ($drop_engine)
-				{
-					$item_category = mysql_result($result2,$i,"category");
-					if ($item_category < 0)
-					{	$item_sweep = 1;	}
-					else
-					{	$item_sweep = 0;	}
-				}
-				else
-				{
-					$item_sweep = mysql_result($result2,$i,"sweep");
-				}
+				$item_id = mysql_result($result2,$i,"itemid");
+				$item_sweep = mysql_result($result2,$i,"sweep");
+				$item_group_chance = mysql_result($result2,$i,"group_chance");
 				$item_chance = mysql_result($result2,$i,"chance");
-			
+				// Новый формат двухступенчатый: group_chance - шанс самой группы
+				// дропа, chance - относительный шанс предмета внутри неё (группы
+				// есть только у drop, не у spoil). Итоговый % = произведению.
+				if (!$item_sweep && $item_group_chance !== null && $item_group_chance !== "")
+				{	$item_chance = $item_chance * $item_group_chance / 100;	}
+
 				$error_finding = 0;
-				$sql = "select name from armor where item_id = $item_id";  // Try armour database
+				$sql = "select name from knightarmour where item_id = $item_id";  // Try armour database
 				$result3 = mysql_query($sql,$con);
 				if (!mysql_fetch_array($result3))
 				{
-					$sql = "select name from weapon where item_id = $item_id"; // Try weapons database
+					$sql = "select name from knightweapon where item_id = $item_id"; // Try weapons database
 					$result3 = mysql_query($sql,$con);
 					if (!mysql_fetch_array($result3))
 					{
-						$sql = "select name from etcitem where item_id = $item_id"; // Try etc_items database
+						$sql = "select name from knightetcitem where item_id = $item_id"; // Try etc_items database
 						$result3 = mysql_query($sql,$con);
 						if (!mysql_fetch_array($result3))
 						{
@@ -444,10 +248,7 @@ if ($evaluser)
 				}
 				if ($item_id == 57)  // Adjust the drop chance acording to item type.
 				{
-					if ($drop_engine)
-					{	$item_chance *= $drop_chance_item;	}
-					else
-					{	$item_chance *= $drop_chance_adena;	}
+					$item_chance *= $drop_chance_adena;
 				}
 				elseif (!$item_sweep)
 				{
@@ -457,12 +258,11 @@ if ($evaluser)
 				{
 					$item_chance *= $drop_chance_spoil;
 				}
-				if ($item_chance > 1000000)
+				if ($item_chance > 100)
 				{
-					$item_chance = 1000000;
+					$item_chance = 100;
 				}
-				$item_chance /=10000;
-				array_push($itm_array, array($item_chance,mysql_result($result2,$i,"itemId"),$item_name,mysql_result($result2,$i,"min"),mysql_result($result2,$i,"max"),mysql_result($result2,$i,"sweep")));
+				array_push($itm_array, array($item_chance,mysql_result($result2,$i,"itemid"),$item_name,mysql_result($result2,$i,"min"),mysql_result($result2,$i,"max"),mysql_result($result2,$i,"sweep")));
 				$i++;
 			}
 			arsort($itm_array);  // Sort the array based on the target key, which in this case is the chance percentage.
@@ -485,7 +285,7 @@ if ($evaluser)
 			echo "<td width=\"32\" class=\"drophead\"><p class=\"dropmain\">&nbsp;</p></td><td width=\"150\" class=\"drophead\"><p class=\"left\">$lang_name</p></td><td class=\"drophead\"><p class=\"dropmain\">Min&nbsp;/&nbsp;Max</p></td><td class=\"drophead\"><p class=\"dropmain\">Chance</p></td></tr>";
 			while ($i < $count_r) 
 			{
-				list($k1) = each($itm_array);
+				$k1 = key($itm_array); next($itm_array);
 				$i_array = $itm_array[$k1];
 				$item_id = $i_array[1];
 				$item_name = $i_array[2];
@@ -493,7 +293,7 @@ if ($evaluser)
 				$item_max = $i_array[4];
 				$item_sweep = $i_array[5];
 				$item_chance = $i_array[0];
-				if (($drop_engine) && ($item_id == 57))
+				if ($item_id == 57)
 				{
 					$item_min = $item_min * $drop_chance_adena;
 					$item_max = $item_max * $drop_chance_adena;
@@ -556,14 +356,14 @@ if ($evaluser)
 			{
 				while ($i < $spoil_count) 
 				{
-					list($k1) = each($spoil_array);
+					$k1 = key($spoil_array); next($spoil_array);
 					$i_array = $spoil_array[$k1];
 					$item_id = $i_array[0];
 					$item_name = $i_array[1];
 					$item_min = $i_array[2];
 					$item_max = $i_array[3];
 					$item_chance = $i_array[4];
-					if (($drop_engine) && ($item_id == 57))
+					if ($item_id == 57)
 					{
 						$item_min = $item_min * $drop_chance_adena;
 						$item_max = $item_max * $drop_chance_adena;
@@ -609,7 +409,13 @@ if ($evaluser)
 			echo "<td class=\"dropmain\">&nbsp<img src=\"" . $images_dir . "wfree.gif\" width=\"7\" height=\"7\" border=\"0\"> - $lang_always&nbsp;</td>";
 			echo "</tr></table></center>";
 			echo "<p class=\"dropmain\">&nbsp;<p class=\"dropmain\"><center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
-			map($map_array, $images_dir, 0);
+			// PHP8 fix: раньше вызывалось без 4-го аргумента (map_num) -
+			// в PHP8 это ArgumentCountError. Приведено к тому же виду, что в
+			// m-search.php/statistics.php/w-online.php - по карте на континент,
+			// плюс теперь передаются полигоны зон спавна (см. mobcount()).
+			$zonesArg = isset($map_zones) ? $map_zones : [];
+			map($map_array, $images_dir, 0, 1, $zonesArg);
+			map($map_array, $images_dir, 0, 2, $zonesArg);
 			echo "</td></tr></table></center><p class=\"dropmain\">&nbsp;<p class=\"dropmain\">";
 		}
 	}
@@ -642,7 +448,7 @@ if ($evaluser)
 			{
 				die('Could not change to L2J database: ' . mysql_error());
 			}
-			$sql = "select distinct type from npc where type <> 'L2Monster' and type <> 'L2Minion' union select distinct type from custom_npc where type <> 'L2Monster' and type <> 'L2Minion'";
+			$sql = "select distinct type from knightnpc where type <> 'Monster' and type <> 'Minion'";
 			$result = mysql_query($sql,$con);
 			if ($monsdetshow)
 			{
@@ -675,31 +481,31 @@ if ($evaluser)
 				$monstersort = "level";
 			}			
 			if ($num_in == "1")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where level = $itemname order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where level = $itemname order by $monstersort"; }
 			elseif ($num_in == "0")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where name like '%$itemname%' order by $monstersort";  }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where name like '%$itemname%' order by $monstersort";  }
 			elseif ($monsdetreq == "0-10")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 11 order by $monstersort";  }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 11 order by $monstersort";  }
 			elseif ($monsdetreq == "11-20")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 21 and level > 10 order by $monstersort";  }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 21 and level > 10 order by $monstersort";  }
 			elseif ($monsdetreq == "21-30")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 31 and level > 20 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 31 and level > 20 order by $monstersort"; }
 			elseif ($monsdetreq == "31-40")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 41 and level > 30 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 41 and level > 30 order by $monstersort"; }
 			elseif ($monsdetreq == "41-50")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 51 and level > 40 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 51 and level > 40 order by $monstersort"; }
 			elseif ($monsdetreq == "51-60")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 61 and level > 50 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 61 and level > 50 order by $monstersort"; }
 			elseif ($monsdetreq == "61-70")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 71 and level > 60 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 71 and level > 60 order by $monstersort"; }
 			elseif ($monsdetreq == "71-80")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level < 81 and level > 70 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level < 81 and level > 70 order by $monstersort"; }
 			elseif ($monsdetreq == "80plus")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where (type = 'L2Monster' or type = 'L2Minion' or type = 'L2RaidBoss') and level > 80 order by $monstersort"; }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where (type = 'Monster' or type = 'Minion' or type = 'RaidBoss') and level > 80 order by $monstersort"; }
 			elseif ($monsdetreq == "Undead")
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where isundead = 1 order by $monstersort";  }
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where isundead = 1 order by $monstersort";  }
 			else
-			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro from knightnpc where type = '$monsdetreq' order by $monstersort";	}
+			{	$sql = "select id, name, type, level, hp, mp, exp, sp, attackrange, aggro, isundead from knightnpc where type = '$monsdetreq' order by $monstersort";	}
 			if (!$result = mysql_query($sql,$con))
 			{
 				die('Could not retrieve from knightdrop database: ' . mysql_error());
@@ -759,12 +565,14 @@ if ($evaluser)
 					$mob_nightt = 0;
 					$mob_normals = 0;
 					$mob_normalt = 0;
-					$sql = "select locx, locy, locz, loc_id from spawnlist where npc_templateid = $mob_id";
+					$sql = "select locx, locy, locz, loc_id from knightspawnlist where npc_templateid = $mob_id";
 					$result2 = mysql_query($sql,$con);
 					$count_r2 = mysql_num_rows($result2);
 					if (mysql_fetch_array($result2))
 					{
-						$mob_spwn = mobcount($mob_id,$db_location,$db_user,$db_psswd, $db_l2jdb);
+						// PHP8 fix: раньше вызывалось с 5 аргументами вместо 9 -
+						// на PHP8 это ArgumentCountError (фатальная ошибка).
+						$mob_spwn = mobcount($mob_id,$db_location,$db_user,$db_psswd,$db_l2jdb,$dblog_location,$dblog_user,$dblog_psswd,$dblog_l2jdb);
 						$mob_spawn = $mob_spwn[1];
 						$mob_count = $mob_spwn[0];
 						$mob_days = $mob_spwn[2];
