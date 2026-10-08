@@ -66,53 +66,30 @@ if ($evaluser)
 			die('Could not change to L2J database: ' . mysql_error());
 			}
 
+		require_once(__DIR__ . '/xmlparse_common.php');
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'skills' . $svr_dir_delimit;
 
-		$sql = "truncate table knightskills";	
-		$result = mysql_query($sql,$con);
+		mysql_query("CREATE TABLE IF NOT EXISTS `knightskills` (`skill_id` INT PRIMARY KEY, `name` VARCHAR(150))", $con);
+		mysql_query("truncate table knightskills", $con);
 		$skill_count = 0;
-		for($ia==0; $ia<1000; $ia++)
+		for ($ia=0; $ia<1000; $ia++)
 		{
-			if ($ia == 0)
-			{	$name = "000";	}
-			elseif ($ia < 10)
-			{	$name = "00" . $ia;	}
-			elseif ($ia < 100)
-			{	$name = "0" . $ia;	}
-			else
-			{	$name = "" . $ia;	}
+			$name = xip_rangeName($ia);
 			$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
-
 			if (file_exists($file_loc))
 			{
-				$lines = file($file_loc);
-				$line_nums = count($lines);
-				foreach ($lines as $line_num => $line) 
+				$xml = xip_loadXml($file_loc);
+				if ($xml)
 				{
-					$skill_id = strchr($line,"skill id=");
-					if ($skill_id)
-					{	
-						$single_del = strpos($line,"'");
-						$double_del = strpos($line,'"');
-						$delimeter = '"';
-						if (($single_del > 0) && ($single_del < $double_del))
-						{	$delimeter = "'";	}
-						if (($single_del > 0) && ($double_del == 0))
-						{	$delimeter = "'";	}
-						$id = substr($skill_id,10);
-						$pos = strpos($id,$delimeter);
-						$id = substr($id,0,$pos);;
-						$name = strchr($skill_id,"name=");
-						$name = substr($name,6);
-						$pos = strpos($name,$delimeter);
-						$name = substr($name,0,$pos);
+					foreach ($xml->skill as $skill)
+					{
+						$id = (int) $skill['id'];
+						$sname = (string) $skill['name'];
+						mysql_query("insert into knightskills (skill_id,name) values ($id, '" . mysql_real_escape_string($sname,$con) . "')", $con);
 						$skill_count++;
-						$name = preg_replace('/\'/','`',$name);
-						$sql = "insert into knightskills (`skill_id`, `name`) values ('$id', '$name')";
-						$result = mysql_query($sql,$con);
 					}
 				}
-			}  
+			}
 		}
 		echo "<p>$skill_count skills imported.</p>";
 	}

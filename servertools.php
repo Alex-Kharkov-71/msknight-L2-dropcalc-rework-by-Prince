@@ -286,8 +286,14 @@ if ($evaluser)
 		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=0','400','150');\"><input value=\"Import NPCs\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
 		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
 		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center></center></td>";	}
+		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importbuylists.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','150');\"><input value=\"Import Buylists\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
 		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
+
+		echo "</tr><tr>";
+		if ($user_access_lvl >= $sec_inc_admin)
+		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importspawns.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','150');\"><input value=\"Import Spawns\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
+		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
+		echo "<td class=\"noborderback\">&nbsp;</td><td class=\"noborderback\">&nbsp;</td>";
 
 		echo "</tr><tr>";
 		if ($user_access_lvl >= $sec_inc_admin)

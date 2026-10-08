@@ -66,151 +66,58 @@ if ($evaluser)
 			die('Could not change to L2J database: ' . mysql_error());
 			}
 
-		$file_loc = $server_dir . 'data' . $svr_dir_delimit . 'recipes.xml';
+		require_once(__DIR__ . '/xmlparse_common.php');
 
-		$lines = file($file_loc);
-		$line_nums = count($lines);
-		$recipe_count = 0;
-		$recipe_items = 0;
-		$ex_recipe_count = 0;
-		$ex_recipe_items = 0;
+		mysql_query("CREATE TABLE IF NOT EXISTS `knightrecipe` (
+			`rec_id` INT, `makes` INT DEFAULT 1, `item` INT, `qty` INT, KEY `rec_id` (`rec_id`))", $con);
+		mysql_query("CREATE TABLE IF NOT EXISTS `knightrecch` (
+			`rec_name` VARCHAR(100), `rec_id` INT PRIMARY KEY, `rec_item` INT, `level` INT,
+			`makes` INT DEFAULT 1, `chance` FLOAT, `multiplier` INT DEFAULT 1, `xml_id` INT)", $con);
+		mysql_query("truncate table knightrecipe", $con);
+		mysql_query("truncate table knightrecch", $con);
 
-		$sql = "truncate table knightrecch";	
-		$result = mysql_query($sql,$con);
-		$sql = "truncate table knightrecipe";	
-		$result = mysql_query($sql,$con);
-		$rec_run = 0;
-		foreach ($lines as $line_num => $line) 
+		// Регистр имени важен на Linux: в L2JMobius файл называется Recipes.xml,
+		// не recipes.xml, как было в старом датапаке.
+		$file_loc = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'Recipes.xml';
+		$rec_count = 0;
+		$ing_count = 0;
+
+		$xml = xip_loadXml($file_loc);
+		if ($xml)
 		{
-		
-			if (strpos($line,"<item") > 0)
+			foreach ($xml->item as $item)
 			{
-				$rec_run = 0;
-				if (strpos($line,"item id=") > 0)
-				{
-					$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-					$r_xmlid = $parts[1];
-					$rec_run++;
-				}
-				if (strpos($line,"recipeId=") > 0)
-				{
-					$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-					$r_recid = $parts[3];
-					$rec_run++;
-				}				
-				if (strpos($line," successRate=") > 0)
-				{
-					$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-					$r_chance = $parts[11];
-					$rec_run++;
-				}
-				if (strpos($line," name=") > 0)
-				{
-					$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-					$r_name = $parts[5];
-					$r_name = preg_replace('/\'/','',$r_name);
-					$r_name = preg_replace('/mk_/','', $r_name);
-					$r_name = preg_replace('/_/',' ', $r_name);
-					$rec_run++;
-				}
-			}
-			if ($rec_run >= 3)
-			{
-				if (strpos($line,"<production") > 0)
-				{
-					$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-					$r_item = $parts[1];
-					$r_created = $parts[3];
-					$rec_run++;
-					$sql2 = "select name from knightarmour where item_id = $r_item";
-					$result2 = mysql_query($sql2,$con);
-					$count = mysql_num_rows($result2);
-					if ($count)
-					{	$r_name = mysql_result($result2,0,"name");	}
-					$sql2 = "select name from knightetcitem where item_id = $r_item";
-					$result2 = mysql_query($sql2,$con);
-					$count = mysql_num_rows($result2);
-					if ($count)
-					{	$r_name = mysql_result($result2,0,"name");	}
-					$sql2 = "select name from knightweapon where item_id = $r_item";
-					$result2 = mysql_query($sql2,$con);
-					$count = mysql_num_rows($result2);
-					if ($count)
-					{	$r_name = mysql_result($result2,0,"name");	}
-					$grade = "";
-					$sql = "select crystal_type from knightarmour where item_id = '$r_item'";
-					$result = mysql_query($sql,$con);
-					$count = mysql_num_rows($result);
-					if ($count)
-					{	$grade = mysql_result($result,0,"crystal_type");	}
-					$sql = "select crystal_type from knightetcitem where item_id = '$r_item'";
-					$result = mysql_query($sql,$con);
-					$count = mysql_num_rows($result);
-					if ($count)
-					{	$grade = mysql_result($result,0,"crystal_type");	}
-					$sql = "select crystal_type from knightweapon where item_id = '$r_item'";
-					$result = mysql_query($sql,$con);
-					$count = mysql_num_rows($result);
-					if ($count)
-					{	$grade = mysql_result($result,0,"crystal_type");	}
-					if ($grade == "none")
-					{	$r_level = 1;	}
-					if ($grade == "d")
-					{	$r_level = 2;	}
-					if ($grade == "c")
-					{	$r_level = 3;	}
-					if ($grade == "b")
-					{	$r_level = 4;	}
-					if ($grade == "a")
-					{	$r_level = 5;	}
-					if ($grade == "s")
-					{	$r_level = 6;	}
-					if ($parts[0] == "common")
-					{	$r_level = 0;	}
-				}
-				if ($rec_run > 3)
-				{
-					if (strpos($line,"<ingredient") > 0)
-					{
-						$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-						$rec_itm_num = $parts[1];
-						$rec_itm_qty = $parts[3];
-						$sql = "insert into knightrecipe (`rec_id`, `makes`, `item`, `qty`) values ('$r_recid', \"$r_item\", '$rec_itm_num', '$rec_itm_qty')";	
-						$ex_recipe_items++;
-						$result = mysql_query($sql,$con);
-						$recipe_items++;
-					}
-				}
-				if ($rec_run == 5)
-				{
-					$sql = "insert into knightrecch (`rec_name`, `rec_id`, `rec_item`, `level`, `makes`, `chance`, `multiplier`, `xml_id`) values (\"$r_name\", '$r_recid', '$r_recitem', '$r_level', '$r_item', '$r_chance', '$r_created', '$r_xmlid')";	
-					$result = mysql_query($sql,$con);
-					$ex_recipe_count++;
-					$rec_run++;
-					if ($result <> 1)
-					{	
-						echo "Failed - $sql<br>";	
-						$ex_recipe_count--;
-					}
-				}
-			}
+				$recId = (int) $item['id'];
+				$realRecipeId = (int) ($item['recipeId'] ?? $recId);
+				$rname = (string) $item['name'];
+				$level = (int) ($item['craftLevel'] ?? 0);
+				$successRate = (float) ($item['successRate'] ?? 100);
 
-			if (strpos($line,"</item") > 0)
-			{
-				$rec_run = 0;
-				$parts = preg_split('/"/', $line, -1, PREG_SPLIT_NO_EMPTY);
-				$r_recid = $parts[1];
-				$r_recitem = 0;
-				$r_item = 0;
-				$r_created = 0;
-				$r_chance = 0;
+				$prodId = 0; $prodCount = 1;
+				if (isset($item->production))
+				{
+					$prodId = (int) $item->production['id'];
+					$prodCount = (int) ($item->production['count'] ?? 1);
+				}
 
-				$recipe_count++;
+				mysql_query("insert into knightrecch (rec_name,rec_id,rec_item,level,makes,chance,multiplier,xml_id) values (
+					'" . mysql_real_escape_string($rname,$con) . "', $realRecipeId, $prodId, $level, $prodCount, $successRate, 1, $recId)", $con);
+				$rec_count++;
+
+				foreach ($item->ingredient ?? [] as $ing)
+				{
+					$iid = (int) $ing['id'];
+					$icount = (int) ($ing['count'] ?? 1);
+					mysql_query("insert into knightrecipe (rec_id,makes,item,qty) values ($realRecipeId, $prodCount, $iid, $icount)", $con);
+					$ing_count++;
+				}
 			}
-			
 		}
-		echo "<p class=\"popup\">$recipe_count recipes, made of $recipe_items items found.</p>";
-		echo "<p class=\"popup\">$ex_recipe_count recipes, made of $ex_recipe_items items imported.</p>";
+		else
+		{
+			echo "<p class=\"popup\">Файл не найден или не парсится: $file_loc</p>";
+		}
+		echo "<p>$rec_count recipes imported ($ing_count ingredients).</p>";
 	}
 }
 

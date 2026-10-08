@@ -164,149 +164,86 @@ if ($evaluser)
 
 
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'items' . $svr_dir_delimit;
+		require_once(__DIR__ . '/xmlparse_common.php');
 		$item_count = 0;
-
-		$item_d_crystallizable= "false";
-		$item_d_crystal_type= "none";
-		$item_d_sellable= "false";
-		$item_d_destroyable= "true";
-		$item_d_tradeable= "true";
-		$item_d_depositable= "true";
-		$item_d_is_stackable= "false";
-		$item_d_is_questitem= "false";
-		$item_d_dropable= "true";
-		$item_d_duration= -1;
-		$item_d_time= -1;
-		$item_d_crystal_count= 0;
-		$item_d_atk_speed= 0;
-		$item_d_p_dam= 0;
-		$item_d_rnd_dam= 0;
-		$item_d_m_dam= 0;
-		$item_d_p_def= 0;
-		$item_d_m_def= 0;
-		$item_d_icon= "";
-
-		if ($ia == 0)
-		{	$name = "000";	}
-		elseif ($ia < 10)
-		{	$name = "00" . $ia;	}
-		elseif ($ia < 100)
-		{	$name = "0" . $ia;	}
-		else
-		{	$name = "" . $ia;	}
+		$name = xip_rangeName($ia);
 		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
-		$item_run = 0;
-echo "<p>Item Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
+		echo "<p>Item Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
 		if (file_exists($file_loc))
 		{
 			if ($next < 1000)
 			{	echo "<META content=\"5;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
-			$lines = file($file_loc);
-			$line_nums = count($lines);
-			foreach ($lines as $line_num => $line) 
+
+			$xml = xip_loadXml($file_loc);
+			if ($xml)
 			{
-				$keywords = preg_split("/[\s]*[\"][\s]*/", $line);
-				$id = trim($keywords[0]);
-				
-				if ($item_run==1)
+				foreach ($xml->item as $item)
 				{
-					if ($id!="</item>")
+					$item_id = (int) $item['id'];
+					$item_type = strtolower((string) $item['type']);
+					$item_name = (string) $item['name'];
+					$sets = xip_readSets($item);
+					$stats = xip_readStats($item);
+
+					$item_d_icon = $sets['icon'] ?? '';
+					$item_d_bodypart = $sets['bodypart'] ?? 'none';
+					$item_d_weight = (int) ($sets['weight'] ?? 0);
+					$item_d_price = (int) ($sets['price'] ?? 0);
+					$item_d_material = $sets['material'] ?? 'wood';
+					$item_d_crystal_type = $sets['crystal_type'] ?? 'none';
+					$item_d_soulshots = (int) ($sets['soulshots'] ?? 0);
+					$item_d_spiritshots = (int) ($sets['spiritshots'] ?? 0);
+					$item_d_weaponType = $sets['weapon_type'] ?? 'none';
+					$item_d_armor_type = $sets['armor_type'] ?? 'none';
+					$item_d_consume_type = $sets['consume_type'] ?? 'normal';
+					$item_d_crystal_count = (int) ($sets['crystal_count'] ?? 0);
+					$item_d_rnd_dam = xip_escNum($stats['randomDamage'] ?? null);
+					$item_d_atk_speed = xip_escNum($stats['pAtkSpd'] ?? null);
+					$item_d_p_dam = xip_escNum($stats['pAtk'] ?? null);
+					$item_d_m_dam = xip_escNum($stats['mAtk'] ?? null);
+					// pDef для брони, sDef - для щитов (у щитов pDef не задаётся).
+					$item_d_p_def = xip_escNum($stats['pDef'] ?? ($stats['sDef'] ?? null));
+					$item_d_m_def = xip_escNum($stats['mDef'] ?? null);
+					$item_d_critical = xip_escNum($stats['critRate'] ?? null);
+					$item_d_avoid_modify = xip_escNum($stats['rEvas'] ?? null);
+					$item_d_crystallizable = xip_bool2enum($sets, 'crystallizable', 'false');
+					$item_d_tradeable = isset($sets['is_tradable']) ? ($sets['is_tradable']==='true'?'true':'false') : 'true';
+					$item_d_dropable = isset($sets['is_dropable']) ? ($sets['is_dropable']==='true'?'true':'false') : 'true';
+					$item_d_sellable = isset($sets['is_sellable']) ? ($sets['is_sellable']==='true'?'true':'false') : 'false';
+					$item_d_destroyable = 'true';
+					$item_d_depositable = 'true';
+					$item_d_is_stackable = xip_bool2enum($sets, 'is_stackable', 'false');
+					$item_d_is_questitem = xip_bool2enum($sets, 'is_questitem', 'false');
+					$item_d_duration = -1;
+					$item_d_time = -1;
+					$item_d_mp_bonus = 0;
+					$item_d_change_weaponId = 0;
+					$item_d_shield_def = 0;
+					$item_d_shield_def_rate = 0;
+					$item_d_hit_modify = 0;
+					$item_d_mp_consume = 0;
+					$item_d_skill = "0-0;";
+
+					if ($item_type == "weapon")
 					{
-						$targ=strtolower(trim($keywords[1]));
-						$content=trim($keywords[3]);
-						$cont2=trim($keywords[5]);
-						$purpose=trim($keywords[5]);
-						if ($targ=="icon")	{	$item_d_icon=$content;	}
-						if ($targ=="bodypart")	{	$item_d_bodypart=$content;	}
-						if ($targ=="weight")	{	$item_d_weight=$content;	}
-						if ($targ=="price")	{	$item_d_price=$content;	}
-						if ($targ=="material")	{	$item_d_material=$content;	}
-						if ($targ=="soulshots")	{	$item_d_soulshots=$content;	}
-						if ($targ=="spiritshots")	{	$item_d_spiritshots=$content;	}
-						if ($targ=="weapon_type")	{	$item_d_weaponType=$content;	}
-						if ($targ=="crystal_count")	{	$item_d_crystal_count=$content;	}
-						if ($targ=="crystal_type")	{	$item_d_crystal_type=$content;	}
-						if ($targ=="random_damage")	{	$item_d_rnd_dam=$content;	}
-						if ($content=="pAtkSpd")	{	$item_d_atk_speed=$cont2;	}
-						if ($content=="pAtk")	{	$item_d_p_dam=$cont2;	}
-						if ($content=="mAtk")	{	$item_d_m_dam=$cont2;	}
-						if ($targ=="is_tradable")	{	$item_d_tradeable=$content;	}
-						if ($targ=="is_dropable")	{	$item_d_dropable=$content;	}
-						if ($targ=="is_sellable")	{	$item_d_sellable=$content;	}
-						if ($targ=="is_stackable")	{	$item_d_is_stackable=$content;	}
-						if ($targ=="is_questitem")	{	$item_d_is_questitem=$content;	}
-						if ($content=="pAtkSpd")	{	$item_d_atk_speed=$cont2;	}
-						if (($content=="pDef") && (strpos($purpose,"enchant") == 0))	{	$item_d_p_def=$cont2;	}
-						if (($content=="mDef") && (strpos($purpose,"enchant") == 0))	{	$item_d_m_def=$cont2;	}
+						$result = mysql_query("insert into `knightweapon` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `soulshots`, `spiritshots`, `material`, `crystal_type`, `p_dam`, `rnd_dam`, `weaponType`, `critical`, `hit_modify`, `avoid_modify`, `shield_def`, `shield_def_rate`, `atk_speed`, `mp_consume`, `m_dam`, `duration`, `time`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `change_weaponId`, `skill`, `is_stackable`, `is_questitem`) values
+(\"$item_id\", \"$item_name\", \"$item_d_icon\", \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_d_soulshots\", \"$item_d_spiritshots\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_p_dam\", \"$item_d_rnd_dam\", \"$item_d_weaponType\", \"$item_d_critical\", \"$item_d_hit_modify\", \"$item_d_avoid_modify\", \"$item_d_shield_def\", \"$item_d_shield_def_rate\", \"$item_d_atk_speed\", \"$item_d_mp_consume\", \"$item_d_m_dam\", \"$item_d_duration\", \"$item_d_time\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_change_weaponId\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
+					}
+					elseif ($item_type == "armor")
+					{
+						$result = mysql_query("insert into `knightarmour` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `armor_type`, `material`, `crystal_type`, `avoid_modify`, `time`, `p_def`, `m_def`, `mp_bonus`, `duration`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
+(\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_d_armor_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_avoid_modify\", \"$item_d_time\", \"$item_d_p_def\", \"$item_d_m_def\", \"$item_d_mp_bonus\", \"$item_d_duration\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
 					else
 					{
-						$item_run=0;
-						if ($item_type == "weapon")
-						{	
-							$result = mysql_query("insert into `knightweapon` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `soulshots`, `spiritshots`, `material`, `crystal_type`, `p_dam`, `rnd_dam`, `weaponType`, `critical`, `hit_modify`, `avoid_modify`, `shield_def`, `shield_def_rate`, `atk_speed`, `mp_consume`, `m_dam`, `duration`, `time`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `change_weaponId`, `skill`, `is_stackable`, `is_questitem`) values
-(\"$item_id\", \"$item_name\", \"$item_d_icon\", \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_d_soulshots\", \"$item_d_spiritshots\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_p_dam\", \"$item_d_rnd_dam\", \"$item_d_weaponType\", \"$item_d_critical\", \"$item_d_hit_modify\", \"$item_d_avoid_modify\", \"$item_d_shield_def\", \"$item_d_shield_def_rate\", \"$item_d_atk_speed\", \"$item_d_mp_consume\", \"$item_d_m_dam\", \"$item_d_duration\", \"$item_d_time\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_change_weaponId\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")",$con);
-						}
-						elseif ($item_type == "armor")
-						{	
-							$result = mysql_query("insert into `knightarmour` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `armor_type`, `material`, `crystal_type`, `avoid_modify`, `time`, `p_def`, `m_def`, `mp_bonus`, `duration`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
-(\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_armor_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_avoid_modify\", \"$item_d_time\", \"$item_d_p_def\", \"$item_d_m_def\", \"$item_d_mp_bonus\", \"$item_d_duration\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")",$con);
-						}
-						else
-						{	
-							$result = mysql_query("insert into `knightetcitem` (`item_id`, `name`, `icon`,  `crystallizable`, `weight`, `consume_type`, `material`, `crystal_type`, `duration`, `time`,  `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
-(\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_crystallizable\", \"$item_d_weight\",  \"$item_consume_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_duration\", \"$item_d_time\",  \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")",$con);
-						}
-
-					$item_d_bodypart= "";
-					$item_d_icon= "";
-					$item_d_crystallizable= "false";
-					$item_d_weight= "";
-					$item_d_soulshots= "";
-					$item_d_spiritshots= "";
-					$item_d_material= "";
-					$item_d_crystal_type= "none";
-					$item_d_p_dam= 0;
-					$item_d_rnd_dam= 0;
-					$item_d_weaponType= "";
-					$item_d_critical= "";
-					$item_d_hit_modify= "";
-					$item_d_avoid_modify= "";
-					$item_d_shield_def= "";
-					$item_d_shield_def_rate= "";
-					$item_d_atk_speed= 0;
-					$item_d_mp_consume= "";
-					$item_d_m_dam= 0;
-					$item_d_duration= -1;
-					$item_d_time= -1;
-					$item_d_price= "";
-					$item_d_crystal_count= 0;
-					$item_d_sellable= "false";
-					$item_d_dropable= "true";
-					$item_d_destroyable= "true";
-					$item_d_tradeable= "true";
-					$item_d_depositable= "true";
-					$item_d_change_weaponId= "";
-					$item_d_skill= "";
-					$item_d_armor_type= "";
-					$item_d_avoid_modify= "";
-					$item_d_p_def= 0;
-					$item_d_m_def= 0;
-					$item_d_mp_bonus= "";
-					$item_d_is_stackable= "false";
-					$item_d_is_questitem= "false";
+						$result = mysql_query("insert into `knightetcitem` (`item_id`, `name`, `icon`,  `crystallizable`, `weight`, `consume_type`, `material`, `crystal_type`, `duration`, `time`,  `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
+(\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_crystallizable\", \"$item_d_weight\",  \"$item_d_consume_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_duration\", \"$item_d_time\",  \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
-				}
-				else
-				{
-					$item_id = trim($keywords[1]);
-					$item_type = strtolower(trim($keywords[3]));
-					$item_name = trim($keywords[5]);
-					if (($item_type == "weapon") || ($item_type == "armor") || ($item_type == "etcitem"))
-					{	$item_run=1;	}
+					$item_count++;
 				}
 			}
-		}  
+			echo "<p>Импортировано предметов: $item_count</p>";
+		}
 		else
 		{
 			if ($next < 1000)
