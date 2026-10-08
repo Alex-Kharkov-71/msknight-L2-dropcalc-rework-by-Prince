@@ -454,7 +454,7 @@ if ($evaluser)
 		$last_bg = -1;
 		while ($i < $count_r) 
 		{
-			list($k1) = each($itm_array);
+			$k1 = key($itm_array); next($itm_array);
 			$i_array = $itm_array[$k1];
 			$item_id = $i_array[1];
 			$item_name = $i_array[2];
@@ -576,7 +576,7 @@ if ($evaluser)
 		{
 			while ($i < $spoil_count) 
 			{
-				list($k1) = each($spoil_array);
+				$k1 = key($spoil_array); next($spoil_array);
 				$i_array = $spoil_array[$k1];
 				$item_id = $i_array[0];
 				$item_name = $i_array[1];

@@ -210,7 +210,7 @@ if ($evaluser)
 				{
 					if (substr_count($line_in, '#_#') > 0)
 					{
-						$actions = split('#_#', $line_in);
+						$actions = preg_split('/#_#/', $line_in);
 						if (($actions[0] == 'accountstart') && ($use_accounts))
 						{
 							$new_account = $actions[1];

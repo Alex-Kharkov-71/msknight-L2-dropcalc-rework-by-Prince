@@ -674,7 +674,7 @@ if ($evaluser)
 				reset($itm_array);
 			}
 
-			while (list($k1) = each($itm_array)) 
+			while (($k1 = key($itm_array)) !== null) 
 			{
 				$i_array = $itm_array[$k1];
 				$mob_id = $i_array[1];
@@ -748,7 +748,7 @@ if ($evaluser)
 			{
 				while ($i < $spoil_count) 
 				{
-					list($k1) = each($spoil_array);
+					$k1 = key($spoil_array); next($spoil_array);
 					$i_array = $spoil_array[$k1];
 					$mob_id = $i_array[0];
 					$mob_name = $i_array[1];

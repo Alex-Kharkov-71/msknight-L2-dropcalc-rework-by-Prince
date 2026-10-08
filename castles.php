@@ -57,7 +57,7 @@ if ($evaluser)
 	
 	function date_to_timestamp ($Date)
 	{
-		$split_date = split('[/.-]', $Date);
+		$split_date = preg_split('#[/.-]#', $Date);
 		$timestamp = mktime($split_date[3], $split_date[4], $split_date[5], $split_date[1], $split_date[0], $split_date[2]);
 		$timestamp = $timestamp*1000;
 		return $timestamp;
