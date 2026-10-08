@@ -89,7 +89,7 @@ if ($evaluser)
 	{
 		$result = mysql_query("update characters set online = 0",$con);
 	}
-	if (!$result = mysql_query("select account_name, charId, char_name, sex, accesslevel, race, level, punish_level, punish_timer, onlinetime from characters where online = '1' order by level",$con))
+	if (!$result = mysql_query("select account_name, charId, char_name, sex, accesslevel, race, level, 0 as punish_level, 0 as punish_timer, onlinetime from characters where online = '1' order by level",$con))
 	{
 		die('Could not retrieve from database: ' . mysql_error());
 	}

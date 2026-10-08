@@ -116,7 +116,7 @@ if ($evaluser)
 	$clan_leader = 0;
 	if ($spec_account)
 	{
-		$sql = "select charId, account_name, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, punish_level from characters where charId = $spec_account";
+		$sql = "select charId, account_name, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, 0 as punish_level from characters where charId = $spec_account";
 		$result = mysql_query($sql,$con);
 		$count_accs = mysql_num_rows($result);
 		$sql = "select COUNT(*) from clan_data where leader_id = '$spec_account'";
@@ -125,7 +125,7 @@ if ($evaluser)
 	}
 	else
 	{
-		$sql = "select charId, account_name, race, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, punish_level from characters where char_name like '%$itemname%' order by $charsort";
+		$sql = "select charId, account_name, race, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, 0 as punish_level from characters where char_name like '%$itemname%' order by $charsort";
 		$result = mysql_query($sql,$con);
 		$count_accs = mysql_num_rows($result);
 		$single_found = "1";

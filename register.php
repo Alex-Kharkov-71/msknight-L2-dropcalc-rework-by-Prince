@@ -163,11 +163,11 @@ if ($usrname)
 				$default_recipe = 0;
 				$default_character = 0;
 				if ($all_newusers_maps)
-				{	$default_maps = 999999999999999999;	}
+				{	$default_maps = 2147483647;	}
 				if ($all_newusers_recipe)
-				{	$default_recipe = 999999999999999999;	}
+				{	$default_recipe = 2147483647;	}
 				if ($all_newusers_character)
-				{	$default_character = 999999999999999999;	}
+				{	$default_character = 2147483647;	}
 				$timeofday = intval(time() / 60);
 				if (($allowpassreset) && ($emailcheck))
 				{	
