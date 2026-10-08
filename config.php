@@ -22,6 +22,9 @@ For Windows 2003 servers, delimeters are "//"
 **** */
 
 //Gamserverdb
+// PHP 8 defaults to UTC. Uncomment and set your own timezone if times look wrong:
+// date_default_timezone_set('Europe/Moscow');
+
 $gameservers = ARRAY(
 ARRAY("Title", "db_location", "db_database", "db_username", "db_password", 0, "server files location", gameserver_port, "knight_db", "gameserver_telnet_ip", "gameserver_telnet_port", "gameserver_Telnet_password", gameserver_timeout)
 // ,ARRAY("Title", "db_location", "db_database", "db_username", "db_password", 0, "server files location", gameserver_port, "knight_db", "gameserver_telnet_ip", "gameserver_telnet_port", "gameserver_Telnet_password", gameserver_timeout)
@@ -123,8 +126,8 @@ $chat_colors = array(
 //
 // -----------------------------------------------
 
-$server_id = preg_replace('/[&%$\/\|@<>#£]/','',$_REQUEST['server_id']);
-$skin_id = preg_replace('/[&%$\/\|@<>#£]/','',$_REQUEST['skin_id']);
+$server_id = (int) ($_REQUEST['server_id'] ?? 0);
+$skin_id = (int) ($_REQUEST['skin_id'] ?? 0);
 $max_servers = count($gameservers);
 $max_skin = count($skinslist);
 if (($server_id < 0) || (!$server_id))
@@ -151,3 +154,5 @@ $core_db_l2jdb = $gameservers[0][2];
 $core_db_user = $gameservers[0][3];
 $core_db_psswd = $gameservers[0][4];
 $skin_dir = "$skin_id";
+
+require_once __DIR__ . '/mysql_compat.php';
