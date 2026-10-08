@@ -429,7 +429,7 @@ if ($evaluser)
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 
 			echo "\n<div style=\"position: relative;\"><img src=\"$map_file\" alt=\"\" width=\"$graphic_width\" height=\"$graphic_height\" border=\"0\"><div>";
-			$sql = "select level, `id` from npc where type = 'L2Monster'union select level, `id` from custom_npc where type = 'L2Monster'";
+			$sql = "select level, `id` from knightnpc where type = 'Monster'";
 			$result4 = mysql_query($sql,$con);
 			$count_r4 = mysql_num_rows($result4);
 			$i4 = 0;
@@ -440,7 +440,7 @@ if ($evaluser)
 				$mob_level = mysql_result($result4,$i4,"level");				
 				$map_tag = intval($mob_level / 10);
 				$point_dat = $images_dir. "temp" . $map_tag . ".gif";
-				$sql = "select locx, locy, loc_id, count, npc_templateid from spawnlist where npc_templateid = $template_id";
+				$sql = "select locx, locy, loc_id, count, npc_templateid from knightspawnlist where npc_templateid = $template_id";
 				$result2 = mysql_query($sql,$con);
 				$count_r2 = mysql_num_rows($result2);
 				if (mysql_fetch_array($result2))
@@ -459,33 +459,10 @@ if ($evaluser)
 								$y_co = intval( difnums($y_co,$base_y) / $y_scale) - 1;
 								echo "<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 3; height: 3\" border=\"0\">\n";
 							}
-						}						
-						else
-						{
-							$location_id = mysql_result($result2,$i2,"loc_id");
-							$sql = "select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id";
-							$result3 = mysql_query($sql,$con);
-							$count_r3 = mysql_num_rows($result3);
-							if (mysql_fetch_array($result3))
-							{	
-								$i3=0;
-								while ($i3 < $count_r3)
-								{
-									$locat_x = mysql_result($result3,$i3,"loc_x");
-									$locat_y = mysql_result($result3,$i3,"loc_y");
-									if (($locat_x <> 0) || ($locat_y <> 0))
-									{
-										if (($locat_x <= $map_right) && ($locat_x >=$map_left) && ($locat_y <= $map_bottom) && ($locat_y >= $map_top))
-										{
-											$x_co = intval( difnums($locat_x,$base_x) / $x_scale) - 1;
-											$y_co = intval( difnums($locat_y,$base_y) / $y_scale) - 1;
-											echo "<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 3; height: 3\" border=\"0\">\n";
-										}
-									}
-									$i3++;
-								}
-							}
 						}
+						// PHP8/L2JMobius fix: fallback na tablitsu locations ubran -
+						// knightspawnlist vsegda daet realnye koordinaty, fallback bolshe
+						// ne nuzhen (i tablitsy locations v L2JMobius bolshe net).
 						$i2++;
 					}
 				}
@@ -541,7 +518,7 @@ if ($evaluser)
 			$image_temp7 = $images_dir . "temp7.gif";
 			$image_temp8 = $images_dir . "temp8.gif";
 			$image_temp9 = $images_dir . "temp9.gif";
-			$sql = "select level, `id` from npc where type = 'L2Monster' union select level, `id` from custom_npc where type = 'L2Monster'";
+			$sql = "select level, `id` from knightnpc where type = 'Monster'";
 			$result4 = mysql_query($sql,$con);
 			$count_r4 = mysql_num_rows($result4);
 			$i4 = 0;
@@ -552,7 +529,7 @@ if ($evaluser)
 				$mob_level = mysql_result($result4,$i4,"level");				
 				$map_tag = intval($mob_level / 10);
 				$point_dat = $images_dir. "temp" . $map_tag . ".gif";
-				$sql = "select locx, locy, loc_id, count, npc_templateid from spawnlist where npc_templateid = $template_id";
+				$sql = "select locx, locy, loc_id, count, npc_templateid from knightspawnlist where npc_templateid = $template_id";
 				$result2 = mysql_query($sql,$con);
 				$count_r2 = mysql_num_rows($result2);
 				if (mysql_fetch_array($result2))
@@ -571,33 +548,10 @@ if ($evaluser)
 								$y_co = intval( difnums($y_co,$base_y) / $y_scale) - 1;
 								echo "<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 3; height: 3\" border=\"0\">\n";
 							}
-						}						
-						else
-						{
-							$location_id = mysql_result($result2,$i2,"loc_id");
-							$sql = "select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id";
-							$result3 = mysql_query($sql,$con);
-							$count_r3 = mysql_num_rows($result3);
-							if (mysql_fetch_array($result3))
-							{	
-								$i3=0;
-								while ($i3 < $count_r3)
-								{
-									$locat_x = mysql_result($result3,$i3,"loc_x");
-									$locat_y = mysql_result($result3,$i3,"loc_y");
-									if (($locat_x <> 0) || ($locat_y <> 0))
-									{
-										if (($locat_x <= $map_right) && ($locat_x >=$map_left) && ($locat_y <= $map_bottom) && ($locat_y >= $map_top))
-										{
-											$x_co = intval( difnums($locat_x,$base_x) / $x_scale) - 1;
-											$y_co = intval( difnums($locat_y,$base_y) / $y_scale) - 1;
-											echo "<img src=\"$point_dat\" align=\"left\" style=\"position: absolute; top: $y_co; left: $x_co; width: 3; height: 3\" border=\"0\">\n";
-										}
-									}
-									$i3++;
-								}
-							}
 						}
+						// PHP8/L2JMobius fix: fallback na tablitsu locations ubran -
+						// knightspawnlist vsegda daet realnye koordinaty, fallback bolshe
+						// ne nuzhen (i tablitsy locations v L2JMobius bolshe net).
 						$i2++;
 					}
 				}
@@ -672,7 +626,7 @@ if ($evaluser)
 			echo "</tr></table></center>";
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 			echo "\n<div style=\"position: relative;\"><img src=\"$map_file\" alt=\"\" width=\"750\" height=\"1084\" border=\"0\"><div>";
-			$sql = "select `level`, `id` from npc where type = 'L2RaidBoss' union select `level`, `id` from custom_npc where type = 'L2RaidBoss'";
+			$sql = "select `level`, `id` from knightnpc where type = 'RaidBoss'";
 			$result4 = mysql_query($sql,$con);
 			$count_r4 = mysql_num_rows($result4);
 			$i4 = 0;
@@ -758,7 +712,7 @@ if ($evaluser)
 			$image_temp8 = $images_dir . "temp8.gif";
 			$image_temp9 = $images_dir . "temp9.gif";
 		
-			$sql = "select `level`, `id` from npc where type = 'L2RaidBoss' union select `level`, `id` from custom_npc where type = 'L2RaidBoss'";
+			$sql = "select `level`, `id` from knightnpc where type = 'RaidBoss'";
 			$result4 = mysql_query($sql,$con);
 			$count_r4 = mysql_num_rows($result4);
 			$i4 = 0;
@@ -860,7 +814,7 @@ if ($evaluser)
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 
 			echo "\n<div style=\"position: relative;\"><img src=\"$map_file\" alt=\"\" width=\"750\" height=\"1084\" border=\"0\"><div>";
-			$sql = "select level, `id` from npc where type = 'L2Boss' union select level, `id` from custom_npc where type = 'L2Boss'";
+			$sql = "select level, `id` from knightnpc where type = 'RaidBoss'";
 			$result4 = mysql_query($sql,$con);
 			$count_r4 = mysql_num_rows($result4);
 			$i4 = 0;
@@ -871,7 +825,7 @@ if ($evaluser)
 				$mob_level = mysql_result($result4,$i4,"level");				
 				$map_tag = intval($mob_level / 10);
 				$point_dat = $images_dir. "temp" . $map_tag . ".gif";
-				$sql = "select locx, locy from spawnlist where npc_templateid = $template_id";
+				$sql = "select locx, locy from knightspawnlist where npc_templateid = $template_id";
 				$result2 = mysql_query($sql,$con);
 				$count_r2 = mysql_num_rows($result2);
 				if (mysql_fetch_array($result2))
