@@ -31,7 +31,7 @@ $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $commandname = input_check($_REQUEST['commandname'],0);
 $new_command = input_check($_REQUEST['new_command'],0);
-$new_group = $_REQUEST['new_group'];
+$new_group = input_check($_REQUEST['new_group'],0);
 $number = preg_replace('/[&%$\\\|<>#£]/','',$_REQUEST['number']);
 
 $langfile = $language_array[$langval][1];

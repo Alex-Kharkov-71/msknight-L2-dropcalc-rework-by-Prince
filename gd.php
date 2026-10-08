@@ -113,7 +113,10 @@ if (strlen($character) > 0)
 	if (!mysql_select_db("$g_knightdb",$con2))
 	{	die('Could not change to L2J database: ' . mysql_error());	}
 
-	$result = mysql_query("select account_name, char_name, level, sex, maxHp, maxMp, maxCp, online, onlinetime, clanid, race, classid, base_class, karma from $g_knightdb.characters where charId = '$g_chr'",$con2);
+	// PHP8/security fix: $g_chr приходит напрямую из $_REQUEST['c'] без какой-либо
+	// проверки и подставлялся в SQL без экранирования - настоящая SQL-инъекция.
+	$g_chr_safe = mysql_real_escape_string($g_chr, $con2);
+	$result = mysql_query("select account_name, char_name, level, sex, maxHp, maxMp, maxCp, online, onlinetime, clanid, race, classid, base_class, karma from $g_knightdb.characters where charId = '$g_chr_safe'",$con2);
 	while ($r_array = mysql_fetch_assoc($result))
 	{
 		$a_name = $r_array['account_name'];

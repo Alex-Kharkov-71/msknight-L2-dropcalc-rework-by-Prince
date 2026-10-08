@@ -899,7 +899,7 @@ function gethexid($server_dir, $svr_dir_delimit)
 function iptonum($ip)
 {
 	$ip_num = 0;
-	$ip_list = split('[.]', $ip);
+	$ip_list = preg_split('/[.]/', $ip);
 	$ip_num = $ip_list[3];
 	$ip_num = $ip_num + ($ip_list[2] * 256);
 	$ip_num = $ip_num + ($ip_list[1] * 65536);
@@ -1365,7 +1365,7 @@ function item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb)
 
 
 // Goes through an input string and returns a string parsed for characters potentially used for hacking.
-function input_check($str, $level) 
+function input_check($str, $level)
 {
 	if ($level == 1)
 	{	$str = preg_replace('/[&%$\/\\\|@<#£]/','',$str);	}
@@ -1373,27 +1373,28 @@ function input_check($str, $level)
 	{	$str = preg_replace('/[&%$\/\\\|<>#£]/','',$str);	}
 	if ($level == 2)
 	$str = preg_replace('/[^0-9]/','',$str);
-	$str = preg_replace('/\'/','\\\'',$str);
+	// PHP8 fix: addslashes() vmesto naivnogo ekranirovaniya odnoy kavychki.
+	// Simvol '\\' uzhe vyrezan regexpom vyshe, poetomu dvoynogo ekranirovaniya net.
+	$str = addslashes($str);
   $str = preg_replace('/mysql./i','',$str);
-//  $str = preg_replace('/\'/','\\\'',$str);
   $count_match = 0;
-  if (stripos($str, 'union ') > 0)
+  if (stripos($str, 'union ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'select ') > 0)
+  if (stripos($str, 'select ') !== false)
   {	$count_match++;	}
-  if (stripos($str, ' where ') > 0)
+  if (stripos($str, ' where ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'update ') > 0)
+  if (stripos($str, 'update ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'delete ') > 0)
+  if (stripos($str, 'delete ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'insert ') > 0)
+  if (stripos($str, 'insert ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'drop ') > 0)
+  if (stripos($str, 'drop ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'mysql.user') > 0)
+  if (stripos($str, 'mysql.user') !== false)
   {	$count_match = $count_match+2;	}
-  if (stripos($str, 'knightdrop') > 0)
+  if (stripos($str, 'knightdrop') !== false)
   {	$count_match = $count_match+2;	}
   if ($count_match > 1)
   {	$str = "";	}

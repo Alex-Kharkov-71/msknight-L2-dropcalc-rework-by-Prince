@@ -30,7 +30,22 @@ $token = input_check($_REQUEST['token'],0);
 $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $action = input_check($_REQUEST['action'],0);
-$number = preg_replace('/[&%$\\\|<>#�]/','',$_REQUEST['number']);
+$number = input_check($_REQUEST['number'],2);
+// PHP8 fix: $number (level 2) оставляет только цифры, а drop_chance_adena/
+// item/spoil в БД - decimal(8,2), т.е. ожидают дробное число вроде "1.5".
+// Раньше (до input_check) это поле могло принимать точку, сейчас не может -
+// значение "1.5" тихо превращалось в "15" (в 10 раз больше). Для этих трёх
+// действий разбираем число заново, отдельно, с разрешённой точкой.
+if (($action == "dropa") || ($action == "dropi") || ($action == "drops"))
+{
+	$number_raw = preg_replace('/[^0-9.]/', '', $_REQUEST['number'] ?? '');
+	// не более одной точки
+	$dotpos = strpos($number_raw, '.');
+	if ($dotpos !== false)
+	{	$number_raw = substr($number_raw, 0, $dotpos + 1) . str_replace('.', '', substr($number_raw, $dotpos + 1));	}
+	if ($number_raw !== '' && is_numeric($number_raw))
+	{	$number = $number_raw;	}
+}
 
 $langfile = $language_array[$langval][1];
 include($langfile);		// Import language variables.

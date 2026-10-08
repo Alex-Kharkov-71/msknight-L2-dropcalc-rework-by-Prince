@@ -29,8 +29,8 @@ $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $newpass1 = input_check($_REQUEST['newpass1'],0);
 $newpass2 = input_check($_REQUEST['newpass2'],0);
-$newemail1 = preg_replace('/[&%$\/\\\|<>#£]/','',$_REQUEST['newemail1']);
-$newemail2 = preg_replace('/[&%$\/\\\|<>#£]/','',$_REQUEST['newemail2']);
+$newemail1 = input_check($_REQUEST['newemail1'],0);
+$newemail2 = input_check($_REQUEST['newemail2'],0);
 $passwordchk = $_REQUEST['newpass1'];
 
 $langfile = $language_array[$langval][1];

@@ -30,7 +30,7 @@ $token = input_check($_REQUEST['token'],0);
 $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $action = input_check($_REQUEST['action'],0);
-$number = preg_replace('/[&%$\\\|<>#�]/','',$_REQUEST['number']);
+$number = input_check($_REQUEST['number'],2);
 
 $langfile = $language_array[$langval][1];
 include($langfile);		// Import language variables.

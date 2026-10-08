@@ -1,6 +1,10 @@
 <?php 
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
-$title = preg_replace('/[&%$\/\\\|@<>#�]/','',$_REQUEST['title']);
+// PHP8 fix: input_check() здесь ещё недоступна (common.php подключается ниже),
+// поэтому оставляем самодостаточную защиту символов + отдельно защищаем от
+// path traversal в имени файла.
+$title = preg_replace('/[&%$\/\\\|@<>#]/','',$_REQUEST['title']);
+$title = str_replace(array('..','/','\\'), '', $title);
 $header = "Content-Disposition: attachment; filename=\"" . $title . ".l2j\"";
 header($header);
 /*

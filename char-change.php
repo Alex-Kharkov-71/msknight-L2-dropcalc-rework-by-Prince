@@ -33,8 +33,8 @@ $charname = input_check($_REQUEST['charname'],1);
 $charnum = input_check($_REQUEST['charnum'],0);
 $action = input_check($_REQUEST['action'],0);
 $account = input_check($_REQUEST['account'],1);
-$number = $_REQUEST['number'];
-$subclass = $_REQUEST['subclass'];
+$number = input_check($_REQUEST['number'],0);
+$subclass = input_check($_REQUEST['subclass'],2);
 $newown = input_check($_REQUEST['newown'],0);
 
 $langfile = $language_array[$langval][1];
