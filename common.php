@@ -1045,89 +1045,39 @@ if (!function_exists("stripos"))
 // Return a location string for a given shop mob
 function shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown)
 {
+	// PHP8/L2JMobius fix: tablitsy zone (goroda) i teleport (blizhayshie
+	// tochki) v L2JMobius net. Teper: koordinaty NPC beryotsya iz knightspawnlist,
+	// a nazvanie rayona - kak blizhayshaya zapis iz knightloc (spisok imenovannykh
+	// lokatsiy, kotoryy vedyot sam DropCalc). Esli knightloc pust - "unknown".
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	if (!$con)
 	{
 		echo "Could Not Connect";
 		die('Could not connect: ' . mysql_error());
-	}		
+	}
 	if (!mysql_select_db("$db_l2jdb",$con))
 	{
 		die('Could not change to L2J database: ' . mysql_error());
 	}
-	$sql = "select locx, locy from spawnlist where npc_templateid = '$shop_loc'";
-	$result6 = mysql_query($sql,$con);
-	$count_locs = 0;
 	$shop_location = $lang_unknown;
-	while ($r_array = mysql_fetch_assoc($result6)) 
+	$shop_loc = (int) $shop_loc;
+	$result6 = mysql_query("select locx, locy from knightspawnlist where npc_templateid = '$shop_loc' limit 1", $con);
+	if ($result6 && ($r_array = mysql_fetch_assoc($result6)))
 	{
-		$lx = $r_array[locx];
-		$ly = $r_array[locy];
+		$lx = $r_array['locx'];
+		$ly = $r_array['locy'];
 		$closest = 100000000;
-		$location_name = $lang_unknown;
-		$i_area_name = $lang_unknown;
-		$result7 = mysql_query("select name, x1, y1, x2, y2 from zone where type = 'Town'",$con);
-		while ($r_array = @mysql_fetch_assoc($result7)) 
+		$result8 = mysql_query("select x, y, name from knightloc", $con);
+		while ($result8 && ($l_array = mysql_fetch_assoc($result8)))
 		{
-			$x1 = $r_array['x1'];
-			$x2 = $r_array['x2'];
-			$y1 = $r_array['y1'];
-			$y2 = $r_array['y2'];
-			$ar_name = $r_array['name'];
-			if ($x1 > $x2)
+			$distx1 = $lx - $l_array['x'];
+			$disty1 = $ly - $l_array['y'];
+			$pythag = sqrt(($distx1 * $distx1) + ($disty1 * $disty1));
+			if ($pythag < $closest)
 			{
-				$temp = $x1;
-				$x1 = $x2;
-				$x2 = $temp;
+				$closest = $pythag;
+				$shop_location = $l_array['name'];
 			}
-			if ($y1 > $y2)
-			{
-				$temp = $y1;
-				$y1 = $y2;
-				$y2 = $temp;
-			}
-			if (($lx >= $x1) && ($lx <= $x2) && ($ly >= $y1) && ($ly <= $y2))
-			{
-				if ($count_locs == 0)
-				{	$i_area_name = "";	}
-				if ($count_locs)
-				{	$i_area_name = $i_area_name . ', ';	}
-				$i_area_name = $i_area_name . $ar_name;
-				$count_locs = 1;
-			}
-		}
-		if ($i_area_name == $lang_unknown)
-		{
-			$closest = 100000000;
-			$result8 = mysql_query("select loc_x,loc_y,description from teleport",$con);
-			while ($r_array = @mysql_fetch_assoc($result8)) 
-			{	
-				$x_pos1 = $r_array['loc_x'];	
-				$y_pos1 = $r_array['loc_y'];	
-				$name1 = $r_array['description'];
-				$spos = strpos($name1, '-> ') + 3;
-				if ($spos > 3)
-				{	$name1 = substr($name1, $spos, (strlen($name1)-$spos));		}
-				$distx1 = $lx - $x_pos1;
-				if ($distx1 < 0) 
-				{	$distx1 = -$distx1;	}
-				$disty1 = $ly - $y_pos1;
-				if ($disty1 < 0) 
-				{	$disty1 = -$disty1;	}
-				$pythag = sqrt(($distx1 * $distx1) + ($disty1 * $disty1));
-				if ($pythag < $closest)
-				{
-					$closest = $pythag;
-					$location_name = $name1;
-				}
-			}
-												
-			if ($location_name == "out)")
-			{	$location_name = "Oren Castle";	}
-			if (strpos($location_name, "vory Tower") > 0)
-			{	$location_name = "Ivory Tower";	}
-			if (strlen($location_name) > 0)
-			{ $shop_location = $location_name;	}
 		}
 	}
 	return $shop_location;

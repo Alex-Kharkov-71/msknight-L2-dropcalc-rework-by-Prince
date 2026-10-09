@@ -206,22 +206,24 @@ if ($evaluser)
 					$item_d_m_def = xip_escNum($stats['mDef'] ?? null);
 					$item_d_critical = xip_escNum($stats['critRate'] ?? null);
 					$item_d_avoid_modify = xip_escNum($stats['rEvas'] ?? null);
-					$item_d_crystallizable = xip_bool2enum($sets, 'crystallizable', 'false');
+					// crystallizable v XML net - eto proizvodnoe ot crystal_count (esli zadan - kristallizuetsya).
+					$item_d_crystallizable = isset($sets['crystallizable']) ? ($sets['crystallizable']==='true'?'true':'false') : (((int) ($sets['crystal_count'] ?? 0)) > 0 ? 'true' : 'false');
 					$item_d_tradeable = isset($sets['is_tradable']) ? ($sets['is_tradable']==='true'?'true':'false') : 'true';
 					$item_d_dropable = isset($sets['is_dropable']) ? ($sets['is_dropable']==='true'?'true':'false') : 'true';
-					$item_d_sellable = isset($sets['is_sellable']) ? ($sets['is_sellable']==='true'?'true':'false') : 'false';
-					$item_d_destroyable = 'true';
-					$item_d_depositable = 'true';
+					// Flagi v XML ukazany tolko kogda otlichayutsya ot umolchaniya, a umolchanie - true.
+					$item_d_sellable = isset($sets['is_sellable']) ? ($sets['is_sellable']==='true'?'true':'false') : 'true';
+					$item_d_destroyable = isset($sets['is_destroyable']) ? ($sets['is_destroyable']==='true'?'true':'false') : 'true';
+					$item_d_depositable = isset($sets['is_depositable']) ? ($sets['is_depositable']==='true'?'true':'false') : 'true';
 					$item_d_is_stackable = xip_bool2enum($sets, 'is_stackable', 'false');
 					$item_d_is_questitem = xip_bool2enum($sets, 'is_questitem', 'false');
 					$item_d_duration = -1;
 					$item_d_time = -1;
 					$item_d_mp_bonus = 0;
-					$item_d_change_weaponId = 0;
+					$item_d_change_weaponId = (int) ($sets['change_weaponId'] ?? 0);
 					$item_d_shield_def = 0;
 					$item_d_shield_def_rate = 0;
 					$item_d_hit_modify = 0;
-					$item_d_mp_consume = 0;
+					$item_d_mp_consume = (int) ($sets['mp_consume'] ?? 0);
 					$item_d_skill = "0-0;";
 
 					if ($item_type == "weapon")

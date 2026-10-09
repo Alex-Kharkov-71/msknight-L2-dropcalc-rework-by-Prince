@@ -81,6 +81,8 @@ if ($evaluser)
 		$file_loc = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'Recipes.xml';
 		$rec_count = 0;
 		$ing_count = 0;
+		$dup_count = 0;
+		$seen_rec = array();
 
 		$xml = xip_loadXml($file_loc);
 		if ($xml)
@@ -89,6 +91,12 @@ if ($evaluser)
 			{
 				$recId = (int) $item['id'];
 				$realRecipeId = (int) ($item['recipeId'] ?? $recId);
+				// V datapake odin recipeId inogda ob'yavlen dvazhdy (naprimer 5008 -
+				// id=138 i id=436). Beryom pervoe opredelenie, vtoroe propuskaem
+				// tselikom, inache ingredienty zadvoilis by.
+				if (isset($seen_rec[$realRecipeId]))
+				{	$dup_count++;	continue;	}
+				$seen_rec[$realRecipeId] = 1;
 				$rname = (string) $item['name'];
 				$level = (int) ($item['craftLevel'] ?? 0);
 				$successRate = (float) ($item['successRate'] ?? 100);
@@ -117,7 +125,7 @@ if ($evaluser)
 		{
 			echo "<p class=\"popup\">Файл не найден или не парсится: $file_loc</p>";
 		}
-		echo "<p>$rec_count recipes imported ($ing_count ingredients).</p>";
+		echo "<p>$rec_count recipes imported ($ing_count ingredients). Duplicate recipeId skipped: $dup_count.</p>";
 	}
 }
 

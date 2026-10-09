@@ -433,7 +433,9 @@ if ($evaluser)
 		
 		if ($found_item)
 		{
-			$sql = "select price, shop_id from merchant_buylists where item_id = $itemid union select price, shop_id from custom_merchant_buylists where item_id = $itemid order by price";
+			// PHP8/L2JMobius fix: merchant_buylists/merchant_shopids nyet - knightbuylist
+			// (importbuylists.php): shop_id v nyom - eto id NPC-torgovtsa. price NULL = tsena predmeta.
+			$sql = "select price, shop_id from knightbuylist where item_id = $itemid order by price";
 			$result2 = mysql_query($sql,$con);
 			$count_r = mysql_num_rows($result2);
 			$shop_shown = 0;
@@ -449,8 +451,8 @@ if ($evaluser)
 					{	$i_price = comaise(mysql_result($result2,$i,"price"));	}
 					$i_shopid = mysql_result($result2,$i,"shop_id");
 
-					$sql = "select npc_id from merchant_shopids where shop_id = $i_shopid union select npc_id from custom_merchant_shopids where shop_id = $i_shopid";
-					$result3 = mysql_query($sql,$con);
+					// shop_id v knightbuylist - eto uzhe id NPC, otdelnyy zapros ne nuzhen.
+					$result3 = mysql_query("select $i_shopid as npc_id", $con);
 					$count_r2 = mysql_num_rows($result3);
 					if ($result3)
 					{
@@ -460,7 +462,7 @@ if ($evaluser)
 						{	$i_npcid = "CUST";	}
 						if (($i_npcid <> "gm") && ($i_npcid <> "CUST"))
 						{
-							$sql = "select name from npc where id = $i_npcid union select name from custom_npc where id = $i_npcid";
+							$sql = "select name from knightnpc where id = $i_npcid";
 							$result6 = mysql_query($sql,$con);
 							if ($result6)
 							{	$count_recs = mysql_num_rows($result6);
@@ -529,7 +531,7 @@ if ($evaluser)
 						$m_type = mysql_result($result8,0,"type");
 						$m_aggro = mysql_result($result8,0,"aggro");
 						echo "<a href=\"m-search.php?$itemname=$mob_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&monsterid=$char_num\" class=\"dropmain\">";
-						if (($m_type == "L2Monster") || ($m_type == "L2Minion") || ($m_type == "L2Boss") || ($m_type == "L2RaidBoss"))
+						if (($m_type == "Monster") || ($m_type == "Minion") || ($m_type == "RaidBoss") || ($m_type == "RaidBoss"))
 						{	
 							if ($m_aggro)
 							{	echo "<font color=$red_code>$m_name</font></a>";	}
@@ -552,17 +554,11 @@ if ($evaluser)
 			echo "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td colspan=\"7\" class=\"lefthead\"><p class=\"dropmain\">DROPS</p></td></tr><tr class=\"thead\">";
 			echo "<td width=\"170\" class=\"drophead\"><p class=\"left\">$lang_name</p></td><td class=\"drophead\"><p class=\"dropmain\">Lvl</p></td><td class=\"drophead\"><p class=\"dropmain\">Min/Max</p></td><td class=\"drophead\" colspan=\"3\"><p class=\"dropmain\">$lang_spawn<br><font color=$green_code>$lang_day...</font><font color=$red_code>$lang_night...</font>$lang_always</p></td><td class=\"drophead\"><p class=\"dropmain\">Chance</p></td></tr>";
 			
+			// PHP8/L2JMobius fix: droplist/custom_droplist net - knightdroplist (importnpc.php).
+			// Vsegda rezhim "sweep" (pryamye shansy); shans = chance * group_chance / 100,
+			// protsenty uzhe nastoyashchie (bez starogo *10000).
 			$drop_engine = 0;
-			$sql = "show fields from droplist";
-			$result2 = mysql_query($sql,$con);
-			while ($r_array = mysql_fetch_assoc($result2)) 
-			{
-				if (strcasecmp($r_array['Field'],"category") == 0)
-				{ $drop_engine = 1; }
-			}
-			$sql = "select mobid, min, max, sweep, chance from droplist where itemid = $itemid union select mobid, min, max, sweep, chance from custom_droplist where itemid = $itemid";
-			if ($drop_engine)
-			{	$sql = "select mobid, min, max, category, chance from droplist where itemid = $itemid union select mobid, min, max, category, chance from custom_droplist where itemid = $itemid";	}
+			$sql = "select mobid, min, max, sweep, chance, group_chance from knightdroplist where itemid = $itemid";
 			$result2 = mysql_query($sql,$con);
 			
 			$itm_array = ARRAY();
@@ -582,6 +578,8 @@ if ($evaluser)
 				else
 				{
 					$item_sweep = $r_array['sweep'];
+					if (!$item_sweep && $r_array['group_chance'] !== null && $r_array['group_chance'] !== '')
+					{	$item_chance = $item_chance * $r_array['group_chance'] / 100;	}
 				}
 				if ($drop_engine)
 				{	
@@ -590,7 +588,7 @@ if ($evaluser)
 					else
 					{
 						$catg = $r_array['category'];
-						$result3 = mysql_query("select chance from droplist where mobId = $mob_id and category = $catg union select chance from custom_droplist where mobId = $mob_id and category = $catg",$con);
+						$result3 = mysql_query("select chance from knightdroplist where mobid = $mob_id and category = $catg",$con);
 						$t_pcnt = 0;
 						while ($r_array3 = mysql_fetch_assoc($result3))
 						{
@@ -615,7 +613,6 @@ if ($evaluser)
 				{   $item_chance *= $drop_chance_item;	}
 				else
 				{	$item_chance *= $drop_chance_spoil;	}
-				$item_chance /=10000;
 				$i_min = $r_array['min'];
 				$i_max = $r_array['max'];
 				if ($item_chance > 100)
@@ -640,7 +637,7 @@ if ($evaluser)
 				}
 				
 				$error_finding = 0;
-				$sql = "select name, type, level from npc where id = $mob_id union select name, type, level from custom_npc where id = $mob_id";  // Try armour database
+				$sql = "select name, type, level from knightnpc where id = $mob_id";  // Try armour database
 				$result3 = mysql_query($sql,$con);
 				if (!mysql_fetch_array($result3))
 				{
@@ -653,11 +650,11 @@ if ($evaluser)
 					$mob_name = mysql_result($result3,0,"name");
 					$mob_level = mysql_result($result3,0,"level");
 					$mob_type = "";
-					if (mysql_result($result3,0,"type") == "L2RaidBoss")
+					if (mysql_result($result3,0,"type") == "RaidBoss")
 					{	$mob_type = " <font color=$red_code><small>(raidboss)</small></font>";	}
-					elseif (mysql_result($result3,0,"type") == "L2Minion")
+					elseif (mysql_result($result3,0,"type") == "Minion")
 					{	$mob_type = " <font color=$red_code><small>(minion)</small></font>";	}
-					elseif (mysql_result($result3,0,"type") == "L2Boss")
+					elseif (mysql_result($result3,0,"type") == "RaidBoss")
 					{	$mob_type = " <font color=$red_code><small>(boss)</small></font>";	}
 					elseif (mysql_result($result3,0,"type") == "L2PenaltyMonster")
 					{	$mob_type = " <font color=$red_code><small>(penalty)</small></font>";	}
@@ -701,7 +698,7 @@ if ($evaluser)
 				$mob_normals = $mob_spwn[6];
 				$mob_normalt = $mob_spwn[7];
 
-				if (($mob_spawnnum > 0) || (($user_access_lvl >= $sec_inc_gmlevel) && ($adminshow)) || ($mob_style == 'L2Boss') || ($mob_style == 'L2RaidBoss') || ($mob_style == 'L2Minion') || ($mob_style == 'L2PenaltyMonster'))
+				if (($mob_spawnnum > 0) || (($user_access_lvl >= $sec_inc_gmlevel) && ($adminshow)) || ($mob_style == 'RaidBoss') || ($mob_style == 'RaidBoss') || ($mob_style == 'Minion') || ($mob_style == 'L2PenaltyMonster'))
 				{
 					if ($item_sweep < 1)
 					{
