@@ -318,7 +318,7 @@ $result2 = mysql_query($sql2,$con);
 					$found = 1;
 					if ($shoponly > 0)
 					{	
-						$result2 = mysql_query("select COUNT(*) from merchant_buylists where item_id = '$i_id' and (shop_id < 1001 or shop_id > 301000)",$con);
+						$result2 = mysql_query("select COUNT(*) from knightbuylist where item_id = '$i_id'",$con);
 						$found = mysql_result($result2,0,"COUNT(*)");
 					}
 					if ($found > 0)
@@ -435,7 +435,7 @@ $result2 = mysql_query($sql2,$con);
 					$found = 1;
 					if ($shoponly > 0)
 					{	
-						$result2 = mysql_query("select COUNT(*) from merchant_buylists where item_id = '$i_id' and (shop_id < 1001 or shop_id > 301000)",$con);
+						$result2 = mysql_query("select COUNT(*) from knightbuylist where item_id = '$i_id'",$con);
 						$found = mysql_result($result2,0,"COUNT(*)");
 					}
 					if ($found > 0)
@@ -549,7 +549,7 @@ $result2 = mysql_query($sql2,$con);
 					$found = 1;
 					if ($shoponly > 0)
 					{	
-						$result2 = mysql_query("select COUNT(*) from merchant_buylists where item_id = '$i_id' and (shop_id < 1001 or shop_id > 301000)",$con);
+						$result2 = mysql_query("select COUNT(*) from knightbuylist where item_id = '$i_id'",$con);
 						$found = mysql_result($result2,0,"COUNT(*)");
 					}
 					if ($found > 0)

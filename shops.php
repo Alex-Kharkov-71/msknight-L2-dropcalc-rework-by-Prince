@@ -75,109 +75,14 @@ if ($evaluser)
 		}
 		echo "<h2 class=\"dropmain\">Shops</h2>";
 
-		if ($action == "delete")
-		{
-			$sql = "delete from merchant_buylists where shop_id = '$shopid' and item_id = '$itemid'";
-			$result = mysql_query($sql,$con);
-			$sql = "select `order` from merchant_buylists where shop_id = '$shopid' order by `order`";
-			$result = mysql_query($sql,$con);
-			$count = mysql_num_rows($result); 	// We start the shop add by tidying up the actual shop order numbers.
-			$i=0;
-			while ($i < $count)
-			{
-				$i_order = mysql_result($result,$i,"order");
-				$i++;
-				if ($i_order != $i)
-				{
-					$sql = "update merchant_buylists set `order` = '$i' where shop_id = '$shopid' and `order` = '$i_order'";
-					$result2 = mysql_query($sql,$con);
-				}
-			}
-		}
+		// PHP8/L2JMobius fix: redaktirovanie magazinov (delete/change/up/down/add)
+		// pravilo tablitsu merchant_buylists igrovogo servera. V L2JMobius magaziny
+		// zadany v XML datapaka (data/buylists), tablitsy net - redaktirovat nechego.
+		// Stranitsa ostayotsya tolko dlya prosmotra (knightbuylist).
+		if ($action != "")
+		{	echo "<h2 class=\"dropmain\">Editing shops from here is not possible: L2JMobius keeps shops in the XML datapack (data/buylists). Edit the XML and re-run Server Utilities - Import Buylists.</h2>";	}
 
-		if ($action == "change")
-		{
-			$sql = "update merchant_buylists set price = '$price' where shop_id = '$shopid' and item_id = '$itemid'";
-			$result = mysql_query($sql,$con);
-		}
-
-		if ($action == "up")
-		{
-			$up_num = $itemid - 1;
-			$sql = "update merchant_buylists set `order` = '9999' where shop_id = '$shopid' and `order` = '$up_num'";
-			$result = mysql_query($sql,$con);
-			$sql = "update merchant_buylists set `order` = '$up_num' where shop_id = '$shopid' and `order` = '$itemid'";
-			$result = mysql_query($sql,$con);
-			$sql = "update merchant_buylists set `order` = '$itemid' where shop_id = '$shopid' and `order` = '9999'";
-			$result = mysql_query($sql,$con);
-		}
-
-		if ($action == "down")
-		{
-			$up_num = $itemid + 1;
-			$sql = "update merchant_buylists set `order` = '9999' where shop_id = '$shopid' and `order` = '$up_num'";
-			$result = mysql_query($sql,$con);
-			$sql = "update merchant_buylists set `order` = '$up_num' where shop_id = '$shopid' and `order` = '$itemid'";
-			$result = mysql_query($sql,$con);
-			$sql = "update merchant_buylists set `order` = '$itemid' where shop_id = '$shopid' and `order` = '9999'";
-			$result = mysql_query($sql,$con);
-		}
-
-		if ($action == "add")
-		{
-			$sql = "select `order` from merchant_buylists where shop_id = '$shopid' order by `order`";
-			$result = mysql_query($sql,$con);
-			$count = mysql_num_rows($result); 	// We start the shop add by tidying up the actual shop order numbers.
-			$i=0;
-			while ($i < $count)
-			{
-				$i_order = mysql_result($result,$i,"order");
-				$i++;
-				if ($i_order != $i)
-				{
-					$sql = "update merchant_buylists set `order` = '$i' where shop_id = '$shopid' and `order` = '$i_order'";
-					$result2 = mysql_query($sql,$con);
-				}
-			}
-			$i++;
-			$next_item = $i;
-			$sql = "select `order` from merchant_buylists where shop_id = '$shopid' and item_id = '$itemid'";
-			$result = mysql_query($sql,$con);
-			$count = mysql_num_rows($result);
-			if ($count)
-			{	echo "<h2 class=\"dropmain\">Item $itemid already in shop.</h2>";	}
-			else
-			{
-				$found_item = 0;
-				$sql = "select name, crystal_type from armor where item_id = '$itemid'";
-				$result2 = mysql_query($sql,$con);
-				$count4 = mysql_num_rows($result2);
-				if ($count4)
-				{	$found_item = 1;	}
-				$sql = "select name, crystal_type from etcitem where item_id = '$itemid'";
-				$result2 = mysql_query($sql,$con);
-				$count4 = mysql_num_rows($result2);
-				if ($count4)
-				{	$found_item = 1;	}
-				$sql = "select name, crystal_type from weapon where item_id = '$itemid'";
-				$result2 = mysql_query($sql,$con);
-				$count4 = mysql_num_rows($result2);
-				if ($count4)
-				{	$found_item = 1;	}
-				if (!$found_item)
-				{	echo "<h2 class=\"dropmain\">Item $itemid doesn't exist in game.</h2>";	}
-				else
-				{
-					$price = intval($price);
-					if ($price < 0)
-					{	$price = 0;	}
-					$sql = "insert into merchant_buylists (item_id, price, shop_id, `order`) values ('$itemid', '$price', '$shopid', '$next_item')";
-					$result2 = mysql_query($sql,$con);
-				}
-			}
-		}
-
-		$sql = "select shop_id, npc_id from merchant_shopids order by shop_id";
+		$sql = "select distinct shop_id, shop_id as npc_id from knightbuylist order by shop_id";
 		$result = mysql_query($sql,$con);
 		$count = mysql_num_rows($result);
 
@@ -192,7 +97,7 @@ if ($evaluser)
 				$shop_id = mysql_result($result,$i,"shop_id");
 				$shop_owner = mysql_result($result,$i,"npc_id");
 				$shop_loc = intval($shop_owner);
-				$sql = "select name from npc where id = '$shop_owner' union select name from custom_npc where id = '$shop_owner'";
+				$sql = "select name from knightnpc where id = '$shop_owner'";
 				$result2 = mysql_query($sql,$con);
 				$count2 = mysql_num_rows($result2);
 				if ($count2)
@@ -221,7 +126,7 @@ if ($evaluser)
 		}
 		else
 		{
-			$sql = "select shop_id, npc_id from merchant_shopids where shop_id = '$shopid'";
+			$sql = "select distinct shop_id, shop_id as npc_id from knightbuylist where shop_id = '$shopid'";
 			$result = mysql_query($sql,$con);
 			$shop_id = mysql_result($result,0,"shop_id");
 			$shop_owner = mysql_result($result,0,"npc_id");
@@ -233,7 +138,7 @@ if ($evaluser)
 				{	$shop_loc = 1000000 + $shop_loc;	}
 				$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
 			}
-			$sql = "select name from npc where id = '$shop_owner' union select name from custom_npc where id = '$shop_owner'";
+			$sql = "select name from knightnpc where id = '$shop_owner'";
 			$result2 = mysql_query($sql,$con);
 			$count2 = mysql_num_rows($result2);
 			if ($count2)
@@ -254,7 +159,7 @@ if ($evaluser)
 			echo "</tr></table></center>";
 			echo "<p>&nbsp</p>";
 
-			$sql = "select item_id, price, `order` from merchant_buylists where shop_id = '$shop_id' order by `order`";
+			$sql = "select item_id, price, 0 as `order` from knightbuylist where shop_id = '$shop_id'";
 
 			$result = mysql_query($sql,$con);
 			$count = mysql_num_rows($result);
@@ -268,6 +173,11 @@ if ($evaluser)
 			{
 				$item_id = mysql_result($result,$i,"item_id");
 				$item_price = mysql_result($result,$i,"price");
+				if ($item_price === null || $item_price === "")
+				{	// price v XML ne zadan - znachit bazovaya tsena predmeta
+					$rp = mysql_query("select price from knightarmour where item_id = '$item_id' union select price from knightweapon where item_id = '$item_id' union select price from knightetcitem where item_id = '$item_id'",$con);
+					$item_price = ($rp && mysql_num_rows($rp)) ? mysql_result($rp,0,"price") : 0;
+				}
 				$itm_grade = "?";
 				$itm_name = "$lang_unknown";
 				$sql = "select name, crystal_type from knightarmour where item_id = '$item_id'";
