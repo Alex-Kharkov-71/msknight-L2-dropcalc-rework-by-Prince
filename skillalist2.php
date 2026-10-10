@@ -89,7 +89,7 @@ if ($evaluser)
 		}
 			
 	}
-	fclose($handle);
+	if ($handle) { fclose($handle); }
 	echo "<p>$s</p>";
 }
 
