@@ -269,8 +269,8 @@ if ($evaluser)
 		if ($action == "vk")
 		{
 			$number = intval($number);
-			$sql = "update characters set varka_ketra_ally = '$number' where char_name = '$charname'";
-			$result = mysql_query($sql,$con);
+			// PHP8/L2JMobius: kolonki characters.varka_ketra_ally v Mobius net - izmenenie nedostupno.
+			$result = false;
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't change Varka Ketra.<br>" . mysql_error() . "</h2>";	}
 			else
@@ -305,7 +305,7 @@ if ($evaluser)
 		if ($action == "heroyes")
 		{
 			$number = intval($number);
-			$sql = "update heroes set played = 1 where char_name = '$charname' and class_id = $subclass";
+			$sql = "update heroes set played = 1 where charId = (select charId from characters where char_name = '$charname') and class_id = $subclass";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't change Hero<br>" . mysql_error() . "</h2>";	}
@@ -317,7 +317,7 @@ if ($evaluser)
 		if ($action == "herono")
 		{
 			$number = intval($number);
-			$sql = "update heroes set played = 0 where char_name = '$charname' and class_id = $subclass";
+			$sql = "update heroes set played = 0 where charId = (select charId from characters where char_name = '$charname') and class_id = $subclass";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't change Hero<br>" . mysql_error() . "</h2>";	}
@@ -329,7 +329,7 @@ if ($evaluser)
 		if ($action == "herocc")
 		{
 			$number = intval($number);
-			$sql = "update heroes set `count` = $number where char_name = '$charname' and class_id = $subclass";
+			$sql = "update heroes set `count` = $number where charId = (select charId from characters where char_name = '$charname') and class_id = $subclass";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't change Hero<br>" . mysql_error() . "</h2>";	}
@@ -340,7 +340,7 @@ if ($evaluser)
 
 		if ($action == "herodelete")
 		{
-			$sql = "delete from heroes where char_name = '$charname' and class_id = $subclass";
+			$sql = "delete from heroes where charId = (select charId from characters where char_name = '$charname') and class_id = $subclass";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't delete Hero<br>" . mysql_error() . "</h2>";	}
@@ -351,7 +351,7 @@ if ($evaluser)
 
 		if ($action == "makehero")
 		{
-			$sql = "insert into heroes (charId, char_name, class_id, count, played) values('$charnum', '$charname', '$subclass', '0', '0')";
+			$sql = "insert into heroes (charId, class_id, count, played) values('$charnum', '$subclass', '0', '0')";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{	echo "<h2 class=\"dropmain\">Database error - Couldn't create Hero<br>" . mysql_error() . "</h2>";	}
@@ -362,7 +362,7 @@ if ($evaluser)
 
 		if ($action == "")
 		{
-			$sql = "select charId, death_penalty_level, accesslevel, level, sp, karma, pvpkills, pkkills, clanid, title, nobless, subpledge, lvl_joined_academy, apprentice, sponsor, varka_ketra_ally from characters where char_name = '$charname'";
+			$sql = "select charId, death_penalty_level, accesslevel, level, sp, karma, pvpkills, pkkills, clanid, title, nobless, subpledge, lvl_joined_academy, apprentice, sponsor from characters where char_name = '$charname'";
 			$result = mysql_query($sql,$con);
 
 			if (!$result)
@@ -436,7 +436,7 @@ if ($evaluser)
 
 			echo "<table width=\"100%\" class=\"blanktab\"><tr><td class=\"noborderback\">";
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"lefthead\" colspan=\"2\"><p class=\"dropmain\"><strong class=\"dropmain\"><font color=$green_code>Ketra(+)</font> <font color=$red_code>Varka(-)</font> = ";
-			$char_vk = mysql_result($result,0,"varka_ketra_ally");
+			$char_vk = 0;	// PHP8/L2JMobius: kolonki characters.varka_ketra_ally v Mobius net
 			if ($char_vk > 0)
 			{	echo "<strong><font color=$green_code>$char_vk</font></strong>";	}
 			elseif ($char_vk < 0)

@@ -281,7 +281,8 @@ if ($evaluser)
 		}
 		else
 		{
-			$lines = file($file_loc);
+			$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 			$line_nums = count($lines);
 			echo "<form method=\"post\" action=\"clog.php\"><input value=\" <- View Last Lines -> \" type=\"submit\" class=\"bigbut\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"lastlines\" type=\"hidden\" value=\"1\"><input name=\"include\" type=\"hidden\" value=\"$include\"></form>";
 			echo "<pre class=\"dropmain\">";

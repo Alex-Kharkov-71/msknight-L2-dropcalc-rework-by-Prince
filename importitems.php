@@ -25,7 +25,7 @@ $username = input_check($_REQUEST['username'],1);
 $token = input_check($_REQUEST['token'],0);
 $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
-$next = input_check($_REQUEST['next'],0);
+$next = (int) input_check($_REQUEST['next'],0);
 $ia = $next;
 $next++;
 

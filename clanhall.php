@@ -55,9 +55,9 @@ if ($evaluser)
 	if (!mysql_select_db("$db_l2jdb",$con))
 	{	die('Could not change to L2J database: ' . mysql_error());	}
 	if (($user_access_lvl >= $sec_inc_admin) && ($action == "hour"))
-	{	$result = mysql_query("update castle set siegehourofday = '$number' where `id` = '$castle'",$con);	}
+	{	/* PHP8/L2JMobius: castle.siegehourofday net - sm. siegeDate v castles.php */	}
 	if (($user_access_lvl >= $sec_inc_admin) && ($action == "day"))
-	{	$result = mysql_query("update castle set siegedayofweek = '$number' where `id` = '$castle'",$con);	}
+	{	/* PHP8/L2JMobius: castle.siegedayofweek net - sm. siegeDate v castles.php */	}
 	
 	echo "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"blanktab\"><tr>";
 	echo "<td class=\"dropmain\" valign=\"top\"><form method=\"post\" action=\"7sign.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\"><input value=\"$lang_sevens\" type=\"submit\" class=\"bigbut2\"></form></td>";

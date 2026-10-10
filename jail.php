@@ -85,9 +85,9 @@ if ($evaluser)
 			$is_online = mysql_result($result_i,0,"online");
 			if (!$is_online)
 			{	
-				$sql = "update characters set punish_level=0, punish_timer=0 where char_name = '$touser'";
-				$result_i = mysql_query($sql,$con);
-				echo "<p class=\"popup\">Unjail command sent</p>";
+				// PHP8/L2JMobius: kolonok characters.punish_level/punish_timer v Mobius net -
+				// offlayn-razjail cherez BD nedostupen (igrok dolzhen byt onlayn).
+				echo "<p class=\"popup\">Offline unjail is not supported on this server version - the player has to be online.</p>";
 			}
 			else
 			{

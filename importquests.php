@@ -77,7 +77,8 @@ if ($evaluser)
 			$result = mysql_query($sql,$con);
 		}
 		$in_file = $file_loc . 'scripts.cfg';
-		$lines = file($in_file);
+		$lines = @file($in_file);
+		if (!is_array($lines)) {	$lines = array();	}
 		$line_nums = count($lines);
 		$found = 0;
 		$run_with = "";
@@ -107,7 +108,8 @@ if ($evaluser)
 			$file_name = $file_loc . 'scripts' . $svr_dir_delimit . 'quests' . $svr_dir_delimit . $run_with . $svr_dir_delimit . '__init__.py';
 			if (file_exists($file_name))
 			{
- 				$lines = file($file_name);
+ 				$lines = @file($file_name);
+		if (!is_array($lines)) {	$lines = array();	}
 				$line_nums = count($lines);
 				$stage = 0;
 				$itm_array = ARRAY();

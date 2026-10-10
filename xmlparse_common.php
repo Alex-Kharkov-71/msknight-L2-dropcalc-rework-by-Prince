@@ -57,8 +57,9 @@ function xip_listXmlFiles(string $dir): array
 }
 
 /** Собрать "NNN00-NNN99" из номера диапазона $ia, как в оригинальном коде. */
-function xip_rangeName(int $ia): string
+function xip_rangeName($ia): string
 {
+	$ia = (int) $ia;
     if ($ia == 0) return "000";
     if ($ia < 10) return "00" . $ia;
     if ($ia < 100) return "0" . $ia;

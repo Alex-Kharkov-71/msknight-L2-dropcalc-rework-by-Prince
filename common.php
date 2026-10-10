@@ -712,13 +712,13 @@ function delete_char($character, $db_location, $db_user, $db_psswd, $db_l2jdb, $
 	$result = mysql_query("select charId from characters where char_name = '$character'",$con);
 	$char_id = mysql_result($result,0,"charId");
 
-	$result = mysql_query("DELETE FROM pets WHERE item_charId IN (SELECT object_id FROM items where owner_id = '$char_id')",$con);
-	$result = mysql_query("DELETE FROM character_friends WHERE char_id = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items where owner_id = '$char_id')",$con);
+	$result = mysql_query("DELETE FROM character_friends WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_subclasses WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_hennas WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_macroses WHERE charId  = '$char_id'",$con);
-	$result = mysql_query("DELETE FROM character_quests WHERE char_id  = '$char_id'",$con);
-	$result = mysql_query("DELETE FROM character_recipebook WHERE char_id  = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM character_quests WHERE charId  = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM character_recipebook WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_shortcuts WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_skills WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_skills_save WHERE charId = '$char_id'",$con);
@@ -765,7 +765,8 @@ function gethexid($server_dir, $svr_dir_delimit)
 {
 	$return_value = "";
 	$file_loc = $server_dir . 'config' . $svr_dir_delimit . 'hexid.txt';
-	$lines = file($file_loc);
+	$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 	$line_nums = count($lines);
 	foreach ($lines as $line_num => $line) 
 	{

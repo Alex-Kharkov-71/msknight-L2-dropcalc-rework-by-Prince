@@ -95,7 +95,8 @@ if ($evaluser)
 			}
 			else
 			{
-				$lines = file($file_loc);
+				$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 				$line_nums = count($lines);
 				echo "<form method=\"post\" action=\"gmlog.php\"><input value=\" <- View Last Lines -> \" type=\"submit\" class=\"bigbut\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"lastlines\" type=\"hidden\" value=\"1\"><input name=\"gm_name\" value=\"$gm_name\" type=\"hidden\"></form>";
 				echo "<pre class=\"dropmain\">";
@@ -115,7 +116,8 @@ if ($evaluser)
 				$output = shell_exec($shell_cmd);
 			}
 
-			$lines = file($file_loc);
+			$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 			$line_nums = count($lines);
 			echo "<pre class=\"dropmain\">";
 			if (!$lastlines)
@@ -142,8 +144,10 @@ if ($evaluser)
   		      Choose GM to audit: <select align=left name='gm_name' OnChange='submit()'>";
 		
 		$dir_loc = $server_dir . 'log' . $svr_dir_delimit . 'GMAudit';
-		$open_dir = opendir($dir_loc);
-		while(false !== ($check = readdir($open_dir))){
+		$open_dir = @opendir($dir_loc);
+		$files = array();
+		$time = array();
+		while($open_dir && (false !== ($check = readdir($open_dir)))){
 			    $time[] = filemtime($dir_loc . $svr_dir_delimit . $check );
 			    $files[] = $check;
 			    array_multisort ($time, SORT_NUMERIC, SORT_DESC,

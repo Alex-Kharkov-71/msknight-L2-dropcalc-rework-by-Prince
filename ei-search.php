@@ -94,7 +94,7 @@ if (($evaluser) && ($username != "guest"))
 		}
 	}
 	else
-	{	$sql = "select charId from characters where access_level >= '$sec_inc_gmlevel'";	}
+	{	$sql = "select charId from characters where accesslevel >= '$sec_inc_gmlevel'";	}
 	
 	$result = mysql_query($sql,$con);
 	$sql = "select owner_id, item_id, count, enchant_level, loc, loc_data from items where enchant_level > '$enchant' ";

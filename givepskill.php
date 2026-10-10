@@ -117,7 +117,7 @@ if ($evaluser)
 			// Looking simply for the name and crystal type.
 			
 
-			$sql = $sql . " where item_charId = '$pet'";
+			$sql = $sql . " where item_obj_id = '$pet'";
 			$result = mysql_query($sql,$con);
 			
 			$sql = "select level from pets_stats where type = '$pet_db' order by level desc limit 1";
@@ -141,14 +141,14 @@ if ($evaluser)
 					else
 					{
 
-						$sql = "update pets set level = $qty where item_charId = '$pet'";
+						$sql = "update pets set level = $qty where item_obj_id = '$pet'";
 						$skill_result = mysql_query($sql,$con);
 						$sql = "select expmax, hpmax, mpmax, patk, pdef, matk, mdef, acc, evasion, crit, speed, atk_speed, cast_speed, feedmax, feedbattle, feednormal, loadmax, hpregen, mpregen from pets_stats where type = '$pet_db' and level = '$qty'";
 						$result = mysql_query($sql,$con);
 						$sql = "update pets set maxhp = '" . mysql_result($result,0,"hpmax") . "', curhp = '" . mysql_result($result,0,"hpmax") . "', maxmp = '" . mysql_result($result,0,"mpmax") . "', curmp = '" . mysql_result($result,0,"mpmax") . "', acc = '" . mysql_result($result,0,"acc") . "', crit = '" . mysql_result($result,0,"crit") . "', evasion = '" . mysql_result($result,0,"evasion");
 						$sql = $sql . "', maxmp = '" . mysql_result($result,0,"mpmax") . "', matk = '" . mysql_result($result,0,"matk") . "', mdef = '" . mysql_result($result,0,"mdef") . "', mspd = '" . mysql_result($result,0,"atk_speed") . "', patk = '" . mysql_result($result,0,"patk") . "', pdef = '" . mysql_result($result,0,"pdef") . "', pspd = '" . mysql_result($result,0,"speed");
 						$sql = $sql . "', fed = '" . mysql_result($result,0,"feedmax") . "', max_fed = '" . mysql_result($result,0,"feedmax") . "', wit = '" . mysql_result($result,0,"loadmax") . "', exp = '" . mysql_result($result,0,"expmax") . "', sp = '" . mysql_result($result,0,"speed");
-						$sql = $sql . "' where item_charId = '$pet'";
+						$sql = $sql . "' where item_obj_id = '$pet'";
 						$result = mysql_query($sql,$con);
 						echo "Skill level $qty given";
 					}

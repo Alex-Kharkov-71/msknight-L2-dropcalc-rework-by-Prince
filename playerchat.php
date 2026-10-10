@@ -84,7 +84,8 @@ if ($evaluser)
 		$output = shell_exec($command_string);
 		
 
-		$lines = file($file_loc);
+		$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 		$line_nums = count($lines);
 		echo "<pre class=\"dropmain\">";
 		if (!$lastlines)

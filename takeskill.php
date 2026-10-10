@@ -27,6 +27,7 @@ include('common.php');
 // Retrieve environment variables
 $username = input_check($_REQUEST['username'],1);
 $token = input_check($_REQUEST['token'],0);
+$langval = input_check($_REQUEST['langval'],2);
 $fromuser = input_check($_REQUEST['fromuser'],1);
 $itemid = input_check($_REQUEST['itemid'],0);
 $itemqty = input_check($_REQUEST['itemqty'],0);

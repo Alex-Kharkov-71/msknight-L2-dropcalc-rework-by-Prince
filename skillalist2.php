@@ -27,7 +27,7 @@ $file = input_check($_REQUEST['file'],0);
 
 $langfile = $language_array[$langval][1];
 include($langfile);		// Import language variables.
-$file2 = $file + 1;
+$file2 = intval($file) + 1;
 echo "<html class=\"popup\">
 <head>
 <title>Michelle's Generic Drop Calc</title>";
@@ -70,7 +70,7 @@ if ($evaluser)
 	$file_loc = $file_base . $s . '00-' . $s . '99.xml';
 	$handle = fopen($file_loc, "r");
 	$skill_on = 99999;
-	while (!feof($handle))
+	while ($handle && !feof($handle))
 	{
 		if ($php_type >= 1)
 		{	$line = stream_get_line($handle, 10000, "\n"); }

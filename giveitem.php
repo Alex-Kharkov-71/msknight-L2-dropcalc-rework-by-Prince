@@ -309,7 +309,7 @@ if ($evaluser)
 							$char_id = mysql_result($char_result,0,"charId");
 							$sql = "delete from character_skills where charId = '$userid' and skill_id = '$itemid'";
 							$skill_result = mysql_query($sql,$con);
-							$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) values ('$userid', '$itemid', '$skill_max', '$skill_name', '0')";
+							$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) values ('$userid', '$itemid', '$skill_max', '0')";
 							$skill_result = mysql_query($sql,$con);
 							echo "Skill $skill_name level $qty given";
 						}

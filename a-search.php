@@ -196,7 +196,7 @@ if ($evaluser)
 		$count_res = 0;
 		$c_access = 0;
 		$c_onl = 0;
-		$a_num = count($result2);
+		$a_num = mysql_num_rows($result2);
 		while ($r_array = mysql_fetch_assoc($result2))  // Go through the characters accounts and total the number of character access levels and if any are online.
 		{
 			$c_alvl = $r_array['accesslevel'];
@@ -294,7 +294,7 @@ if ($evaluser)
 				{ echo "<td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Acc Lvl</strong></p></td>"; }
 				echo "</tr>\n";
 			}
-			$a_num = count($result2);
+			$a_num = mysql_num_rows($result2);
 			while ($r_array = mysql_fetch_assoc($result2))  // Go through the characters accounts for each that matches the player account.
 			{
 				$c_num = $r_array['charId'];
