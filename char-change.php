@@ -478,15 +478,15 @@ if ($evaluser)
 			$sql = "select class_id, class_index from character_subclasses where charId = '$charnum'";
 			
 			$result2 = mysql_query($sql,$con);
-			$subclass_list = ARRAY(0);
+			$subknightclass = ARRAY(0);
 			while ($r_array = mysql_fetch_assoc($result2))
-			{	array_push($subclass_list, $r_array['class_index']);	}
-			for ($i=0; $i < count($subclass_list); $i++)
+			{	array_push($subknightclass, $r_array['class_index']);	}
+			for ($i=0; $i < count($subknightclass); $i++)
 			{
-				$t_class = $subclass_list[$i];
+				$t_class = $subknightclass[$i];
 				if ($t_class == 0)
 				{
-					$sql = "select class_name from class_list where id = $c_baseclass";
+					$sql = "select class_name from knightclass where id = $c_baseclass";
 					$result3 = mysql_query($sql,$con);
 					$cl_name = mysql_result($result3,0,"class_name");
 				}
@@ -495,7 +495,7 @@ if ($evaluser)
 					$sql = "select class_id from character_subclasses where charId = '$char_id' and class_index = $t_class";
 					$result3 = mysql_query($sql,$con);
 					$cl_id = mysql_result($result3,0,"class_id");
-					$sql = "select class_name from class_list where id = $cl_id";
+					$sql = "select class_name from knightclass where id = $cl_id";
 					$result3 = mysql_query($sql,$con);
 					$cl_name = mysql_result($result3,0,"class_name");
 				}

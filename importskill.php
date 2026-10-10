@@ -69,7 +69,8 @@ if ($evaluser)
 		require_once(__DIR__ . '/xmlparse_common.php');
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'skills' . $svr_dir_delimit;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS `knightskills` (`skill_id` INT PRIMARY KEY, `name` VARCHAR(150))", $con);
+		mysql_query("CREATE TABLE IF NOT EXISTS `knightskills` (`skill_id` INT PRIMARY KEY, `name` VARCHAR(150), `levels` INT DEFAULT 1)", $con);
+		mysql_query("alter table knightskills add column if not exists `levels` INT DEFAULT 1", $con);
 		mysql_query("truncate table knightskills", $con);
 		$skill_count = 0;
 		for ($ia=0; $ia<1000; $ia++)
@@ -85,7 +86,7 @@ if ($evaluser)
 					{
 						$id = (int) $skill['id'];
 						$sname = (string) $skill['name'];
-						mysql_query("insert into knightskills (skill_id,name) values ($id, '" . mysql_real_escape_string($sname,$con) . "')", $con);
+						mysql_query("insert into knightskills (skill_id,name,levels) values ($id, '" . mysql_real_escape_string($sname,$con) . "', " . (int) ($skill['levels'] ?? 1) . ")", $con);
 						$skill_count++;
 					}
 				}

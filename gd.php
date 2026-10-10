@@ -193,7 +193,7 @@ if (strlen($character) > 0)
 		{	$base = $base . 'm';	}
 		else
 		{	$base = $base . 'f';	}
-		$result2 = mysql_query("select class_name from $g_knightdb.class_list where id = '$c_class'",$con2);
+		$result2 = mysql_query("select class_name from $g_knightdb.knightclass where id = '$c_class'",$con2);
 		$class_name = mysql_result($result2,0,"class_name");
 		$c_classtitle = substr($class_name,strpos($class_name,'_')+1,(strlen($class_name)-strpos($class_name,'_')));
 		$c_clan = "";

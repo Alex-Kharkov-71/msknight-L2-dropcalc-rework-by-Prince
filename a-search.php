@@ -316,7 +316,7 @@ if ($evaluser)
 				$c_race_n = "$lang_unknown";
 				$c_class_n = "$lang_unknown";
 				$c_class_s = "Unkonwn";
-				$result_class = mysql_query("select class_name from class_list where id = $c_class",$con);
+				$result_class = mysql_query("select class_name from knightclass where id = $c_class",$con);
 				$class_count =  mysql_num_rows($result_class);
 				if ($class_count >0)
 				{	$c_class_s = mysql_result($result_class,0,"class_name");	}

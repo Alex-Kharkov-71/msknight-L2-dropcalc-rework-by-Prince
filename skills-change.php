@@ -91,7 +91,7 @@ if ($evaluser)
 			$subclass_id = $r_array['class_index'];
 			$subclass_name = $r_array['class_id'];
 			$subclass_level = $r_array['level'];
-			$sql = "select class_name from class_list where id = $subclass_name";
+			$sql = "select class_name from knightclass where id = $subclass_name";
 			$result2 = mysql_query($sql,$con);
 			$class_name = mysql_result($result2,0,"class_name");
 			$slip_out = $slip_out . "<option value=\"skills-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum&action=1&skillid=$skill_id&level=$skill_level&subclass=$subclass_id\"";
@@ -119,23 +119,28 @@ if ($evaluser)
 			$character_level = mysql_result($result,0,"level");
 		}
 		
-		$sql = "select parent_id from class_list where id = $base_char_class";
+		$sql = "select parent_id from knightclass where id = $base_char_class";
 		$result = mysql_query($sql,$con);
 		$parent_class = mysql_result($result,0,"parent_id");
 		while ($parent_class > -1)
 		{
 			$list_of_classes = $list_of_classes . ', ' . $parent_class;
-			$sql = "select parent_id from class_list where id = $parent_class";
+			$sql = "select parent_id from knightclass where id = $parent_class";
 			$result = mysql_query($sql,$con);
 			$parent_class = mysql_result($result,0,"parent_id");
 		}
-		$sql = "select * from skill_trees where class_id in ($list_of_classes) order by skill_id, level";
+		// PHP8/L2JMobius fix: tablitsy skill_trees (derevo skillov klassa) v L2JMobius net -
+		// ona teper v XML (data/skillTrees), obrazets kotorogo mne ne prislali. Spisok
+		// skillov klassa nedostupen, no pravka urovney uzhe imeyushchikhsya skillov
+		// i stranitsa v tselom rabotayut.
+		echo "<p class=\"dropmain\">The class skill tree is not available on L2JMobius (skill trees are in the XML datapack).</p>";
+		$sql = "select 0 as skill_id, '' as name, 0 as level, 0 as class_id from dual where 1 = 0";
 		$result = mysql_query($sql,$con);
 		echo "<p class=\"dropmain\">&nbsp;</p><center><a href=\"c-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum\" class=\"droph2\">Character - $charname - Level $character_level</a></center>\n";
 		
 		if ($count > 0)
 		{
-			$sql = "select class_name from class_list where id = $base_char_class_keep";
+			$sql = "select class_name from knightclass where id = $base_char_class_keep";
 			$result2 = mysql_query($sql,$con);
 			$class_name = mysql_result($result2,0,"class_name");
 			echo "<center><p class=\"dropmain\"><select onChange=\"document.location=options[selectedIndex].value;\"><option value=\"skills-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum&action=1&skillid=$skill_id&level=$skill_level&subclass=0\">Main Class - " . $class_name . " - " . $character_level_keep . "</option>";
@@ -160,7 +165,7 @@ if ($evaluser)
 				{	$sql = "update character_skills set skill_level = $level where skill_id = $skillid and charId = $charnum and class_index = $subclass";	}
 				else
 				{	
-					$sql = "select name from skill_trees where skill_id = $skillid";
+					$sql = "select name from knightskills where skill_id = $skillid";
 					$result2 = mysql_query($sql,$con);
 					$skill_name = mysql_result($result2,0,"name");
 					$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUE ($charnum, $skillid, $level, $subclass)";	

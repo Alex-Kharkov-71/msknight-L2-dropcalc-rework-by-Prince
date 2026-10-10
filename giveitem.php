@@ -272,7 +272,7 @@ if ($evaluser)
 				$itemid = $itms[$i2];
 				if ($itemid > 0)
 				{
-					$sql = "select name, level from skill_trees where skill_id = '$itemid' order by level desc limit 1";
+					$sql = "select name, levels as level from knightskills where skill_id = '$itemid'";
 					$skill_result = mysql_query($sql,$con);
 					if ($skill_result)
 					{

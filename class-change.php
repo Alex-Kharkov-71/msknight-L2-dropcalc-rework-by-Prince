@@ -55,7 +55,7 @@ function skill_table($username, $token, $langval, $server_id, $skin_id, $charnum
 			die('Could not change to L2J database: ' . mysql_error());
 		}
 		
-		$sql = "select class_name, id from class_list where parent_id = $skill_id";
+		$sql = "select class_name, id from knightclass where parent_id = $skill_id";
 		$result = mysql_query($sql,$con);
 		$table_show = 0;
 		while ($r_array = mysql_fetch_assoc($result))
@@ -173,7 +173,7 @@ if ($evaluser)
 				$sql = "update characters set base_class = $baseclass where charId = $charnum";
 				$result = mysql_query($sql,$con);
 
-				$sql = "select class_name from class_list where id = $baseclass";
+				$sql = "select class_name from knightclass where id = $baseclass";
 				$result = mysql_query($sql,$con);
 				$class_name = substr(mysql_result($result,0,"class_name"), 0 , 2);
 				$race = 0;
@@ -202,7 +202,7 @@ if ($evaluser)
 			$subclass_id = $r_array['class_index'];
 			$subclass_number = $r_array['class_id'];
 			$subclass_level = $r_array['level'];
-			$sql = "select class_name from class_list where id = $subclass_number";
+			$sql = "select class_name from knightclass where id = $subclass_number";
 			$result2 = mysql_query($sql,$con);
 			$class_name = mysql_result($result2,0,"class_name");
 			$slip_out = $slip_out . "<option value=\"class-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum&action=1&skillid=$skill_id&level=$skill_level&subclass=$subclass_id\"";
@@ -232,7 +232,7 @@ if ($evaluser)
 		// choices for the main class.
 		if ($count > 0)
 		{
-			$sql = "select class_name from class_list where id = $base_char_class";
+			$sql = "select class_name from knightclass where id = $base_char_class";
 			$result2 = mysql_query($sql,$con);
 			$class_name = mysql_result($result2,0,"class_name");
 			echo "<center><p class=\"dropmain\"><select onChange=\"document.location=options[selectedIndex].value;\"><option value=\"class-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum&action=1&skillid=$skill_id&level=$skill_level&subclass=0\">Main Class - " . $class_name . " - " . $level . "</option>";
@@ -250,7 +250,7 @@ if ($evaluser)
 				$r_count = mysql_result($result3,0,"COUNT(*)");
 				if ($r_count != 1)
 				{	
-					$sql = "select class_name from class_list where id = $sub_class_id";
+					$sql = "select class_name from knightclass where id = $sub_class_id";
 					$result3 = mysql_query($sql,$con);
 					$sub_name = mysql_result($result3,0,"class_name");
 					echo "<center><a href=\"c-search.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&charnum=$charnum\" class=\"droph2\">Problem - Subclass $sub_name not suitable for base class.</a></center>";	
@@ -268,7 +268,7 @@ if ($evaluser)
 		}
 		
 		// Go through all of the base level classes in turn.
-		$sql = "select class_name, id from class_list where parent_id = -1";
+		$sql = "select class_name, id from knightclass where parent_id = -1";
 		$result = mysql_query($sql,$con);
 		while ($r_array = mysql_fetch_assoc($result))
 		{
