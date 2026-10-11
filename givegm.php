@@ -87,6 +87,11 @@ if ($evaluser)
 	}
 	else
 	{
+		// PHP8/L2JMobius fix: instrument opiraetsya na tablitsy, kotorykh v L2JMobius net (access_levels table - access levels are in the XML config) -
+		// otklyuchen, chtoby ne pisat musor v bazu servera.
+		echo "<p class=\"popup\">This GM tool is not available on L2JMobius (access_levels table - access levels are in the XML config).</p>";
+		echo "</center></body></html>";
+		return 0;
 
 		if ($action)
 		{

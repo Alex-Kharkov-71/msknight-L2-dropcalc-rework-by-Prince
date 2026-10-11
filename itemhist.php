@@ -133,11 +133,11 @@ if ($evaluser)
 				while ($r_array = mysql_fetch_assoc($result2))
 				{	
 					$name_id = $r_array[item_id];
-					$sql = "select name from weapon where item_id = $name_id";
+					$sql = "select name from knightweapon where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}
-					$sql = "select name from armor where item_id = $name_id";
+					$sql = "select name from knightarmour where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}
@@ -180,11 +180,11 @@ if ($evaluser)
 				while ($r_array = mysql_fetch_assoc($result2))
 				{	
 					$name_id = $r_array[item_id];
-					$sql = "select name from weapon where item_id = $name_id";
+					$sql = "select name from knightweapon where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}
-					$sql = "select name from armor where item_id = $name_id";
+					$sql = "select name from knightarmour where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}
@@ -243,11 +243,11 @@ if ($evaluser)
 				while ($r_array = mysql_fetch_assoc($result2))
 				{	
 					$name_id = $r_array[item_id];
-					$sql = "select name from weapon where item_id = $name_id";
+					$sql = "select name from knightweapon where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}
-					$sql = "select name from armor where item_id = $name_id";
+					$sql = "select name from knightarmour where item_id = $name_id";
 					$result3 = mysql_query($sql,$con);
 					while ($r_array = mysql_fetch_assoc($result3))
 					{	$item_name = $r_array[name];	}

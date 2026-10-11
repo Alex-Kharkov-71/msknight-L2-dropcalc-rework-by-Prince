@@ -110,6 +110,11 @@ if ($evaluser)
 	}
 	else
 	{
+		// PHP8/L2JMobius fix: instrument opiraetsya na tablitsy, kotorykh v L2JMobius net (pets_stats - pet stats are in the XML datapack) -
+		// otklyuchen, chtoby ne pisat musor v bazu servera.
+		echo "<p class=\"popup\">This GM tool is not available on L2JMobius (pets_stats - pet stats are in the XML datapack).</p>";
+		echo "</center></body></html>";
+		return 0;
 		// If we have entered with an item, then attempt to give it.
 		if ($qty)
 		{

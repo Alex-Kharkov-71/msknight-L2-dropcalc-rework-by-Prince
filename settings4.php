@@ -70,6 +70,11 @@ if ($evaluser)
 
 		echo "<p class=\"dropmain\">&nbsp;</p><h2 class=\"dropmain\">Character Permission Settings</h2>";
 
+		// PHP8/L2JMobius fix: admin_command_access_rights i access_levels net (prava GM
+		// teper v XML-konfige servera) - zapis otklyuchena.
+		writewarn("Admin command rights cannot be edited here on L2JMobius (they are defined in the server's XML configuration).");
+		$commandname = "";
+		$new_command = "";
 		if (strlen($commandname) > 0)
 		{
 			$sql = "update admin_command_access_rights set accessLevels = $number where adminCommand ='$commandname'";

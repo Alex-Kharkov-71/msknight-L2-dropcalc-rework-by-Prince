@@ -59,6 +59,11 @@ if ($evaluser)
 	}
 	else
 	{
+		// PHP8/L2JMobius fix: instrument opiraetsya na tablitsy, kotorykh v L2JMobius net (npc/custom_npc tables - NPCs are in the XML datapack) -
+		// otklyuchen, chtoby ne pisat musor v bazu servera.
+		echo "<p class=\"popup\">This GM tool is not available on L2JMobius (npc/custom_npc tables - NPCs are in the XML datapack).</p>";
+		echo "</center></body></html>";
+		return 0;
 		$con = mysql_connect($db_location,$db_user,$db_psswd);
 		mysql_query("SET NAMES 'utf8'", $con);
 		mysql_query("SET character_set_results='utf8'", $con);

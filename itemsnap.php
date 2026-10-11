@@ -65,7 +65,7 @@ if ($evaluser)
 			}
 		$sql = "delete from $knight_db.itemlog where object_id not in (select object_id from items);";
 		$result = mysql_query($sql,$con);
-		$sql = "select owner_id, object_id, enchant_level from items where item_id in (select item_id from armor) or item_id in (select item_id from weapon);";	
+		$sql = "select owner_id, object_id, enchant_level from items where item_id in (select item_id from knightarmour) or item_id in (select item_id from knightweapon);";	
 		$result = mysql_query($sql,$con);
 		$timestamp =  time();
 		$count = 0;

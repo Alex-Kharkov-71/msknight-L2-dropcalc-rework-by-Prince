@@ -173,6 +173,7 @@ if ($evaluser)
 			echo "<p class=\"popup\">Full set for class given to $touser.</p>";
 			$itemid = "";
 		}
+		if ($itemid == "setgive2") { echo "<p class=\"popup\">Not available on L2JMobius (armorsets table - armor sets are in the XML datapack).</p>"; $itemid = ""; }
 		if ($itemid == "setgive2")
 		{
 			$sql = "select * from armorsets where id = $settogive";
@@ -342,6 +343,7 @@ if ($evaluser)
 			echo "</center></body></html>";
 			return 0;
 		}
+		if ($itemid == "pet") { echo "<p class=\"popup\">Not available on L2JMobius (pets_stats table - pet data is in the XML datapack).</p>"; $itemid = ""; }
 		if ($itemid == "pet")
 		{
 			$sql = "select distinct type from pets_stats";

@@ -175,7 +175,7 @@ if ($evaluser)
 		}
 		if ($action == 2)
 		{
-			$sql = "select distinct skill_id from skill_trees";
+			$sql = "select distinct skill_id from knightskills";
 			$result2 = mysql_query($sql,$con);
 			$target = 0;
 			while ($r_array = mysql_fetch_assoc($result2))

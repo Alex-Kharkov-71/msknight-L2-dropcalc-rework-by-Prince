@@ -972,9 +972,9 @@ if ($evaluser)
 			$result = mysql_query("SELECT clan_id FROM clan_data");
 			$count = mysql_num_rows($result);
 			echo "<tr><td class=\"dropmain\"><p class=\"dropmain\">No. of clans</p></td><td class=\"dropmain\"><p class=\"dropmain\">$count</p></td></tr>";
-			$result = mysql_query("SELECT `count` FROM spawnlist");
+			$result = mysql_query("SELECT `count` FROM knightspawnlist");
 			$count = mysql_num_rows($result);
-			$result = mysql_query("SELECT loc_id FROM locations");
+			$result = mysql_query("SELECT zone FROM knightspawnzone");
 			$count2 = mysql_num_rows($result);
 			echo "<tr><td class=\"dropmain\"><p class=\"dropmain\">Spawns</p></td><td class=\"dropmain\"><p class=\"dropmain\">$count basic - $count2 extended</p></td></tr>";
 
