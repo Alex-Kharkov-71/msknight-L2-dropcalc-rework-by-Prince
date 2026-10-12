@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -732,6 +732,7 @@ if ($evaluser)
 						}
 					}
 				}
+				next($itm_array);	// PHP8: each() udalena, ukazatel nuzhno dvigat vruchnuyu
 			}
 			
 			echo "</table>";

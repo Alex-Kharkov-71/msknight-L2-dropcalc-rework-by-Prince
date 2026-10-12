@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 // PHP8 fix: input_check() здесь ещё недоступна (common.php подключается ниже),
 // поэтому оставляем самодостаточную защиту символов + отдельно защищаем от
 // path traversal в имени файла.
