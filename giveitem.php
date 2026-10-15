@@ -131,17 +131,17 @@ if ($evaluser)
 					// Try and find the details on the object from each of the three content databases.
 					// Looking simply for the name and crystal type.
 					$obj_name = item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb);
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 					if($usetelnet)
 					{
 						$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-						fputs($usetelnet, $telnet_password);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, "msg ".utf82lang ($touser)." Admin gave you this: ".$qty." ".$obj_name."\r");
-						fputs($usetelnet, "exit\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $telnet_password);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, "msg ".utf82lang ($touser)." Admin gave you this: ".$qty." ".$obj_name."\r");
+						telnet_write($usetelnet, "exit\r\n");
+						telnet_close($usetelnet);
 					}
 					else
 					{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -223,18 +223,18 @@ if ($evaluser)
 						// Try and find the details on the object from each of the three content databases.
 						// Looking simply for the name and crystal type.
 						$obj_name = item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb);
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 						if($usetelnet)
 						{
 							$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "msg ".utf82lang ($touser)." admin gave you this: ".$qty." ".$obj_name);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "exit\r\n");
-							fclose($usetelnet);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "msg ".utf82lang ($touser)." admin gave you this: ".$qty." ".$obj_name);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "exit\r\n");
+							telnet_close($usetelnet);
 						}
 						else
 						{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -489,17 +489,17 @@ if ($evaluser)
 					if ($useronline)
 					{
 						
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 						if($usetelnet)
 						{
 							$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "msg ".utf82lang ($touser)." admin gave you : ".$qty." ".$obj_name."\r");
-							fputs($usetelnet, "exit\r\n");
-							fclose($usetelnet);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "msg ".utf82lang ($touser)." admin gave you : ".$qty." ".$obj_name."\r");
+							telnet_write($usetelnet, "exit\r\n");
+							telnet_close($usetelnet);
 						}
 						else
 						{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}

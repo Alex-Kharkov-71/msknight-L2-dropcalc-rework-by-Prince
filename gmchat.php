@@ -78,16 +78,16 @@ if ($evaluser)
 		if ($sendchat)
 		{
 		
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'gmchat ' . $sendchat;
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 				echo "<p class=\"popup\">Announcement Sent</p>";
 			}
 			else

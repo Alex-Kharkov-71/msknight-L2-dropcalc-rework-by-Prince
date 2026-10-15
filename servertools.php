@@ -49,16 +49,16 @@ if ($evaluser)
 
 		if (($action == "extreload") && ($user_access_lvl >= $sec_inc_admin))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'extreload';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -66,16 +66,16 @@ if ($evaluser)
 
 		if (($action == "extinit") && ($user_access_lvl >= $sec_inc_admin))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'extinit';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -83,16 +83,16 @@ if ($evaluser)
 
 		if (($action == "extunload") && ($user_access_lvl >= $sec_inc_admin))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'extunload';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -100,16 +100,16 @@ if ($evaluser)
 
 		if (($action == "restart1") && ($user_access_lvl >= $reboot_server))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'restart 60';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -118,16 +118,16 @@ if ($evaluser)
 
 		if (($action == "restart3") && ($user_access_lvl >= $reboot_server))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'restart 180';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -136,16 +136,16 @@ if ($evaluser)
 
 		if (($action == "restart10") && ($user_access_lvl >= $reboot_server))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'restart 600';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -154,16 +154,16 @@ if ($evaluser)
 
 		if (($action == "abort") && ($user_access_lvl >= $reboot_server))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'abort';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -171,16 +171,16 @@ if ($evaluser)
 
 		if (($action == "purge") && ($user_access_lvl >= $sec_inc_admin))	
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'purge';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fclose($usetelnet);
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}

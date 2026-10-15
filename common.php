@@ -822,23 +822,23 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 	$result = mysql_query("select account_name, char_name from characters where (maxhp > 50000) or (maxmp > 50000)",$con);
 	while ($r_array = mysql_fetch_assoc($result))
 	{	$char = $r_array['char_name'];
-		$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+		$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 		if($usetelnet)
 		{
 			$give_string = 'announce ' . $char . ' being kicked and deleted for botting.';
-			fputs($usetelnet, $telnet_password);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, $give_string);
-			fputs($usetelnet, "\r\n");
-			fclose($usetelnet);
+			telnet_write($usetelnet, $telnet_password);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, $give_string);
+			telnet_write($usetelnet, "\r\n");
+			telnet_close($usetelnet);
 			sleep(5);
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-			fputs($usetelnet, $telnet_password);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			telnet_write($usetelnet, $telnet_password);
 			$give_string = 'kick ' . $char ;
-			fputs($usetelnet, $give_string);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, "exit\r\n");
-			fclose($usetelnet);
+			telnet_write($usetelnet, $give_string);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, "exit\r\n");
+			telnet_close($usetelnet);
 		}
 		delete_char($char, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb);
 	}
@@ -861,24 +861,24 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 			{
 				while ($r_array = mysql_fetch_assoc($result2))
 				{
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 					if($usetelnet)
 					{
 						$charname = $r_array['char_name'];
 						$give_string = 'announce ' . $charname . ' being kicked and banned for access violation.';
-						fputs($usetelnet, $telnet_password);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $telnet_password);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_close($usetelnet);
 						sleep(5);
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-						fputs($usetelnet, $telnet_password);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						telnet_write($usetelnet, $telnet_password);
 						$give_string = 'kick ' . $charname ;
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, "exit\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, "exit\r\n");
+						telnet_close($usetelnet);
 					}
 				}
 			}
@@ -919,24 +919,24 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 			$result2 = mysql_query("select char_name from characters where account_name = '$accname' and online = 1",$con);
 			while ($r_array = mysql_fetch_assoc($result2))
 			{
-				$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+				$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 				if($usetelnet)
 				{
 					$charname = $r_array['char_name'];
 					$give_string = 'announce ' . $charname . ' being kicked and banned for access violation.';
-					fputs($usetelnet, $telnet_password);
-					fputs($usetelnet, "\r\n");
-					fputs($usetelnet, $give_string);
-					fputs($usetelnet, "\r\n");
-					fclose($usetelnet);
+					telnet_write($usetelnet, $telnet_password);
+					telnet_write($usetelnet, "\r\n");
+					telnet_write($usetelnet, $give_string);
+					telnet_write($usetelnet, "\r\n");
+					telnet_close($usetelnet);
 					sleep(5);
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-					fputs($usetelnet, $telnet_password);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					telnet_write($usetelnet, $telnet_password);
 					$give_string = 'kick ' . $charname ;
-					fputs($usetelnet, $give_string);
-					fputs($usetelnet, "\r\n");
-					fputs($usetelnet, "exit\r\n");
-					fclose($usetelnet);
+					telnet_write($usetelnet, $give_string);
+					telnet_write($usetelnet, "\r\n");
+					telnet_write($usetelnet, "exit\r\n");
+					telnet_close($usetelnet);
 				}
 			}
 			// Ban the account
@@ -988,13 +988,94 @@ function item_check($skill, $i_id, $use_duplicate, $db_location, $db_user, $db_p
 	return $i_id;
 }
 
-function checkport($ip, $port, $timeout) 
+// ---------------------------------------------------------------------
+// Server status lamps and telnet (L2JMobius has no telnet console)
+// ---------------------------------------------------------------------
+
+// Plain TCP connect: is something listening on ip:port. Needs no telnet.
+function checkport($ip, $port, $timeout)
 {
-		$sock = @fsockopen($ip, $port, $errno, $errstr, (float)$timeout);
-		$online = ($sock>0);
- 		if ($sock) @fclose($sock);
- 		return $online;
+	if (trim((string) $ip) === '' || (int) $port < 1)
+	{	return false;	}
+	$sock = @fsockopen($ip, (int) $port, $errno, $errstr, (float) $timeout);
+	if ($sock)
+	{	@fclose($sock);	return true;	}
+	return false;
 }
+
+// Seconds to wait per server for the lamp. Old configs only have log_telnet_timeout.
+function status_timeout()
+{
+	$t = $GLOBALS['status_timeout'] ?? ($GLOBALS['log_telnet_timeout'] ?? 2);
+	return (float) $t;
+}
+
+// Host for the game server lamp: gameservers[i][13], else the telnet ip [9], else the DB host [1].
+function gameserver_status_host($i)
+{
+	$s = $GLOBALS['gameservers'][$i] ?? array();
+	foreach (array(13, 9, 1) as $k)
+	{
+		if (isset($s[$k]) && trim((string) $s[$k]) !== '')
+		{	return trim($s[$k]);	}
+	}
+	return 'localhost';
+}
+
+function logserver_status_host()
+{
+	foreach (array('logsvr_status_host', 'log_telnet_host', 'logsvr_location') as $v)
+	{
+		if (!empty($GLOBALS[$v]))
+		{	return $GLOBALS[$v];	}
+	}
+	return 'localhost';
+}
+
+function gameserver_online($i)
+{
+	return checkport(gameserver_status_host($i), $GLOBALS['gameservers'][$i][7] ?? 0, status_timeout());
+}
+
+function logserver_online()
+{
+	return checkport(logserver_status_host(), $GLOBALS['dblog_port'] ?? 2106, status_timeout());
+}
+
+// Telnet is off unless config sets $telnet_enabled = true (old l2jserver only).
+function telnet_enabled()
+{
+	return !empty($GLOBALS['telnet_enabled']);
+}
+
+// Like fsockopen(), but fails at once when telnet is disabled - no timeout, no attempt.
+function telnet_open($host, $port, &$errno, &$errstr, $timeout)
+{
+	if (!telnet_enabled())
+	{
+		$errno = 0;
+		$errstr = "telnet is disabled (L2JMobius has no telnet console)";
+		return false;
+	}
+	return @fsockopen($host, $port, $errno, $errstr, (float) $timeout);
+}
+
+// Safe on a failed connection (fputs(false) is a fatal TypeError in PHP 8).
+function telnet_write($h, $s)
+{	return $h ? fputs($h, $s) : false;	}
+
+function telnet_gets($h, $len = null)
+{
+	if (!$h)
+	{	return false;	}
+	return ($len === null) ? fgets($h) : fgets($h, $len);
+}
+
+function telnet_eof($h)
+{	return $h ? feof($h) : true;	}
+
+function telnet_close($h)
+{	if ($h) { @fclose($h); }	}
 
 function onlinetime($onlinetime)
 {

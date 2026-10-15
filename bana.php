@@ -118,26 +118,26 @@ if ($evaluser)
 					while ($r_array = mysql_fetch_assoc($result_i))
 					{
 						$char_name = $r_array['char_name'];
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 						if($usetelnet)
 						{
 							$give_string = 'kick ' . utf82lang ($char_name) ;
 							$give_string2 = 'msg ' . utf82lang ($char_namer) . ' ADMIN HAS BANNED YOUR ACCOUNT.';
 							$give_string3 = 'msg ' . utf82lang ($char_name) . ' PLEASE TALK WITH YOUR ADMIN TEAM.';
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string2);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string3);
-							fputs($usetelnet, "\r\n");
-							fclose($usetelnet);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string2);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string3);
+							telnet_write($usetelnet, "\r\n");
+							telnet_close($usetelnet);
 							sleep(5);
-							$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, $give_string);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "exit\r\n");
-							fclose($usetelnet);
+							$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, $give_string);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "exit\r\n");
+							telnet_close($usetelnet);
 							echo "<p class=\"popup\">Kick command sent</p>";
 						}
 						else

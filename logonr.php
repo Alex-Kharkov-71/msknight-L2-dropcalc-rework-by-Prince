@@ -79,22 +79,22 @@ if ($evaluser)
 		if ($go)
 		{
 
-			$usetelnet = fsockopen($log_telnet_host, $log_telnet_port, $errno, $errstr, $log_telnet_timeout);
+			$usetelnet = telnet_open($log_telnet_host, $log_telnet_port, $errno, $errstr, $log_telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'restart' ;
-//				fputs($usetelnet, $username);
-//				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $passwd);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				while (!feof($usetelnet))
+//				telnet_write($usetelnet, $username);
+//				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $passwd);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				while (!telnet_eof($usetelnet))
 				{
-					$line = fgets($usetelnet, 128);
+					$line = telnet_gets($usetelnet, 128);
 					echo "<p>$line</p>";
 				}
-				fclose($usetelnet);
+				telnet_close($usetelnet);
 				echo "<p class=\"popup\">Restart command sent</p>";
 			}
 			else

@@ -25,9 +25,19 @@ For Windows 2003 servers, delimeters are "//"
 // PHP 8 defaults to UTC. Uncomment and set your own timezone if times look wrong:
 // date_default_timezone_set('Europe/Moscow');
 
+// One ARRAY(...) per game server. Positions:
+//  0 title shown in the menu          1 game DB host        2 game DB name
+//  3 DB user                          4 DB password         5 default skin number
+//  6 server files folder (ends with a slash; the folder that contains data/)
+//  7 game server port (players connect here; used by the online lamp)
+//  8 name of the DropCalc "knight" database (item log, notes)
+//  9-12 telnet ip / port / password / timeout - ONLY for servers that have a telnet
+//       console (old l2jserver). L2JMobius has none: leave "", "", "", 10.
+// 13 (optional) host used for the online lamp. If empty, [9] is tried, then [1].
+//    Use it when the game server runs on another machine than the database.
 $gameservers = ARRAY(
-ARRAY("Title", "db_location", "db_database", "db_username", "db_password", 0, "server files location", gameserver_port, "knight_db", "gameserver_telnet_ip", "gameserver_telnet_port", "gameserver_Telnet_password", gameserver_timeout)
-// ,ARRAY("Title", "db_location", "db_database", "db_username", "db_password", 0, "server files location", gameserver_port, "knight_db", "gameserver_telnet_ip", "gameserver_telnet_port", "gameserver_Telnet_password", gameserver_timeout)
+ARRAY("Title", "db_location", "db_database", "db_username", "db_password", 0, "/path/to/l2server/", 7777, "knight_db", "", "", "", 10, "game_server_host")
+// ,ARRAY("Title2", "db_location", "db_database", "db_username", "db_password", 0, "/path/to/l2server2/", 7778, "knight_db", "", "", "", 10, "game_server_host")
 );
 
 
@@ -43,6 +53,17 @@ $dblog_port = 2106;
 $log_telnet_host = "localhost";
 $log_telnet_port = "9999";
 $log_telnet_timeout = 10;
+
+// ---------- L2JMobius: no telnet console ----------
+// l2jserver had a telnet console, DropCalc used it to kick / announce / give items /
+// jail etc. L2JMobius has none. false = every telnet-based action fails at once with a
+// clear message instead of waiting for a timeout. Set true only for a server with telnet.
+$telnet_enabled = false;
+// Online lamps in the page header (login server + game servers): plain TCP connect to the
+// port. This does not need telnet. Seconds to wait per server before showing "offline":
+$status_timeout = 2;
+// Host of the login server for the lamp (port is $dblog_port above)
+$logsvr_status_host = "localhost";
 
 //----------Linux version
 $login_dir = "/l2jserver/login";	// Dont forget the ending slash/backslashes!

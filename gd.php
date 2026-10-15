@@ -38,10 +38,12 @@ function onlinetime($onlinetime)
 
 function checkport($ip, $port, $timeout) 
 {
-		$sock = @fsockopen($host, $port, $errno, $errstr, (float)$timeout);
-		$online = ($sock>0);
- 		if ($online) @fclose($sock);
- 		return $online;
+		// PHP8 fix: the body used an undefined $host, so the status was always 0.
+		if (trim((string) $ip) === '' || (int) $port < 1)
+		{	return false;	}
+		$sock = @fsockopen($ip, (int) $port, $errno, $errstr, (float)$timeout);
+		if ($sock) { @fclose($sock); return true; }
+		return false;
 }
 
 $con = mysql_connect($core_db_location, $core_db_user, $core_db_psswd);
@@ -222,7 +224,16 @@ elseif (strlen($server) > 0)
 	$g_port = $gameservers[$server][7];
 	$con2 = mysql_connect($g_ip, $g_user, $g_passwd);
 	mysql_query("SET NAMES 'utf8'", $con2);
-	if (checkport($g_ip, $g_port, $g_timeout))
+	// Host for the online check: gameservers[n][13], else the telnet ip [9], else the DB host.
+	$g_status_host = $g_ip;
+	foreach (array(13, 9) as $k)
+	{
+		if (isset($gameservers[$server][$k]) && trim((string) $gameservers[$server][$k]) !== '')
+		{	$g_status_host = trim($gameservers[$server][$k]);	break;	}
+	}
+	if (!isset($g_timeout) || $g_timeout < 1)
+	{	$g_timeout = isset($status_timeout) ? $status_timeout : 2;	}
+	if (checkport($g_status_host, $g_port, $g_timeout))
 	{	$gs_status = 1;	}
 	else
 	{	$gs_status = 0;	}

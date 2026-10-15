@@ -79,32 +79,32 @@ if ($evaluser)
 		if ($go)
 		{
 
-			$usetelnet = fsockopen($log_telnet_host, $log_telnet_port, $errno, $errstr, $log_telnet_timeout);
+			$usetelnet = telnet_open($log_telnet_host, $log_telnet_port, $errno, $errstr, $log_telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'status' ;
 				$give_string2 = 'quit' ;
-//				fputs($usetelnet, $username);
-//				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $passwd);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string2);
-				fputs($usetelnet, "\r\n");
-				$line = fgets($usetelnet, 128);
-				$line = fgets($usetelnet, 128);
-				$line = fgets($usetelnet, 128);
-				$line = fgets($usetelnet, 128);
-				$line = fgets($usetelnet, 128);
+//				telnet_write($usetelnet, $username);
+//				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $passwd);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string2);
+				telnet_write($usetelnet, "\r\n");
+				$line = telnet_gets($usetelnet, 128);
+				$line = telnet_gets($usetelnet, 128);
+				$line = telnet_gets($usetelnet, 128);
+				$line = telnet_gets($usetelnet, 128);
+				$line = telnet_gets($usetelnet, 128);
 				echo "<p>$line</p>";
-				$line = fgets($usetelnet, 128);
-				while (!feof($usetelnet))
+				$line = telnet_gets($usetelnet, 128);
+				while (!telnet_eof($usetelnet))
 				{
-					$line = fgets($usetelnet, 128);
+					$line = telnet_gets($usetelnet, 128);
 					echo "<p>$line</p>";
 				}
-				fclose($usetelnet);
+				telnet_close($usetelnet);
 			}
 			else
 			{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}

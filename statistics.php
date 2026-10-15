@@ -212,26 +212,26 @@ if ($evaluser)
 		}
 		elseif ($action=="performance")
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'performance';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
 				echo "<center><table class=\"noborder\" cellpadding=\"5\"><tr><td class=\"dropmain\"><pre class=\"dropstat\">";
-				while (!feof($usetelnet))
+				while (!telnet_eof($usetelnet))
 				{
-					$line = fgets($usetelnet, 128);
+					$line = telnet_gets($usetelnet, 128);
 					echo "$line";
 				}
-				fclose($usetelnet);
+				telnet_close($usetelnet);
 				echo "</pre></td></tr></table></center>";
 			}
 			else
@@ -260,26 +260,26 @@ if ($evaluser)
 		}
 		elseif ($action=="status")
 		{
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 			if($usetelnet)
 			{
 				$give_string = 'status';
-				fputs($usetelnet, $telnet_password);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, $give_string);
-				fputs($usetelnet, "\r\n");
-				fputs($usetelnet, "exit\r\n");
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
-				fgets($usetelnet, 128) ;
+				telnet_write($usetelnet, $telnet_password);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, $give_string);
+				telnet_write($usetelnet, "\r\n");
+				telnet_write($usetelnet, "exit\r\n");
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
+				telnet_gets($usetelnet, 128) ;
 				echo "<center><table class=\"noborder\" cellpadding=\"5\"><tr><td class=\"dropmain\"><pre class=\"dropstat\">";
-				while (!feof($usetelnet))
+				while (!telnet_eof($usetelnet))
 				{
-					$line = fgets($usetelnet, 128);
+					$line = telnet_gets($usetelnet, 128);
 					echo "$line";
 				}
-				fclose($usetelnet);
+				telnet_close($usetelnet);
 				echo "</pre></td></tr></table></center>";
 			}
 			else

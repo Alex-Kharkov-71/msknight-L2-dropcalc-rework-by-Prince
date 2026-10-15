@@ -66,18 +66,18 @@ if ($evaluser)
 	}
 	else
 	{		// Insert a test character designed to be detected by the security system.
-		$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+		$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 		if($usetelnet)
 		{
 			$sql = "insert into characters (char_name, maxhp) values ('@AdminTestChar@', '100000')";	
 			$result = mysql_query($sql,$con);
 			$give_string = 'announce Security test character created.';
-			fputs($usetelnet, $telnet_password);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, $give_string);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, "exit\r\n");
-			fclose($usetelnet);
+			telnet_write($usetelnet, $telnet_password);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, $give_string);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, "exit\r\n");
+			telnet_close($usetelnet);
 			echo "<p class=\"popup\">Security test character created.</p>";
 		}
 	}
