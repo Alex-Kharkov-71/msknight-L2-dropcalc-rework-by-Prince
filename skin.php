@@ -66,7 +66,7 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$result_set = mysql_query($sql,$con3);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	$hide_language = mysql_result($result_set,0,"hide_language");
 	$hide_server = mysql_result($result_set,0,"hide_server");
@@ -83,7 +83,7 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$result_set = mysql_query($sql,$con2);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	if (mysql_num_rows($result_set)> 0 )
 	{	$access_lvl = mysql_result($result_set,0,"accessLevel");	}
@@ -285,7 +285,7 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 	$result_set = mysql_query($sql,$con3);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	$hide_language = mysql_result($result_set,0,"hide_language");
 	$hide_server = mysql_result($result_set,0,"hide_server");

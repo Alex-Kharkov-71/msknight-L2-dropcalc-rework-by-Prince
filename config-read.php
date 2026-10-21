@@ -34,7 +34,7 @@ no charge is made for its use.  Use is at users risk.
 	$result_set = mysql_query($sql,$con);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	
 	$register_allow = mysql_result($result_set,0,"register_allow");
@@ -155,7 +155,7 @@ no charge is made for its use.  Use is at users risk.
 	$result_set = mysql_query($sql,$con);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	
 	$hide_language = mysql_result($result_set,0,"hide_language");

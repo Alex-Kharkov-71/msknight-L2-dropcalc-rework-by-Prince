@@ -63,7 +63,7 @@ $sql = "select * from $core_db_l2jdb.knightsettings";
 $result_set = mysql_query($sql,$con);
 if (!$result_set)
 {	
-	echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+	echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 }
 $gdon = mysql_result($result_set,0,"gd_on");
 $gdstyle = mysql_result($result_set,0,"gd_style");
