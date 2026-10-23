@@ -19,9 +19,19 @@
    (в сборке Mobius это `.../dist/game/`). Поля telnet (9–12) для Mobius оставьте пустыми.
    Если часовой пояс не тот — раскомментируйте `date_default_timezone_set(...)`.
    Новые настройки добавляются в `config.php.example` — переносите их в свой `config.php`.
-3. В **игровой БД** выполните `sql/knight_missing_tables.sql` и `sql/knight_classes.sql`
-   (оба безопасны: `CREATE TABLE IF NOT EXISTS`, справочник классов — `REPLACE`).
-   Таблицы `knightdrop` и `knightipok` в БД логина у вас уже есть.
+3. Создайте таблицы DropCalc (скрипты безопасны для повторного запуска, `CREATE TABLE IF NOT EXISTS`):
+   - **в каждой игровой БД** (например `l2s1` и `l2s2` — рейты и статистика у каждого сервера свои):
+     `mysql -u root -p ИМЯ_ИГРОВОЙ_БД < sql/install_game_db.sql`
+   - **в БД логина** (если `knightdrop` там ещё нет; она общая для всех игровых серверов):
+     `mysql -u root -p ИМЯ_БД_ЛОГИНА < sql/install_login_db.sql`
+
+   В игровой БД скрипт создаёт все таблицы `knight*` и одну строку `knightsettings` со значениями по умолчанию.
+   **Значения по умолчанию в ней небезопасны для боевого сервера:** `sec_inc_gmlevel = 0` и `sec_inc_admin = 0`
+   (при нуле любой пользователь считается GM/админом), `register_allow = 0`, `guest_allow = 0`. Сразу после
+   установки задайте их под свой сервер, например:
+   `UPDATE knightsettings SET sec_inc_gmlevel = 1, sec_inc_admin = 100, register_allow = 1;`
+   (числа — это `accounts.accessLevel` ваших GM-аккаунтов). Рейты: `drop_chance_adena/item/spoil` (по умолчанию 1.00).
+   База `knight_db` из позиции 8 массива сервера (`itemlog`, `accnotes`...) отдельного скрипта не требует.
 4. Войдите администратором → **Server Utilities** → по очереди **Import**:
    предметы, NPC (вместе с дропом и скиллами NPC), скиллы, рецепты, магазины, спавны.
    Предметы и NPC идут по файлам диапазонов (`00000-00099.xml` …) с автообновлением окна —
