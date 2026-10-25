@@ -208,7 +208,7 @@ if ($evaluser)
 
 		if ($action == "maptime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{
 				$newtime = time() + ($newtime * 86400);
 			}

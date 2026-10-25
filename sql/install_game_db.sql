@@ -233,8 +233,13 @@ CREATE TABLE IF NOT EXISTS `knightquestrun` (
   KEY `qiest_id` (`quest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- one settings row is required (all columns have defaults, drop rates 1.00)
-INSERT INTO `knightsettings` (`drop_chance_adena`) SELECT 1.00 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
+-- One settings row is required (all other columns have defaults, drop rates 1.00).
+-- SAFE START: nobody is a GM/admin until you decide. sec_inc_gmlevel / sec_inc_admin are the
+-- minimum accounts.accessLevel of the LOGIN server that counts as DropCalc GM / admin. The dump
+-- default 0 would make every player an admin. 256 is above any accessLevel (tinyint, max 255).
+-- Registration of new game accounts through the web (register_allow) and guests stay off.
+-- Create the first admin later with sql/make_admin.sql.
+INSERT INTO `knightsettings` (`drop_chance_adena`, `sec_inc_gmlevel`, `sec_inc_admin`) SELECT 1.00, 256, 256 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
 
 -- ===== tables of this port, filled by Server Utilities -> Import =====
 CREATE TABLE IF NOT EXISTS `knightnpc` (

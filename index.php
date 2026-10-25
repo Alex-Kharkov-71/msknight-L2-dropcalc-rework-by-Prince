@@ -70,11 +70,11 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 		$default_recipe = '0';
 		$default_character = '0';
 		if ($all_newusers_maps)
-		{	$default_maps = '999999999999999999';	}
+		{	$default_maps = '2147483647';	}
 		if ($all_newusers_recipe)
-		{	$default_recipe = '999999999999999999';	}
+		{	$default_recipe = '2147483647';	}
 		if ($all_newusers_character)
-		{	$default_character = '999999999999999999';	}
+		{	$default_character = '2147483647';	}
 		if (!mysql_query("insert into $dblog_l2jdb.knightdrop (name, lastaction, token, mapaccess, recipeaccess, characcess, lastheard, ipaddr, access_level) values ('$username', 0, 0, '$default_maps', '$default_recipe', '$default_character', '$timeofday' ,'$ipaddr' ,'$usr_access')",$con2))
 		{	echo "<h2 class=\"dropmain\">Error - Couldn't insert user into knightdrop table.<br>" . mysql_error() . "</h2>";	}
 	}
