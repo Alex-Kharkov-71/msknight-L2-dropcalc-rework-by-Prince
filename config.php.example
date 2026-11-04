@@ -59,6 +59,12 @@ $log_telnet_timeout = 10;
 // jail etc. L2JMobius has none. false = every telnet-based action fails at once with a
 // clear message instead of waiting for a timeout. Set true only for a server with telnet.
 $telnet_enabled = false;
+
+// ---------- First install ----------
+// Game accounts (login names of the login server) that may run Install tables (install.php)
+// before DropCalc has any admin. Put your own account here for the first install, then use
+// sql/make_admin.sql to make real admins and clear the list.
+$install_admins = array();   // e.g. array("yourlogin")
 // Online lamps in the page header (login server + game servers): plain TCP connect to the
 // port. This does not need telnet. Seconds to wait per server before showing "offline":
 $status_timeout = 2;

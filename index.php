@@ -22,6 +22,7 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 	mysql_query("SET NAMES 'utf8'", $con2);
 	if (!mysql_select_db("$dblog_l2jdb",$con2))
 	{	die('Wrap_start could not change to logserver database: ' . mysql_error());}
+	dc_ensure_login_tables($con2);
 
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	mysql_query("SET NAMES 'utf8'", $con);
@@ -52,9 +53,10 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 	{	return 0;	}
 
 	// Generate random token
-	$token = "";
-	for ($i=1; $i<=10; $i++)
-	{  $token = ($token * 10) + rand()%9;	}
+	// PHP8: "" * 10 is a TypeError now; random_int() instead of the predictable rand().
+	$token = (string) random_int(1, 9);
+	for ($i=2; $i<=10; $i++)
+	{  $token .= random_int(0, 9);	}
 	$usr_access = mysql_result($result,0,"accessLevel");
 
 	// If the user is in the gametables and the password checks, but the user isn't in the knightdrop 
@@ -119,6 +121,7 @@ $con2 = mysql_connect($dblog_location,$dblog_user,$dblog_psswd);
 mysql_query("SET NAMES 'utf8'", $con2);
 if (!mysql_select_db("$dblog_l2jdb",$con2))
 {	die('Wrap_start could not change to logserver database: ' . mysql_error());	}
+	dc_ensure_login_tables($con2);
 	
 if ($action == 'logoff')
 {

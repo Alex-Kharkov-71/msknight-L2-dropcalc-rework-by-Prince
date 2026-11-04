@@ -1,5 +1,6 @@
 
 <?php 
+require_once(__DIR__ . '/dc_install_lib.php');
 error_reporting(E_ERROR | E_PARSE);
 
 /*
@@ -30,8 +31,7 @@ no charge is made for its use.  Use is at users risk.
 		die('Could not change to L2J database: ' . mysql_error());
 	}
 
-	$sql = "select * from knightsettings";
-	$result_set = mysql_query($sql,$con);
+	$result_set = dc_read_settings($con, "knightsettings");
 	if (!$result_set)
 	{	
 		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
@@ -151,8 +151,7 @@ no charge is made for its use.  Use is at users risk.
 		die('Could not change to L2J database: ' . mysql_error());
 	}
 
-	$sql = "select * from $core_db_l2jdb.knightsettings";
-	$result_set = mysql_query($sql,$con);
+	$result_set = dc_read_settings($con, "$core_db_l2jdb.knightsettings");
 	if (!$result_set)
 	{	
 		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";

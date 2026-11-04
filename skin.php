@@ -1,4 +1,5 @@
 <?php 
+require_once(__DIR__ . '/dc_install_lib.php');
 error_reporting(E_ERROR | E_PARSE);
 
 include($skin_dir . $svr_dir_delimit . "skincols.php");
@@ -62,8 +63,7 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 		die('Wrap_start could not change to gameserver database: ' . mysql_error());
 	}
 	
-	$sql = "select * from $core_db_l2jdb.knightsettings";
-	$result_set = mysql_query($sql,$con3);
+	$result_set = dc_read_settings($con3, "$core_db_l2jdb.knightsettings");
 	if (!$result_set)
 	{	
 		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
@@ -236,6 +236,8 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$lang_file = $language_array[$langval][1];
 	include($lang_file);		// Import language variables.
 	include($skin_dir . $svr_dir_delimit . $wrapfile);
+	if (strpos($wrapfile, "wrapopen") === 0)
+	{	dc_installer_banner($username);	}
 
 }
 
@@ -281,8 +283,7 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 		die('Wrap_start could not change to gameserver database: ' . mysql_error());
 	}
 	
-	$sql = "select * from $core_db_l2jdb.knightsettings";
-	$result_set = mysql_query($sql,$con3);
+	$result_set = dc_read_settings($con3, "$core_db_l2jdb.knightsettings");
 	if (!$result_set)
 	{	
 		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
@@ -416,6 +417,8 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 	$lang_file = $language_array[$langval][1];
 	include($lang_file);		// Import language variables.
 	include($skin_dir . $svr_dir_delimit . $wrapfile);
+	if (strpos($wrapfile, "wrapopen") === 0)
+	{	dc_installer_banner($username);	}
 
 }
 
