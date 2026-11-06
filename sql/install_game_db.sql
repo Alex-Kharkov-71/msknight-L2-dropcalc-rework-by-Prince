@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS `knightquestrun` (
 -- default 0 would make every player an admin. 256 is above any accessLevel (tinyint, max 255).
 -- Registration of new game accounts through the web (register_allow) and guests stay off.
 -- Create the first admin later with sql/make_admin.sql.
-INSERT INTO `knightsettings` (`drop_chance_adena`, `sec_inc_gmlevel`, `sec_inc_admin`, `db_tokenexp`) SELECT 1.00, 256, 256, 60 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
+INSERT INTO `knightsettings` (`drop_chance_adena`, `sec_inc_gmlevel`, `sec_inc_admin`, `db_tokenexp`, `sec_giveandtake`, `sec_takeskill`, `sec_chatto`, `adjust_anounce`, `kick_player`, `adjust_trust`, `reboot_server`, `adjust_shop`, `adjust_drops`, `sec_adj_notes`) SELECT 1.00, 256, 256, 60, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
 
 -- ===== tables of this port, filled by Server Utilities -> Import =====
 CREATE TABLE IF NOT EXISTS `knightnpc` (
