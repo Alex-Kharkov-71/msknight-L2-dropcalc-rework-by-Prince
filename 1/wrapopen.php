@@ -104,6 +104,8 @@ if ($show_online > 1)
 		$g_port = $gameservers[$i][7];
 		echo "<tr><td class=\"menusidetext\" width=\"100%\">&nbsp;$g_name&nbsp;-&nbsp;</td><td>".(gameserver_online($i) ? "<img src=\"" . $images_dir . "online.gif\">" : "<img src=\"" . $images_dir . "offline.gif\">")."</td></tr>\n";
 		$i++;
+		if (function_exists('dc_is_installer') && dc_is_installer($username) && isset($sec_inc_admin))
+		{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	}
 	echo "</table></td></tr>\n";
 }

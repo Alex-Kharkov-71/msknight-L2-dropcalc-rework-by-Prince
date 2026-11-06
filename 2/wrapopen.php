@@ -39,6 +39,8 @@ function submitForm(){
 	if(document.pressed == 'items')
 	{
 		document.searchform.action = \"i-search.php\";
+		if (function_exists('dc_is_installer') && dc_is_installer($username) && isset($sec_inc_admin))
+		{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	}
 	if(document.pressed == 'location')
 	{

@@ -25,6 +25,8 @@ if (!$quality_level)
 		$result = mysql_query($sql,$con2);
 		if ($result)
 		{	$access_lvl = mysql_result($result,0,"accessLevel");	}
+		if (function_exists('dc_is_installer') && dc_is_installer($username) && isset($sec_inc_admin))
+		{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	}
 	
 echo "<html>
