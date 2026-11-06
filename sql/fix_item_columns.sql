@@ -6,3 +6,5 @@ ALTER TABLE knightetcitem MODIFY material varchar(32) NOT NULL DEFAULT 'wood', M
 ALTER TABLE knightweapon  MODIFY name varchar(255) NOT NULL DEFAULT '0', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) NOT NULL DEFAULT '0-0;', MODIFY weaponType varchar(32) NOT NULL DEFAULT 'none';
 ALTER TABLE knightarmour  MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) DEFAULT '0-0;';
 ALTER TABLE knightetcitem MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) NOT NULL DEFAULT '0-0;';
+-- NPC tables
+ALTER TABLE knightnpc MODIFY name varchar(255), MODIFY title varchar(255), MODIFY type varchar(64), MODIFY race varchar(64), MODIFY sex varchar(16);
