@@ -75,6 +75,7 @@ if ($evaluser)
 			`makes` INT DEFAULT 1, `chance` FLOAT, `multiplier` INT DEFAULT 1, `xml_id` INT)", $con);
 		mysql_query("truncate table knightrecipe", $con);
 		mysql_query("truncate table knightrecch", $con);
+		xip_stat_reset($con, 'rec');
 
 		// Регистр имени важен на Linux: в L2JMobius файл называется Recipes.xml,
 		// не recipes.xml, как было в старом датапаке.
@@ -108,7 +109,7 @@ if ($evaluser)
 					$prodCount = (int) ($item->production['count'] ?? 1);
 				}
 
-				mysql_query("insert into knightrecch (rec_name,rec_id,rec_item,level,makes,chance,multiplier,xml_id) values (
+				xip_q("insert into knightrecch (rec_name,rec_id,rec_item,level,makes,chance,multiplier,xml_id) values (
 					'" . mysql_real_escape_string($rname,$con) . "', $realRecipeId, $prodId, $level, $prodCount, $successRate, 1, $recId)", $con);
 				$rec_count++;
 
@@ -116,7 +117,7 @@ if ($evaluser)
 				{
 					$iid = (int) $ing['id'];
 					$icount = (int) ($ing['count'] ?? 1);
-					mysql_query("insert into knightrecipe (rec_id,makes,item,qty) values ($realRecipeId, $prodCount, $iid, $icount)", $con);
+					xip_q("insert into knightrecipe (rec_id,makes,item,qty) values ($realRecipeId, $prodCount, $iid, $icount)", $con);
 					$ing_count++;
 				}
 			}
@@ -126,6 +127,8 @@ if ($evaluser)
 			echo "<p class=\"popup\">Файл не найден или не парсится: $file_loc</p>";
 		}
 		echo "<p>$rec_count recipes imported ($ing_count ingredients). Duplicate recipeId skipped: $dup_count.</p>";
+		xip_stat_flush($con, 'rec');
+		xip_stat_report($con, 'rec');
 	}
 }
 

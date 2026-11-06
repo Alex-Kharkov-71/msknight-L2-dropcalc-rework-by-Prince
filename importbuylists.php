@@ -64,6 +64,7 @@ if ($evaluser)
 			`shop_id` INT, `item_id` INT, `price` BIGINT DEFAULT NULL,
 			KEY `shop_id` (`shop_id`), KEY `item_id` (`item_id`))", $con);
 		mysql_query("truncate table knightbuylist", $con);
+		xip_stat_reset($con, 'buylists');
 
 		$dir = $server_dir . 'data' . $svr_dir_delimit . 'buylists' . $svr_dir_delimit;
 		$files = xip_listXmlFiles($dir);
@@ -84,12 +85,14 @@ if ($evaluser)
 				$price = isset($item['price']) ? (int) $item['price'] : null;
 				foreach ($npcIds as $shopId)
 				{
-					mysql_query("insert into knightbuylist (shop_id,item_id,price) values ($shopId, $itemId, " . ($price===null?'NULL':$price) . ")", $con);
+					xip_q("insert into knightbuylist (shop_id,item_id,price) values ($shopId, $itemId, " . ($price===null?'NULL':$price) . ")", $con);
 					$count++;
 				}
 			}
 		}
 		echo "<p>Импортировано строк магазинов: $count (файлов обработано: " . count($files) . ")</p>";
+		xip_stat_flush($con, 'buylists');
+		xip_stat_report($con, 'buylists');
 	}
 }
 

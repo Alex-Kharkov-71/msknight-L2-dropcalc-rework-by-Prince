@@ -165,6 +165,8 @@ if ($evaluser)
 
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'items' . $svr_dir_delimit;
 		require_once(__DIR__ . '/xmlparse_common.php');
+		if ($next == 1)
+		{	xip_stat_reset($con, 'items');	}
 		$item_count = 0;
 		$name = xip_rangeName($ia);
 		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
@@ -228,25 +230,24 @@ if ($evaluser)
 
 					if ($item_type == "weapon")
 					{
-						$result = mysql_query("insert into `knightweapon` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `soulshots`, `spiritshots`, `material`, `crystal_type`, `p_dam`, `rnd_dam`, `weaponType`, `critical`, `hit_modify`, `avoid_modify`, `shield_def`, `shield_def_rate`, `atk_speed`, `mp_consume`, `m_dam`, `duration`, `time`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `change_weaponId`, `skill`, `is_stackable`, `is_questitem`) values
+						$result = xip_q("insert into `knightweapon` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `soulshots`, `spiritshots`, `material`, `crystal_type`, `p_dam`, `rnd_dam`, `weaponType`, `critical`, `hit_modify`, `avoid_modify`, `shield_def`, `shield_def_rate`, `atk_speed`, `mp_consume`, `m_dam`, `duration`, `time`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `change_weaponId`, `skill`, `is_stackable`, `is_questitem`) values
 (\"$item_id\", \"$item_name\", \"$item_d_icon\", \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_d_soulshots\", \"$item_d_spiritshots\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_p_dam\", \"$item_d_rnd_dam\", \"$item_d_weaponType\", \"$item_d_critical\", \"$item_d_hit_modify\", \"$item_d_avoid_modify\", \"$item_d_shield_def\", \"$item_d_shield_def_rate\", \"$item_d_atk_speed\", \"$item_d_mp_consume\", \"$item_d_m_dam\", \"$item_d_duration\", \"$item_d_time\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_change_weaponId\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
 					elseif ($item_type == "armor")
 					{
-						$result = mysql_query("insert into `knightarmour` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `armor_type`, `material`, `crystal_type`, `avoid_modify`, `time`, `p_def`, `m_def`, `mp_bonus`, `duration`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
+						$result = xip_q("insert into `knightarmour` (`item_id`, `name`, `icon`, `bodypart`, `crystallizable`, `weight`, `armor_type`, `material`, `crystal_type`, `avoid_modify`, `time`, `p_def`, `m_def`, `mp_bonus`, `duration`, `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
 (\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_bodypart\", \"$item_d_crystallizable\", \"$item_d_weight\", \"$item_d_armor_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_avoid_modify\", \"$item_d_time\", \"$item_d_p_def\", \"$item_d_m_def\", \"$item_d_mp_bonus\", \"$item_d_duration\", \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
 					else
 					{
-						$result = mysql_query("insert into `knightetcitem` (`item_id`, `name`, `icon`,  `crystallizable`, `weight`, `consume_type`, `material`, `crystal_type`, `duration`, `time`,  `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
+						$result = xip_q("insert into `knightetcitem` (`item_id`, `name`, `icon`,  `crystallizable`, `weight`, `consume_type`, `material`, `crystal_type`, `duration`, `time`,  `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
 (\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_crystallizable\", \"$item_d_weight\",  \"$item_d_consume_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_duration\", \"$item_d_time\",  \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
-					if (!$result)
-					{	echo "<p style=\"color:red\">Item $item_id ($item_type) NOT imported: " . htmlspecialchars((string) mysql_error()) . "</p>";	}
 					$item_count++;
 				}
 			}
 			echo "<p>Импортировано предметов: $item_count</p>";
+			xip_stat_flush($con, 'items');
 		}
 		else
 		{
@@ -254,7 +255,9 @@ if ($evaluser)
 			{	echo "<META content=\"1;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		if ($next == 1000)
-		{	echo "<p>Import Complete</p>";	}
+		{	echo "<p>Import Complete</p>";
+			require_once(__DIR__ . '/xmlparse_common.php');
+			xip_stat_report($con, 'items');	}
 	}
 }
 

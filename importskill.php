@@ -72,6 +72,7 @@ if ($evaluser)
 		mysql_query("CREATE TABLE IF NOT EXISTS `knightskills` (`skill_id` INT PRIMARY KEY, `name` VARCHAR(150), `levels` INT DEFAULT 1)", $con);
 		mysql_query("alter table knightskills add column if not exists `levels` INT DEFAULT 1", $con);
 		mysql_query("truncate table knightskills", $con);
+		xip_stat_reset($con, 'skill');
 		$skill_count = 0;
 		for ($ia=0; $ia<1000; $ia++)
 		{
@@ -86,13 +87,15 @@ if ($evaluser)
 					{
 						$id = (int) $skill['id'];
 						$sname = (string) $skill['name'];
-						mysql_query("insert into knightskills (skill_id,name,levels) values ($id, '" . mysql_real_escape_string($sname,$con) . "', " . (int) ($skill['levels'] ?? 1) . ")", $con);
+						xip_q("insert into knightskills (skill_id,name,levels) values ($id, '" . mysql_real_escape_string($sname,$con) . "', " . (int) ($skill['levels'] ?? 1) . ")", $con);
 						$skill_count++;
 					}
 				}
 			}
 		}
 		echo "<p>$skill_count skills imported.</p>";
+		xip_stat_flush($con, 'skill');
+		xip_stat_report($con, 'skill');
 	}
 }
 

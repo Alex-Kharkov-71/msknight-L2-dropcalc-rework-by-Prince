@@ -73,6 +73,7 @@ if ($evaluser)
 		mysql_query("CREATE TABLE IF NOT EXISTS `knightspawnzone` (
 			`zone` VARCHAR(100) PRIMARY KEY, `minZ` INT, `maxZ` INT, `points` TEXT)", $con);
 		mysql_query("truncate table knightspawnzone", $con);
+		xip_stat_reset($con, 'spawns');
 
 		$dir = $server_dir . 'data' . $svr_dir_delimit . 'spawns' . $svr_dir_delimit;
 		$files = xip_listXmlFiles($dir);
@@ -102,7 +103,7 @@ if ($evaluser)
 				foreach ($xs as $i => $x)
 				{	$pointsStr[] = $x . ',' . $ys[$i];	}
 				$pointsStr = implode(';', $pointsStr);
-				mysql_query("replace into knightspawnzone (zone,minZ,maxZ,points) values (
+				xip_q("replace into knightspawnzone (zone,minZ,maxZ,points) values (
 					'" . mysql_real_escape_string($zone,$con) . "', " . ($minZ ?? 0) . ", " . ($maxZ ?? 0) . ",
 					'" . mysql_real_escape_string($pointsStr,$con) . "')", $con);
 
@@ -110,13 +111,15 @@ if ($evaluser)
 				{
 					$npcId = (int) $npc['id'];
 					$cnt = (int) ($npc['count'] ?? 1);
-					mysql_query("insert into knightspawnlist (npc_templateid,locx,locy,locz,count,loc_id,is_approximate)
+					xip_q("insert into knightspawnlist (npc_templateid,locx,locy,locz,count,loc_id,is_approximate)
 						values ($npcId, $cx, $cy, $cz, $cnt, '" . mysql_real_escape_string($zone,$con) . "', 1)", $con);
 					$count++;
 				}
 			}
 		}
 		echo "<p>Импортировано строк спавна: $count (файлов обработано: " . count($files) . ")</p>";
+		xip_stat_flush($con, 'spawns');
+		xip_stat_report($con, 'spawns');
 	}
 }
 

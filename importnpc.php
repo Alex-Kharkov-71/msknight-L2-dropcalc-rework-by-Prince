@@ -92,28 +92,13 @@ if ($evaluser)
 			mysql_query("truncate table knightnpc", $con);
 			mysql_query("truncate table knightdroplist", $con);
 			mysql_query("truncate table knightnpcskills", $con);
+			xip_stat_reset($con, 'npc');
 		}
 
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'npcs' . $svr_dir_delimit;
 		$name = xip_rangeName($ia);
 		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
 		$npc_count = 0;
-		if (!function_exists('npc_q'))
-		{
-			function npc_q($sql, $con)
-			{
-				global $npc_errs;
-				$r = mysql_query($sql, $con);
-				if (!$r)
-				{
-					$npc_errs++;
-					if ($npc_errs <= 10)
-					{	echo "<p style=\"color:red\">NOT imported: " . htmlspecialchars((string) mysql_error()) . " | " . htmlspecialchars(substr(preg_replace('/\s+/', ' ', $sql), 0, 160)) . "</p>";	}
-				}
-				return $r;
-			}
-		}
-		$npc_errs = 0;
 		$drop_count = 0;
 		echo "<p>NPC Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
 
@@ -160,7 +145,7 @@ if ($evaluser)
 					// isundead: отдельного флага нет, но это и есть race=UNDEAD.
 					$isUndead = (strtoupper($race) === 'UNDEAD') ? 1 : 0;
 
-					npc_q("insert into knightnpc (id,name,title,type,level,race,sex,exp,sp,hp,mp,patk,matk,pdef,mdef,
+					xip_q("insert into knightnpc (id,name,title,type,level,race,sex,exp,sp,hp,mp,patk,matk,pdef,mdef,
 						atkspd,accuracy,attackrange,walkspd,runspd,aggro,is_aggressive,rhand,lhand,matkspd,isundead) values (
 						$id, '" . mysql_real_escape_string($name_,$con) . "', '" . mysql_real_escape_string($title,$con) . "',
 						'" . mysql_real_escape_string($type,$con) . "', $level, '" . mysql_real_escape_string($race,$con) . "',
@@ -174,7 +159,7 @@ if ($evaluser)
 						{
 							$skId = (int) $sk['id'];
 							$skLvl = (int) $sk['level'];
-							npc_q("insert into knightnpcskills (npcid,skillid,level) values ($id, $skId, $skLvl)", $con);
+							xip_q("insert into knightnpcskills (npcid,skillid,level) values ($id, $skId, $skLvl)", $con);
 						}
 					}
 
@@ -187,7 +172,7 @@ if ($evaluser)
 							foreach ($group->item as $it)
 							{
 								$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
-								npc_q("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
+								xip_q("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
 									values ($id,$iid,$min,$max,$chance,$groupChance,0,$cat)", $con);
 								$drop_count++;
 							}
@@ -196,14 +181,15 @@ if ($evaluser)
 						foreach ($npc->dropLists->spoil->item ?? [] as $it)
 						{
 							$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
-							npc_q("insert into knightdroplist (mobid,itemid,min,max,chance,sweep)
+							xip_q("insert into knightdroplist (mobid,itemid,min,max,chance,sweep)
 								values ($id,$iid,$min,$max,$chance,1)", $con);
 							$drop_count++;
 						}
 					}
 				}
 			}
-			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count, errors: $npc_errs</p>";
+			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count</p>";
+			xip_stat_flush($con, 'npc');
 		}
 		else
 		{
@@ -211,7 +197,9 @@ if ($evaluser)
 			{	echo "<META content=\"1;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		if ($next == 1000)
-		{	echo "<p>NPC import complete.</p>";	}
+		{	echo "<p>NPC import complete.</p>";
+			require_once(__DIR__ . '/xmlparse_common.php');
+			xip_stat_report($con, 'npc');	}
 	}
 }
 
