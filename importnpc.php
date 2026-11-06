@@ -64,8 +64,8 @@ if ($evaluser)
 		// современных движках статика NPC в БД сервера больше не хранится -
 		// только в XML. Поэтому своя фиксированная схема.
 		mysql_query("CREATE TABLE IF NOT EXISTS `knightnpc` (
-			`id` INT PRIMARY KEY, `name` VARCHAR(100), `title` VARCHAR(100), `type` VARCHAR(30), `level` INT DEFAULT 1,
-			`race` VARCHAR(30), `sex` VARCHAR(10), `exp` FLOAT DEFAULT 0, `sp` FLOAT DEFAULT 0,
+			`id` INT PRIMARY KEY, `name` VARCHAR(255), `title` VARCHAR(255), `type` VARCHAR(64), `level` INT DEFAULT 1,
+			`race` VARCHAR(64), `sex` VARCHAR(16), `exp` FLOAT DEFAULT 0, `sp` FLOAT DEFAULT 0,
 			`hp` FLOAT DEFAULT 0, `mp` FLOAT DEFAULT 0, `patk` FLOAT DEFAULT 0, `matk` FLOAT DEFAULT 0,
 			`pdef` FLOAT DEFAULT 0, `mdef` FLOAT DEFAULT 0, `atkspd` INT DEFAULT 0, `accuracy` FLOAT DEFAULT 0,
 			`attackrange` INT DEFAULT 0, `walkspd` FLOAT DEFAULT 0, `runspd` FLOAT DEFAULT 0,
@@ -81,7 +81,6 @@ if ($evaluser)
 		// не сохранялись в отдельную таблицу.
 		mysql_query("CREATE TABLE IF NOT EXISTS `knightnpcskills` (
 			`npcid` INT, `skillid` INT, `level` INT, KEY `npcid` (`npcid`))", $con);
-		mysql_query("truncate table knightnpcskills", $con);
 
 		mysql_query("CREATE TABLE IF NOT EXISTS `knightdroplist` (
 			`mobid` INT, `itemid` INT, `min` INT, `max` INT, `chance` FLOAT, `group_chance` FLOAT DEFAULT NULL,
@@ -92,12 +91,29 @@ if ($evaluser)
 		{
 			mysql_query("truncate table knightnpc", $con);
 			mysql_query("truncate table knightdroplist", $con);
+			mysql_query("truncate table knightnpcskills", $con);
 		}
 
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'npcs' . $svr_dir_delimit;
 		$name = xip_rangeName($ia);
 		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
 		$npc_count = 0;
+		if (!function_exists('npc_q'))
+		{
+			function npc_q($sql, $con)
+			{
+				global $npc_errs;
+				$r = mysql_query($sql, $con);
+				if (!$r)
+				{
+					$npc_errs++;
+					if ($npc_errs <= 10)
+					{	echo "<p style=\"color:red\">NOT imported: " . htmlspecialchars((string) mysql_error()) . " | " . htmlspecialchars(substr(preg_replace('/\s+/', ' ', $sql), 0, 160)) . "</p>";	}
+				}
+				return $r;
+			}
+		}
+		$npc_errs = 0;
 		$drop_count = 0;
 		echo "<p>NPC Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
 
@@ -144,7 +160,7 @@ if ($evaluser)
 					// isundead: отдельного флага нет, но это и есть race=UNDEAD.
 					$isUndead = (strtoupper($race) === 'UNDEAD') ? 1 : 0;
 
-					mysql_query("insert into knightnpc (id,name,title,type,level,race,sex,exp,sp,hp,mp,patk,matk,pdef,mdef,
+					npc_q("insert into knightnpc (id,name,title,type,level,race,sex,exp,sp,hp,mp,patk,matk,pdef,mdef,
 						atkspd,accuracy,attackrange,walkspd,runspd,aggro,is_aggressive,rhand,lhand,matkspd,isundead) values (
 						$id, '" . mysql_real_escape_string($name_,$con) . "', '" . mysql_real_escape_string($title,$con) . "',
 						'" . mysql_real_escape_string($type,$con) . "', $level, '" . mysql_real_escape_string($race,$con) . "',
@@ -158,7 +174,7 @@ if ($evaluser)
 						{
 							$skId = (int) $sk['id'];
 							$skLvl = (int) $sk['level'];
-							mysql_query("insert into knightnpcskills (npcid,skillid,level) values ($id, $skId, $skLvl)", $con);
+							npc_q("insert into knightnpcskills (npcid,skillid,level) values ($id, $skId, $skLvl)", $con);
 						}
 					}
 
@@ -171,7 +187,7 @@ if ($evaluser)
 							foreach ($group->item as $it)
 							{
 								$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
-								mysql_query("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
+								npc_q("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
 									values ($id,$iid,$min,$max,$chance,$groupChance,0,$cat)", $con);
 								$drop_count++;
 							}
@@ -180,14 +196,14 @@ if ($evaluser)
 						foreach ($npc->dropLists->spoil->item ?? [] as $it)
 						{
 							$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
-							mysql_query("insert into knightdroplist (mobid,itemid,min,max,chance,sweep)
+							npc_q("insert into knightdroplist (mobid,itemid,min,max,chance,sweep)
 								values ($id,$iid,$min,$max,$chance,1)", $con);
 							$drop_count++;
 						}
 					}
 				}
 			}
-			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count</p>";
+			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count, errors: $npc_errs</p>";
 		}
 		else
 		{
