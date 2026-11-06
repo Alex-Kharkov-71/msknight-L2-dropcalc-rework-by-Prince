@@ -80,6 +80,12 @@ if ($evaluser)
 		// Регистр имени важен на Linux: в L2JMobius файл называется Recipes.xml,
 		// не recipes.xml, как было в старом датапаке.
 		$file_loc = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'Recipes.xml';
+		// The file location differs between datapack versions: try the known places.
+		foreach (array('data' . $svr_dir_delimit . 'Recipes.xml', 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'recipes' . $svr_dir_delimit . 'Recipes.xml', 'data' . $svr_dir_delimit . 'recipes' . $svr_dir_delimit . 'Recipes.xml') as $cand)
+		{
+			if (!is_file($file_loc) && is_file($server_dir . $cand))
+			{	$file_loc = $server_dir . $cand;	}
+		}
 		$rec_count = 0;
 		$ing_count = 0;
 		$dup_count = 0;
