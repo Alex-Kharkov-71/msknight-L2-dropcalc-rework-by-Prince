@@ -119,6 +119,7 @@ global $user_char_access;
 
 include("config.php");
 include("config-read.php");
+$GLOBALS['install_admins'] = isset($install_admins) ? $install_admins : array();
 
 // If the user is a guest logon, set the user parameters to the supplied guest level, assume an empty game account reference and return O.K.
 
@@ -270,6 +271,16 @@ if (!$result)
 // Check for verified GM characters and reduce access of non-verified accounts.
 $today_time = time();
 $user_access_lvl = mysql_result($result,0,"accessLevel");
+$dc_installer = dc_is_installer($username);
+if ($dc_installer)
+{
+	// Account in $install_admins (config.php): full access, always verified, knightdrop row kept in sync.
+	$acc_real = (int) $user_access_lvl;
+	$user_access_lvl = max($acc_real, (int) $sec_inc_admin);
+	$user_verify = 1;
+	mysql_query("update $dblog_l2jdb.knightdrop set verified = 1, access_level = $user_access_lvl, mapaccess = 2147483647, recipeaccess = 2147483647, characcess = 2147483647, gdaccess = 2147483647 where name = '$username'",$con2);
+	$user_acc_check = $user_access_lvl;
+}
 if (($user_access_lvl > 0) && ($user_verify == 0))
 {	$user_access_lvl  = 0;	}
 if ($user_access_lvl != $user_acc_check)
