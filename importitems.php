@@ -73,9 +73,9 @@ if ($evaluser)
   `icon` varchar(50) NOT NULL DEFAULT '0',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
   `weight` smallint(4) NOT NULL DEFAULT '0',
-  `consume_type` varchar(9) NOT NULL DEFAULT 'normal',
-  `material` varchar(11) NOT NULL DEFAULT 'wood',
-  `crystal_type` varchar(4) NOT NULL DEFAULT 'none',
+  `consume_type` varchar(16) NOT NULL DEFAULT 'normal',
+  `material` varchar(32) NOT NULL DEFAULT 'wood',
+  `crystal_type` varchar(8) NOT NULL DEFAULT 'none',
   `duration` mediumint(5) NOT NULL DEFAULT '-1',
   `time` mediumint(5) NOT NULL DEFAULT '-1',
   `price` int(10) unsigned NOT NULL DEFAULT '0',
@@ -93,13 +93,13 @@ if ($evaluser)
   `item_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `name` varchar(120) NOT NULL DEFAULT '0',
   `icon` varchar(50) NOT NULL DEFAULT '0',
-  `bodypart` varchar(15) NOT NULL DEFAULT 'none',
+  `bodypart` varchar(32) NOT NULL DEFAULT 'none',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
   `weight` smallint(4) NOT NULL DEFAULT '0',
   `soulshots` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `spiritshots` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `material` varchar(11) NOT NULL DEFAULT 'wood',
-  `crystal_type` varchar(4) NOT NULL DEFAULT 'none',
+  `material` varchar(32) NOT NULL DEFAULT 'wood',
+  `crystal_type` varchar(8) NOT NULL DEFAULT 'none',
   `p_dam` smallint(4) NOT NULL DEFAULT '0',
   `rnd_dam` smallint(3) NOT NULL DEFAULT '0',
   `weaponType` varchar(20) NOT NULL DEFAULT 'none',
@@ -129,12 +129,12 @@ if ($evaluser)
   `item_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `name` varchar(120) NOT NULL DEFAULT '',
   `icon` varchar(50) NOT NULL DEFAULT '0',
-  `bodypart` varchar(15) NOT NULL DEFAULT 'none',
+  `bodypart` varchar(32) NOT NULL DEFAULT 'none',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
-  `armor_type` varchar(5) NOT NULL DEFAULT 'none',
+  `armor_type` varchar(16) NOT NULL DEFAULT 'none',
   `weight` smallint(4) NOT NULL DEFAULT '0',
-  `material` varchar(15) NOT NULL DEFAULT 'wood',
-  `crystal_type` varchar(4) NOT NULL DEFAULT 'none',
+  `material` varchar(32) NOT NULL DEFAULT 'wood',
+  `crystal_type` varchar(8) NOT NULL DEFAULT 'none',
   `avoid_modify` tinyint(2) NOT NULL DEFAULT '0',
   `duration` mediumint(5) NOT NULL DEFAULT '-1',
   `time` mediumint(5) NOT NULL DEFAULT '-1',
@@ -241,6 +241,8 @@ if ($evaluser)
 						$result = mysql_query("insert into `knightetcitem` (`item_id`, `name`, `icon`,  `crystallizable`, `weight`, `consume_type`, `material`, `crystal_type`, `duration`, `time`,  `price`, `crystal_count`, `sellable`, `dropable`, `destroyable`, `tradeable`, `depositable`, `skill`, `is_stackable`, `is_questitem`) values
 (\"$item_id\", \"$item_name\", \"$item_d_icon\",  \"$item_d_crystallizable\", \"$item_d_weight\",  \"$item_d_consume_type\", \"$item_d_material\", \"$item_d_crystal_type\", \"$item_d_duration\", \"$item_d_time\",  \"$item_d_price\", \"$item_d_crystal_count\", \"$item_d_sellable\", \"$item_d_dropable\", \"$item_d_destroyable\", \"$item_d_tradeable\", \"$item_d_depositable\", \"$item_d_skill\", \"$item_d_is_stackable\", \"$item_d_is_questitem\")", $con);
 					}
+					if (!$result)
+					{	echo "<p style=\"color:red\">Item $item_id ($item_type) NOT imported: " . htmlspecialchars((string) mysql_error()) . "</p>";	}
 					$item_count++;
 				}
 			}
