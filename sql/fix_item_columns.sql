@@ -8,3 +8,6 @@ ALTER TABLE knightarmour  MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY i
 ALTER TABLE knightetcitem MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) NOT NULL DEFAULT '0-0;';
 -- NPC tables
 ALTER TABLE knightnpc MODIFY name varchar(255), MODIFY title varchar(255), MODIFY type varchar(64), MODIFY race varchar(64), MODIFY sex varchar(16);
+
+-- Skin selection: allow users to choose a skin, do not force the server default (run on each GAME database)
+UPDATE knightsettings SET user_change_skin = 1, force_default_skin = 0;

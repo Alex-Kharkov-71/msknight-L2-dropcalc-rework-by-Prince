@@ -89,6 +89,8 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	{	$access_lvl = mysql_result($result_set,0,"accessLevel");	}
 	else
 	{	$access_lvl = 0;	}
+	if (dc_is_installer($username))
+	{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	if ($access_lvl < $sec_inc_gmlevel)
 	{
 		if ($force_default_skin)
