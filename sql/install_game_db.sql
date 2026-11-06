@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS `knightsettings` (
 
 CREATE TABLE IF NOT EXISTS `knightweapon` (
   `item_id` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `name` varchar(120) NOT NULL DEFAULT '0',
-  `icon` varchar(50) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '0',
+  `icon` varchar(100) NOT NULL DEFAULT '0',
   `bodypart` varchar(32) NOT NULL DEFAULT 'none',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
   `weight` smallint(4) NOT NULL DEFAULT 0,
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `knightweapon` (
   `crystal_type` varchar(8) NOT NULL DEFAULT 'none',
   `p_dam` smallint(4) NOT NULL DEFAULT 0,
   `rnd_dam` smallint(3) NOT NULL DEFAULT 0,
-  `weaponType` varchar(20) NOT NULL DEFAULT 'none',
+  `weaponType` varchar(32) NOT NULL DEFAULT 'none',
   `critical` smallint(3) NOT NULL DEFAULT 0,
   `hit_modify` tinyint(2) NOT NULL DEFAULT 0,
   `avoid_modify` tinyint(2) NOT NULL DEFAULT 0,
@@ -162,14 +162,14 @@ CREATE TABLE IF NOT EXISTS `knightweapon` (
   `is_stackable` enum('true','false') NOT NULL DEFAULT 'false',
   `is_questitem` enum('true','false') NOT NULL DEFAULT 'false',
   `change_weaponId` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `skill` varchar(70) NOT NULL DEFAULT '0-0;',
+  `skill` varchar(255) NOT NULL DEFAULT '0-0;',
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `knightarmour` (
   `item_id` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `name` varchar(120) NOT NULL DEFAULT '',
-  `icon` varchar(50) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` varchar(100) NOT NULL DEFAULT '0',
   `bodypart` varchar(32) NOT NULL DEFAULT 'none',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
   `armor_type` varchar(16) NOT NULL DEFAULT 'none',
@@ -191,14 +191,14 @@ CREATE TABLE IF NOT EXISTS `knightarmour` (
   `depositable` enum('true','false') NOT NULL DEFAULT 'false',
   `is_stackable` enum('true','false') NOT NULL DEFAULT 'false',
   `is_questitem` enum('true','false') NOT NULL DEFAULT 'false',
-  `skill` varchar(70) DEFAULT '0-0;',
+  `skill` varchar(255) DEFAULT '0-0;',
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `knightetcitem` (
   `item_id` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `icon` varchar(50) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` varchar(100) NOT NULL DEFAULT '0',
   `crystallizable` enum('true','false') NOT NULL DEFAULT 'false',
   `weight` smallint(4) NOT NULL DEFAULT 0,
   `consume_type` varchar(16) NOT NULL DEFAULT 'normal',
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `knightetcitem` (
   `depositable` enum('true','false') NOT NULL DEFAULT 'false',
   `is_stackable` enum('true','false') NOT NULL DEFAULT 'false',
   `is_questitem` enum('true','false') NOT NULL DEFAULT 'false',
-  `skill` varchar(70) NOT NULL DEFAULT '0-0;',
+  `skill` varchar(255) NOT NULL DEFAULT '0-0;',
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

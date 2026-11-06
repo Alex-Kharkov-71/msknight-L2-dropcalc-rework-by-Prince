@@ -3,3 +3,6 @@
 ALTER TABLE knightweapon  MODIFY material varchar(32) NOT NULL DEFAULT 'wood', MODIFY crystal_type varchar(8) NOT NULL DEFAULT 'none', MODIFY bodypart varchar(32) NOT NULL DEFAULT 'none';
 ALTER TABLE knightarmour  MODIFY material varchar(32) NOT NULL DEFAULT 'wood', MODIFY crystal_type varchar(8) NOT NULL DEFAULT 'none', MODIFY bodypart varchar(32) NOT NULL DEFAULT 'none', MODIFY armor_type varchar(16) NOT NULL DEFAULT 'none';
 ALTER TABLE knightetcitem MODIFY material varchar(32) NOT NULL DEFAULT 'wood', MODIFY crystal_type varchar(8) NOT NULL DEFAULT 'none', MODIFY consume_type varchar(16) NOT NULL DEFAULT 'normal';
+ALTER TABLE knightweapon  MODIFY name varchar(255) NOT NULL DEFAULT '0', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) NOT NULL DEFAULT '0-0;', MODIFY weaponType varchar(32) NOT NULL DEFAULT 'none';
+ALTER TABLE knightarmour  MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) DEFAULT '0-0;';
+ALTER TABLE knightetcitem MODIFY name varchar(255) NOT NULL DEFAULT '', MODIFY icon varchar(100) NOT NULL DEFAULT '0', MODIFY skill varchar(255) NOT NULL DEFAULT '0-0;';
