@@ -77,50 +77,25 @@ if ($evaluser)
 		if ($go)
 		{
 			
-			$sql = "drop table if exists $dblog_l2jdb.knightdrop";	
-			$result_i = mysql_query($sql,$con2);
+			// Non-destructive: existing knightdrop rows (verification, passwords, e-mails, access) stay untouched,
+			// only accounts of the login server that have no DropCalc record yet are added (unverified).
+			require_once(__DIR__ . '/dc_install_lib.php');
+			dc_ensure_login_tables($con2);
+			$before = 0;
+			$r0 = mysql_query("select count(*) from $dblog_l2jdb.knightdrop", $con2);
+			if ($r0) { $before = (int) mysql_result($r0, 0, 0); }
+			$sql = "insert ignore into $dblog_l2jdb.knightdrop (name, access_level) select login, accessLevel from $dblog_l2jdb.accounts";
+			$result_i = mysql_query($sql, $con2);
 			if (!$result_i)
-			{	
-				echo "<p class=\"popup\">Couldn't drop the knightdrop table</p>";	
+			{
+				echo "<p class=\"popup\">Couldn't import the accounts: " . htmlspecialchars((string) mysql_error()) . "</p>";
 			}
 			else
 			{
-				$sql = "CREATE TABLE $dblog_l2jdb.knightdrop ( 
-				`name` varchar(45) NOT NULL default '', 
-				`lastaction` int(11) default NULL, 
-				`token` varchar(10) default NULL, 
-				mapaccess int(20) default 0, 
-				recipeaccess int(20) default 0, 
-				`gdaccess` int(20) default 0,
-				boxingok int(1) NULL, 
-				warnlevel int(1) NULL, 
-				`characcess` int(20) default '0',    
-				`lastheard` int(20) default '0',   
-				ipaddr varchar(30) default NULL, 
-				`access_level` int(11) default 0,
-				`email` varchar(50) default '',
-				`request_time` int(20) default 0,
-				`request_key` varchar(45),
-				`emailcheck` int(1) NOT NULL default '0',
-				`password` varchar(45) default NULL,
-				PRIMARY KEY  (`name`), UNIQUE KEY `id` (`name`) )";
-				$result_i = mysql_query($sql,$con2);
-				if (!$result_i)
-				{	
-					echo "<p class=\"popup\">Couldn't create the knightdrop table!!!</p>";
-				}
-
-				$sql = "insert into $dblog_l2jdb.knightdrop (name, access_level) select login, accessLevel from $dblog_l2jdb.accounts";	
-				$result_i = mysql_query($sql,$con2);
-				if (!$result_i)
-				{	
-					echo "<p class=\"popup\">Couldn't import the accounts!!!</p>";
-				}
-				else
-				{
-					echo "<p class=\"popup\">Accounts data imported O.K.</p>";
-					echo "<p class=\"popup\">NOTE - Please log in again.</p>";
-				}
+				$added = (int) mysql_affected_rows($con2);
+				$r1 = mysql_query("select count(*) from $dblog_l2jdb.knightdrop", $con2);
+				$after = $r1 ? (int) mysql_result($r1, 0, 0) : $before;
+				echo "<p class=\"popup\">Accounts imported O.K.: added $added new, already present $before, total $after.</p>";
 			}
 		}
 		else
