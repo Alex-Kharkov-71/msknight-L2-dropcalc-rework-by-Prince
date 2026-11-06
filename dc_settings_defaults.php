@@ -7,7 +7,7 @@ return array(
 	'guest_allow' => 0,
 	'guest_user_maps' => 0,
 	'low_graphic_allow' => 0,
-	'db_tokenexp' => 0,
+	'db_tokenexp' => 60,
 	'sec_inc_gmlevel' => 0,
 	'sec_inc_admin' => 0,
 	'sec_giveandtake' => 0,
