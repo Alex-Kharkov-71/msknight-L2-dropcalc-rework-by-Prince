@@ -146,13 +146,28 @@ function dc_drop_tables($con, $names)
 	}
 }
 
+// Menu entry "Install tables" for installers (next to Server tools). $style: 0/1 = side menu rows, 2 = top bar.
+function dc_install_menu_row($username, $style)
+{
+	if (!dc_is_installer($username))
+	{	return '';	}
+	$g = $GLOBALS;
+	$link = "install.php?username=" . urlencode($username) . "&token=" . urlencode($g['token'] ?? '') . "&langval=" . (int) ($g['langval'] ?? 0) . "&server_id=" . (int) ($g['server_id'] ?? 0) . "&skin_id=" . (int) ($g['skin_id'] ?? 0);
+	$link = htmlspecialchars($link);
+	$sd = $g['skin_dir'] ?? '';
+	if ($style == 2)
+	{	return "<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"$link\" class=\"whitetop\">Install tables</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$sd/bronzethin.jpg');\"><img src=\"$sd/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>";	}
+	$bg = ($style == 1) ? "background: url('$sd/bg_sideback.jpg') no-repeat top left;" : "background:#000000 url('$sd/bg_sideback.jpg') repeat-x top right;";
+	return "</tr><tr><td class=\"menuside\" style=\"$bg\"><a href=\"$link\" class=\"igotitleft\">&nbsp;Install tables</a></td>";
+}
+
 // Line under the page header: a link to install.php for installers, a notice for everybody
 // while DropCalc is not installed.
 function dc_installer_banner($username)
 {
 	$not_inst = !empty($GLOBALS['dc_not_installed']);
 	$is_inst = dc_is_installer($username);
-	if (!$not_inst && !$is_inst)
+	if (!$not_inst)
 	{	return;	}
 	if ($is_inst)
 	{

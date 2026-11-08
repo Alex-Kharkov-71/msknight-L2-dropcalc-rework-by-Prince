@@ -1,4 +1,5 @@
 <?php
+$dc_imr = function($u,$st){ return function_exists('dc_install_menu_row') ? dc_install_menu_row($u,$st) : ''; };
 /*
 Incoming Varialbe List
 ----------------------
@@ -369,7 +370,7 @@ if ($username != "guest")
 		{	echo "<tr>
 			<td ><img src=\"$skin_dir/blank.gif\" width=\"180\" height=\"15\" alt=\"Menu Sword\" title=\"Menu Sword\" /></td>
 			</tr><tr>
-				<td class=\"menuside\" style=\"background: url('$skin_dir/bg_sideback.jpg') no-repeat top left;\"><a href=\"servertools.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\" class=\"igotitleft\">&nbsp;$lang_servertools</a></td>
+				<td class=\"menuside\" style=\"background: url('$skin_dir/bg_sideback.jpg') no-repeat top left;\"><a href=\"servertools.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\" class=\"igotitleft\">&nbsp;$lang_servertools</a></td>{$dc_imr($username,1)}
 			</tr><tr>
 				<td class=\"menuside\" style=\"background: url('$skin_dir/bg_sideback.jpg') no-repeat top left;\"><a href=\"sconsole.php?$itemname=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&lastlines=1#bottomline\" class=\"igotitleft\">&nbsp;$lang_serverconsole</a></td>
 			</tr><tr>

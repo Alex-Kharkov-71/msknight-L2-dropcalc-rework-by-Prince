@@ -1,4 +1,5 @@
 <?php
+$dc_imr = function($u,$st){ return function_exists('dc_install_menu_row') ? dc_install_menu_row($u,$st) : ''; };
 /*
 Incoming Varialbe List
 ----------------------
@@ -188,6 +189,7 @@ if ($username != "guest")
 		{	echo "<tr><td width=\"100%\" colspan=\"3\"><img src=\"$skin_dir/blank.gif\" alt=\"\" width=\"1\" height=\"8\" border=\"0\"></td></tr>
 			<tr><td width=\"100%\" colspan=\"3\" style=\"background: url('$skin_dir/bronzethin.jpg');\"><table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><img src=\"$skin_dir/blank.gif\" alt=\"\" width=\"1\" height=\"25\" border=\"0\"></td>
 			<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"servertools.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\" class=\"whitetop\">$lang_servertools</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$skin_dir/bronzethin.jpg');\"><img src=\"$skin_dir/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>
+			{$dc_imr($username,2)}
 			<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"sconsole.php?$itemname=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&lastlines=1#bottomline\" class=\"whitetop\">$lang_serverconsole</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$skin_dir/bronzethin.jpg');\"><img src=\"$skin_dir/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>
 			<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"statistics.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&action=\" class=\"whitetop\">$lang_serverstats</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$skin_dir/bronzethin.jpg');\"><img src=\"$skin_dir/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>
 			<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"clog.php?$itemname=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&lastlines=1#bottomline\" class=\"whitetop\">$lang_chatlog</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$skin_dir/bronzethin.jpg');\"><img src=\"$skin_dir/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>";
