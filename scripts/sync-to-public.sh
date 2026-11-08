@@ -13,7 +13,7 @@ flock -n 9 || { echo "sync already running"; exit 1; }
 
 L=(mysql --defaults-extra-file="$LOCAL_CNF" -N -B)
 R=(mysql --defaults-extra-file="$REMOTE_CNF" -h "$REMOTE_HOST" -P "${REMOTE_PORT:-3306}" --max_allowed_packet=256M --compress)
-SKIP="knightdrop knightipok knightsettings knightimportstat"
+SKIP="knightdrop knightipok knightsettings knightimportstat accnotes"
 
 sync_db() {            # $1 = home db, $2 = public db, $3 = "login" for the accounts db
   local src="$1" pub="$2" kind="${3:-game}" stage old t ign=()
