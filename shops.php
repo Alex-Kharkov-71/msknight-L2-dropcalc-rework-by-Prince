@@ -111,7 +111,7 @@ if ($evaluser)
 					if ($shop_loc < 10000)
 					{	$shop_loc = 1000000 + $shop_loc;	}
 					$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
-					$chk_npc = mysql_query("select 1 from knightnpc where id = '" . intval($shop_owner) . "'", $con);
+					$chk_npc = mysql_query("select 1 from knightnpc where id = '" . (($shop_loc >= 1000000) ? ($shop_loc - 1000000) : intval($shop_loc)) . "'", $con);
 					if ($chk_npc && !mysql_num_rows($chk_npc))
 					{	$shop_location = "Buylist without NPC";	}
 							
@@ -140,7 +140,7 @@ if ($evaluser)
 				if ($shop_loc < 10000)
 				{	$shop_loc = 1000000 + $shop_loc;	}
 				$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
-				$chk_npc = mysql_query("select 1 from knightnpc where id = '" . intval($shop_owner) . "'", $con);
+				$chk_npc = mysql_query("select 1 from knightnpc where id = '" . (($shop_loc >= 1000000) ? ($shop_loc - 1000000) : intval($shop_loc)) . "'", $con);
 				if ($chk_npc && !mysql_num_rows($chk_npc))
 				{	$shop_location = "Buylist without NPC";	}
 			}
