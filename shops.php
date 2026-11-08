@@ -96,16 +96,14 @@ if ($evaluser)
 
 		if (!$shopid)
 		{
-			$vl = array('' => 'Shops with a spawn (normal)', 'nospawn' => 'Without a spawn', 'all' => 'All shops');
-			echo "<p class=\"dropmain\">";
+			$vl = array('' => ($lang_shops_spawn ?? 'Shops with a spawn'), 'nospawn' => ($lang_shops_nospawn ?? 'Without a spawn'), 'all' => ($lang_shops_all ?? 'All shops'));
+			echo "<table class=\"blanktab\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\"><tr>";
 			foreach ($vl as $vk => $vt)
 			{
-				if ($vk == $view)
-				{	echo "<strong class=\"dropmain\">[ $vt ]</strong>&nbsp;&nbsp;";	}
-				else
-				{	echo "<a class=\"dropmain\" href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&view=$vk\">$vt</a>&nbsp;&nbsp;";	}
+				$sel = ($vk == $view) ? " style=\"font-weight:bold;text-decoration:underline\"" : "";
+				echo "<td class=\"noborderback\"><form method=\"get\" action=\"shops.php\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" type=\"hidden\" value=\"$server_id\"><input name=\"skin_id\" type=\"hidden\" value=\"$skin_id\"><input name=\"view\" type=\"hidden\" value=\"$vk\"><input value=\"$vt\" type=\"submit\" class=\"bigbut2\"$sel></form></td>";
 			}
-			echo " &nbsp; ($count)</p>";
+			echo "<td class=\"noborderback\"><p class=\"dropmain\">&nbsp;($count)</p></td></tr></table>";
 			echo "<table class=\"blanktab\" width=\"100%\"><tr><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Location</strong></p></td></tr>";
 			$i=0;
 			$target = intval($count / 4) + 1;
@@ -131,7 +129,7 @@ if ($evaluser)
 					$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
 					$chk_npc = mysql_query("select 1 from knightnpc where id = '" . (($shop_loc >= 1000000) ? ($shop_loc - 1000000) : intval($shop_loc)) . "'", $con);
 					if ($chk_npc && !mysql_num_rows($chk_npc))
-					{	$shop_location = "Buylist without NPC";	}
+					{	$shop_location = (isset($lang_shops_nonpc) ? $lang_shops_nonpc : 'Buylist without NPC');	}
 							
 				}
 				echo "<tr><td class=\"dropmain\">$shop_id</td><td class=\"dropmain\"><a href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&shopid=$shop_id\" class=\"dropmain\">$shop_owner</a></td><td class=\"dropmain\">$shop_location</td></tr>";
@@ -160,7 +158,7 @@ if ($evaluser)
 				$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
 				$chk_npc = mysql_query("select 1 from knightnpc where id = '" . (($shop_loc >= 1000000) ? ($shop_loc - 1000000) : intval($shop_loc)) . "'", $con);
 				if ($chk_npc && !mysql_num_rows($chk_npc))
-				{	$shop_location = "Buylist without NPC";	}
+				{	$shop_location = (isset($lang_shops_nonpc) ? $lang_shops_nonpc : 'Buylist without NPC');	}
 			}
 			$sql = "select name from knightnpc where id = '$shop_owner'";
 			$result2 = mysql_query($sql,$con);

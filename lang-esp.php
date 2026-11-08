@@ -156,4 +156,8 @@ $lang_erasename = "Borrar nombre";
 $lang_server = "Server";
 $lang_skin = "Skin";
 $lang_fame = "Fame";
+$lang_shops_spawn = "Tiendas con aparici&oacute;n";
+$lang_shops_nospawn = "Sin aparici&oacute;n";
+$lang_shops_all = "Todas las tiendas";
+$lang_shops_nonpc = "Lista de tienda sin NPC";
 ?>

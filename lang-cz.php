@@ -157,4 +157,8 @@ $lang_erasename = "Smazat jm&eacute;no";
 $lang_server = "Server";
 $lang_skin = "Skin";
 $lang_fame = "Fame";
+$lang_shops_spawn = "Obchody se spawnem";
+$lang_shops_nospawn = "Bez spawnu";
+$lang_shops_all = "V&scaron;echny obchody";
+$lang_shops_nonpc = "Seznam obchodu bez NPC";
 ?>
