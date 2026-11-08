@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -57,7 +57,7 @@ if ($evaluser)
 	
 	function date_to_timestamp ($Date)
 	{
-		$split_date = split('[/.-]', $Date);
+		$split_date = preg_split('#[/.-]#', $Date);
 		$timestamp = mktime($split_date[3], $split_date[4], $split_date[5], $split_date[1], $split_date[0], $split_date[2]);
 		$timestamp = $timestamp*1000;
 		return $timestamp;

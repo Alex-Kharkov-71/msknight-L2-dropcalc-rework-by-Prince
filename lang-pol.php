@@ -158,4 +158,8 @@ $lang_erasename = "Erase Name";
 $lang_server = "Server";
 $lang_skin = "Skin";
 $lang_fame = "Fame";
+$lang_shops_spawn = "Sklepy ze spawnem";
+$lang_shops_nospawn = "Bez spawnu";
+$lang_shops_all = "Wszystkie sklepy";
+$lang_shops_nonpc = "Lista sklepu bez NPC";
 ?>

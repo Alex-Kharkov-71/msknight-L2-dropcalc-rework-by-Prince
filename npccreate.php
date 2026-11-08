@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -59,6 +59,11 @@ if ($evaluser)
 	}
 	else
 	{
+		// PHP8/L2JMobius fix: instrument opiraetsya na tablitsy, kotorykh v L2JMobius net (npc/custom_npc tables - NPCs are in the XML datapack) -
+		// otklyuchen, chtoby ne pisat musor v bazu servera.
+		echo "<p class=\"popup\">This GM tool is not available on L2JMobius (npc/custom_npc tables - NPCs are in the XML datapack).</p>";
+		echo "</center></body></html>";
+		return 0;
 		$con = mysql_connect($db_location,$db_user,$db_psswd);
 		mysql_query("SET NAMES 'utf8'", $con);
 		mysql_query("SET character_set_results='utf8'", $con);
@@ -203,7 +208,7 @@ if ($evaluser)
 
 		if ($action == "maptime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{
 				$newtime = time() + ($newtime * 86400);
 			}

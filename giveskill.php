@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -83,7 +83,7 @@ if ($evaluser)
 		{
 			// Try and find the details on the object from each of the three content databases.
 			// Looking simply for the name and crystal type.
-			$sql = "select name, level from skill_trees where skill_id = '$itemid' order by level desc limit 1";
+			$sql = "select name, levels as level from knightskills where skill_id = '$itemid'";
 			$skill_result = mysql_query($sql,$con);
 			if ($skill_result)
 			{

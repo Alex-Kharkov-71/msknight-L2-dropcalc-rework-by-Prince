@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -31,7 +31,7 @@ $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $commandname = input_check($_REQUEST['commandname'],0);
 $new_command = input_check($_REQUEST['new_command'],0);
-$new_group = $_REQUEST['new_group'];
+$new_group = input_check($_REQUEST['new_group'],0);
 $number = preg_replace('/[&%$\\\|<>#£]/','',$_REQUEST['number']);
 
 $langfile = $language_array[$langval][1];
@@ -70,6 +70,11 @@ if ($evaluser)
 
 		echo "<p class=\"dropmain\">&nbsp;</p><h2 class=\"dropmain\">Character Permission Settings</h2>";
 
+		// PHP8/L2JMobius fix: admin_command_access_rights i access_levels net (prava GM
+		// teper v XML-konfige servera) - zapis otklyuchena.
+		writewarn("Admin command rights cannot be edited here on L2JMobius (they are defined in the server's XML configuration).");
+		$commandname = "";
+		$new_command = "";
 		if (strlen($commandname) > 0)
 		{
 			$sql = "update admin_command_access_rights set accessLevels = $number where adminCommand ='$commandname'";

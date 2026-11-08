@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -210,7 +210,7 @@ if ($evaluser)
 				{
 					if (substr_count($line_in, '#_#') > 0)
 					{
-						$actions = split('#_#', $line_in);
+						$actions = preg_split('/#_#/', $line_in);
 						if (($actions[0] == 'accountstart') && ($use_accounts))
 						{
 							$new_account = $actions[1];

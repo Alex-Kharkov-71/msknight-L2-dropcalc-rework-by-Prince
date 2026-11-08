@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -116,7 +116,7 @@ if ($evaluser)
 	$clan_leader = 0;
 	if ($spec_account)
 	{
-		$sql = "select charId, account_name, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, punish_level from characters where charId = $spec_account";
+		$sql = "select charId, account_name, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, 0 as punish_level from characters where charId = $spec_account";
 		$result = mysql_query($sql,$con);
 		$count_accs = mysql_num_rows($result);
 		$sql = "select COUNT(*) from clan_data where leader_id = '$spec_account'";
@@ -125,7 +125,7 @@ if ($evaluser)
 	}
 	else
 	{
-		$sql = "select charId, account_name, race, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, punish_level from characters where char_name like '%$itemname%' order by $charsort";
+		$sql = "select charId, account_name, race, char_name, accesslevel, classid, clanid, level, sex, maxhp, curhp, maxcp, curcp, maxmp, curmp, sp, accesslevel, online, onlinetime, x, y, 0 as punish_level from characters where char_name like '%$itemname%' order by $charsort";
 		$result = mysql_query($sql,$con);
 		$count_accs = mysql_num_rows($result);
 		$single_found = "1";
@@ -193,7 +193,7 @@ if ($evaluser)
 		$c_race_n = "$lang_unknown";
 		$c_class_n = "$lang_unknown";
 		$c_class_s = "$lang_unknown";
-		$sql = "select class_name from class_list where id = $c_class";
+		$sql = "select class_name from knightclass where id = $c_class";
 		$result_class = mysql_query($sql,$con);
 		$class_count =  mysql_num_rows($result_class);
 		if ($class_count >0)
@@ -320,7 +320,7 @@ if ($evaluser)
 		}
 		if (($action == "addskill") && ($user_access_lvl >= $sec_takeskill) && ($c_online < 1))
 		{
-			$sql = "select level from skill_trees where skill_id = $itemid order by level desc limit 1";
+			$sql = "select levels as level from knightskills where skill_id = $itemid";
 			$result6 = mysql_query($sql,$con);
 			$mav_lvl = mysql_result($result6,0,"level");
 			$sql = "update character_skills set skill_level = skill_level + 1 where charId = $spec_account and skill_id = $itemid and skill_level < $mav_lvl";
@@ -645,7 +645,7 @@ if ($evaluser)
 			{
 				$class_id = $r_array['class_id'];
 				$c_level = $r_array['level'];
-				$result3 = mysql_query("select class_name from class_list where id = '$class_id'",$con);
+				$result3 = mysql_query("select class_name from knightclass where id = '$class_id'",$con);
 				$sub_class = class_rename(mysql_result($result3,0,"class_name"));
 				echo "<tr><td class=\"dropmain\">$sub_class</td><td class=\"dropmain\">$c_level</td></tr>";
 			}
@@ -1321,7 +1321,7 @@ if ($evaluser)
 	else
 	// Display skill view if requested.
 	{
-		$result2 = mysql_query("select class_name from class_list where id = '$c_class'",$con);
+		$result2 = mysql_query("select class_name from knightclass where id = '$c_class'",$con);
 		$main_class = class_rename(mysql_result($result2,0,"class_name"));
 		$classes = array($main_class);
 		$result2 = mysql_query("select class_id from character_subclasses where charId = '$spec_account' order by class_index",$con);
@@ -1331,7 +1331,7 @@ if ($evaluser)
 			while ($r_array = mysql_fetch_assoc($result2))
 			{
 				$class_id = $r_array['class_id'];
-				$result3 = mysql_query("select class_name from class_list where id = '$class_id'",$con);
+				$result3 = mysql_query("select class_name from knightclass where id = '$class_id'",$con);
 				$sub_class = class_rename(mysql_result($result3,0,"class_name"));
 				array_push($classes, $sub_class);
 			}

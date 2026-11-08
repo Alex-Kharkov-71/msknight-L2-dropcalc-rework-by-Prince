@@ -1,5 +1,6 @@
 <?php 
-//error_reporting(E_ERROR | E_WARNING | E_PARSE);
+require_once(__DIR__ . '/dc_install_lib.php');
+//error_reporting(E_ERROR | E_PARSE);
 header("Content-type: image/jpeg");
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -38,10 +39,12 @@ function onlinetime($onlinetime)
 
 function checkport($ip, $port, $timeout) 
 {
-		$sock = @fsockopen($host, $port, $errno, $errstr, (float)$timeout);
-		$online = ($sock>0);
- 		if ($online) @fclose($sock);
- 		return $online;
+		// PHP8 fix: the body used an undefined $host, so the status was always 0.
+		if (trim((string) $ip) === '' || (int) $port < 1)
+		{	return false;	}
+		$sock = @fsockopen($ip, (int) $port, $errno, $errstr, (float)$timeout);
+		if ($sock) { @fclose($sock); return true; }
+		return false;
 }
 
 $con = mysql_connect($core_db_location, $core_db_user, $core_db_psswd);
@@ -57,11 +60,10 @@ if (!mysql_select_db("$db_l2jdb",$con))
 	die('Could not change to L2J database: ' . mysql_error());
 }
 
-$sql = "select * from $core_db_l2jdb.knightsettings";
-$result_set = mysql_query($sql,$con);
+$result_set = dc_read_settings($con, "$core_db_l2jdb.knightsettings");
 if (!$result_set)
 {	
-	echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+	echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 }
 $gdon = mysql_result($result_set,0,"gd_on");
 $gdstyle = mysql_result($result_set,0,"gd_style");
@@ -113,7 +115,10 @@ if (strlen($character) > 0)
 	if (!mysql_select_db("$g_knightdb",$con2))
 	{	die('Could not change to L2J database: ' . mysql_error());	}
 
-	$result = mysql_query("select account_name, char_name, level, sex, maxHp, maxMp, maxCp, online, onlinetime, clanid, race, classid, base_class, karma from $g_knightdb.characters where charId = '$g_chr'",$con2);
+	// PHP8/security fix: $g_chr приходит напрямую из $_REQUEST['c'] без какой-либо
+	// проверки и подставлялся в SQL без экранирования - настоящая SQL-инъекция.
+	$g_chr_safe = mysql_real_escape_string($g_chr, $con2);
+	$result = mysql_query("select account_name, char_name, level, sex, maxHp, maxMp, maxCp, online, onlinetime, clanid, race, classid, base_class, karma from $g_knightdb.characters where charId = '$g_chr_safe'",$con2);
 	while ($r_array = mysql_fetch_assoc($result))
 	{
 		$a_name = $r_array['account_name'];
@@ -190,7 +195,7 @@ if (strlen($character) > 0)
 		{	$base = $base . 'm';	}
 		else
 		{	$base = $base . 'f';	}
-		$result2 = mysql_query("select class_name from $g_knightdb.class_list where id = '$c_class'",$con2);
+		$result2 = mysql_query("select class_name from $g_knightdb.knightclass where id = '$c_class'",$con2);
 		$class_name = mysql_result($result2,0,"class_name");
 		$c_classtitle = substr($class_name,strpos($class_name,'_')+1,(strlen($class_name)-strpos($class_name,'_')));
 		$c_clan = "";
@@ -219,7 +224,16 @@ elseif (strlen($server) > 0)
 	$g_port = $gameservers[$server][7];
 	$con2 = mysql_connect($g_ip, $g_user, $g_passwd);
 	mysql_query("SET NAMES 'utf8'", $con2);
-	if (checkport($g_ip, $g_port, $g_timeout))
+	// Host for the online check: gameservers[n][13], else the telnet ip [9], else the DB host.
+	$g_status_host = $g_ip;
+	foreach (array(13, 9) as $k)
+	{
+		if (isset($gameservers[$server][$k]) && trim((string) $gameservers[$server][$k]) !== '')
+		{	$g_status_host = trim($gameservers[$server][$k]);	break;	}
+	}
+	if (!isset($g_timeout) || $g_timeout < 1)
+	{	$g_timeout = isset($status_timeout) ? $status_timeout : 2;	}
+	if (checkport($g_status_host, $g_port, $g_timeout))
 	{	$gs_status = 1;	}
 	else
 	{	$gs_status = 0;	}

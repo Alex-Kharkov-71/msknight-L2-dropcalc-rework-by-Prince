@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -29,9 +29,9 @@ include('authsendemail.php');
 $usrname = input_check($_REQUEST['usrname'],1);
 $langval = input_check($_REQUEST['langval'],2);
 $name1 = input_check($_REQUEST['name1'],1);
-$email1 = preg_replace('/[&%$\/\\\|<>#£]/','',$_REQUEST['email1']);
+$email1 = input_check($_REQUEST['email1'],0);
 $user = input_check($_REQUEST['user'],1);
-$key = preg_replace('/[&%$\\\|<>#£]/','',$_REQUEST['key']);
+$key = input_check($_REQUEST['key'],0);
 $password1 = input_check($_REQUEST['psswd1'],0);
 $password2 = input_check($_REQUEST['psswd2'],0);
 $passwordchk = $_REQUEST['psswd1'];

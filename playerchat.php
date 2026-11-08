@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -84,7 +84,8 @@ if ($evaluser)
 		$output = shell_exec($command_string);
 		
 
-		$lines = file($file_loc);
+		$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 		$line_nums = count($lines);
 		echo "<pre class=\"dropmain\">";
 		if (!$lastlines)

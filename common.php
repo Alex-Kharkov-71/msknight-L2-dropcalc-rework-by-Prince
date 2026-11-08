@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -119,6 +119,7 @@ global $user_char_access;
 
 include("config.php");
 include("config-read.php");
+$GLOBALS['install_admins'] = isset($install_admins) ? $install_admins : array();
 
 // If the user is a guest logon, set the user parameters to the supplied guest level, assume an empty game account reference and return O.K.
 
@@ -270,6 +271,16 @@ if (!$result)
 // Check for verified GM characters and reduce access of non-verified accounts.
 $today_time = time();
 $user_access_lvl = mysql_result($result,0,"accessLevel");
+$dc_installer = dc_is_installer($username);
+if ($dc_installer)
+{
+	// Account in $install_admins (config.php): full access, always verified, knightdrop row kept in sync.
+	$acc_real = (int) $user_access_lvl;
+	$user_access_lvl = max($acc_real, (int) $sec_inc_admin);
+	$user_verify = 1;
+	mysql_query("update $dblog_l2jdb.knightdrop set verified = 1, access_level = $user_access_lvl, mapaccess = 2147483647, recipeaccess = 2147483647, characcess = 2147483647, gdaccess = 2147483647 where name = '$username'",$con2);
+	$user_acc_check = $user_access_lvl;
+}
 if (($user_access_lvl > 0) && ($user_verify == 0))
 {	$user_access_lvl  = 0;	}
 if ($user_access_lvl != $user_acc_check)
@@ -465,260 +476,148 @@ function comaise($price)
 
 function mobcount($mob_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb)
 {
-	// Connect to DB
+	global $map_array, $map_locs, $map_zones;
+	// PHP8 fix: если у моба вообще нет точек спавна, эти массивы должны
+	// остаться пустыми, а не null - иначе count(null) в map()/map_2()
+	// фатально падает (TypeError). Такое вполне реально (квестовые мобы,
+	// GM-спавн и т.п.), не только артефакт неполных тестовых данных.
+	if (!isset($map_array)) { $map_array = array(); }
+	if (!isset($map_locs)) { $map_locs = array(); }
+	if (!isset($map_zones)) { $map_zones = array(); }
+
+	// PHP8/L2JMobius fix: spawnlist/custom_spawnlist - таблицы живого сервера,
+	// которых в L2JMobius больше нет (статика только в XML) - заменены на
+	// knightspawnlist/knightspawnzone (importspawns.php).
+	//
+	// raidboss_spawnlist/grandboss_data/random_spawn/random_spawn_loc - ПРОВЕРЕНО
+	// по реальному дампу схемы L2JMobius: эти таблицы всё ещё существуют и с
+	// теми же колонками, что ожидал оригинальный код (это живое состояние -
+	// текущая позиция и респаун конкретного босса, не статика из датапака),
+	// поэтому читаются как и раньше, без изменений схемы.
+	//
+	// Что осознанно потеряно при миграции (честно, без умолчания):
+	// - day/night спавн (periodOfDay) - в новом формате датапака такого
+	//   атрибута нет, всё считается "обычным" (always) спавном;
+	// - таблица minions (группировка "минион при боссе") - подтверждено,
+	//   что в L2JMobius её больше нет, источника данных нет.
+
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	if (!$con)
 	{
 		echo "Could Not Connect";
 		die('Could not connect: ' . mysql_error());
-	}		
+	}
 	if (!mysql_select_db("$db_l2jdb",$con))
 	{	die('Could not change to $db_l2jdb database: ' . mysql_error());	}
 
-	if (!$result2 = mysql_query("show fields from spawnlist",$con))						// Determine if the day/night ability is in the database
-	{	die('Could not retrieve fields from spawnlist database: ' . mysql_error());	}
-	$res = mysql_fetch_array($result2);
-	$daynight = 0;
-	while ($r_array = mysql_fetch_assoc($result2)) 
-	{
-		if (strcasecmp($r_array['Field'], "periodofday") == 0)
-		{ $daynight = 1; }
-	}
-	// Select all occurances of the mob from the standard spawnlist.
-	if ($daynight)
-	{	$sql = "select locx, locy, locz, loc_id, `count`, periodOfDay from spawnlist where npc_templateid = '$mob_id' union select locx, locy, locz, loc_id, `count`, periodOfDay from custom_spawnlist where npc_templateid = '$mob_id'";	}
-	else
-	{	$sql = "select locx, locy, locz, loc_id, `count` from spawnlist where npc_templateid = '$mob_id' union select locx, locy, locz, loc_id, `count` from custom_spawnlist where npc_templateid = '$mob_id'";	}
-	$result2 = mysql_query($sql,$con);
-	$count_r2 = mysql_num_rows($result2);
-	$err_str = mysql_num_rows($result2);
-	$mob_spawnnum=0;
-	$mob_count=0;
+	$mob_spawnnum = 0;
+	$mob_count = 0;
 	$mob_days = 0;
 	$mob_dayt = 0;
 	$mob_nights = 0;
 	$mob_nightt = 0;
 	$mob_normals = 0;
 	$mob_normalt = 0;
-	while ($r_array = mysql_fetch_assoc($result2)) 
-	{
 
-		if (($r_array['locx'] <> 0) || ($r_array['locy'] <> 0) || ($r_array['locz'] <> 0))
-		{
-			$mob_spawnnum++;		// Add the number of total spawns, and add to the number of day, night or always spawns.
-			$mob_count++;
-			$map_loc = 2;
-			if ($daynight)
-			{	$periodofday = $r_array['periodOfDay'];	}
-			else
-			{	$periodofday = 0;	}
-			if ( $periodofday == 1 )
-			{
-				$mob_days++;
-				$mob_dayt++;
-				$map_loc = 0;
-			}
-			elseif ( $periodofday == 2 )
-			{
-				$mob_nights++;
-				$mob_nightt++;
-				$map_loc = 1;
-			}
-			else
-			{
-				$mob_normals++;
-				$mob_normalt++;
-			}
-			if (!$map_array)		// Add the spawn location to the map.
-			{
-				$map_array = array(array(($r_array['locx']), ($r_array['locy']), $map_loc));
-				$map_locs = array(array(($r_array['locx']), ($r_array['locy']), ($r_array['locz'])));
-			}
-			else
-			{
-				array_push($map_array, array($r_array['locx'], $r_array['locy'], $map_loc));
-				array_push($map_locs, array($r_array['locx'], $r_array['locy'], $r_array['locz']));
-			}
-		}						
-		else		// If we are dealing with x=0, y0 and z=0 then we've got a multiple spawn entry to deal with.
-		{
-			$mob_spawnnum = $mob_spawnnum + $r_array['count'];		// Add the total number of spawned occurances to the totals
-			if ($daynight)
-			{	$periodofday = $r_array['periodOfDay'];	}
-			else
-			{	$periodofday = 0;	}
-			if ( $periodofday == 1 )
-			{
-				$mob_days = $mob_days + $r_array['count'];
-			}
-			elseif ( $periodofday == 2 )
-			{
-				$mob_nights = $mob_nights + $r_array['count'];
-			}
-			else
-			{
-				$mob_normals = $mob_normals + $r_array['count'];
-			}
-			$location_id = $r_array['loc_id'];
-			$result3 = mysql_query("select loc_x, loc_y, loc_y, loc_zmin from locations where loc_id = $location_id",$con);
-			while ($r_array = mysql_fetch_assoc($result3)) // Now we have to go through all the possible locations and add them to 
-			{													//	the map.
-				$locat_x = $r_array['loc_x'];
-				$locat_y = $r_array['loc_y'];
-				$locat_z = $r_array['loc_zmin'];
-				$map_loc = 2;
-				
-				if (($locat_x <> 0) || ($locat_y <> 0) || ($locat_z <> 0))
-				{
-					
-					if ( $periodofday == 1 )
-					{
-						$mob_dayt++;
-						$map_loc = 0;
-					}
-					elseif ( $periodofday == 2 )
-					{
-						$mob_nightt++;
-						$map_loc = 1;
-					}
-					else
-					{
-						$mob_normalt++;
-					}
-					$mob_count++;
-					if (!$map_array)		// Add the spawn location to the map.
-					{
-						$map_array = array(array($locat_x, $locat_y, $map_loc));
-						$map_locs = array(array($locat_x, $locat_y, $locat_z));
-					}
-					else
-					{
-						array_push($map_array, array($locat_x, $locat_y, $map_loc));
-						array_push($map_locs, array($locat_x, $locat_y, $locat_z));
-					}
-				}
-			}
-		}
-	}
-
-	// Check to see if the mob is a raidboss.
-	$result2 = mysql_query("select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $mob_id",$con);
-	while ($r_array = mysql_fetch_assoc($result2)) 		// Add any occurances of the raidboss to the totals and add the points to the map.
-	{
-		if (($r_array['loc_x'] <> 0) || ($r_array['loc_y'] <> 0) || ($r_array['loc_z'] <> 0))
-		{
-			$mob_spawnnum++;
-			$mob_count++;
-			$mob_normals++;
-			$mob_normalt++;
-			$locat_x = $r_array['loc_x'];
-			$locat_y = $r_array['loc_y'];
-			$locat_z = $r_array['loc_z'];
-			if (!$map_array)
-			{	
-				$map_array = array(array($locat_x, $locat_y, 0));	
-				$map_locs = array(array($locat_x, $locat_y, $locat_z));	
-			}
-			else
-			{	
-				array_push($map_array, array($locat_x, $locat_y, 0));	
-				array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
-			}
-		}
-	}
-
-	// Check to see if the mob ID is spawned as a minion.
-	$result2 = mysql_query("select boss_id, amount_min, amount_max from minions where minion_id = $mob_id",$con);
+	$sql = "select locx, locy, locz, loc_id, `count` from knightspawnlist where npc_templateid = '$mob_id'";
+	$result2 = mysql_query($sql,$con);
 	while ($r_array = mysql_fetch_assoc($result2))
 	{
-		$boss_id = $r_array['boss_id']; 			// Add any occurances of the minions to the totals and add the points to the map.
-		$minion_spawns = $r_array['amount_max'];
-		$minion_spawn_min = $r_array['amount_min'];
-		$result3 = mysql_query("select loc_x, loc_y, loc_z from raidboss_spawnlist where boss_id = $boss_id",$con);
-		while ($r_array = mysql_fetch_assoc($result3))		// ... but only add them if the actual raidboss is spawned.
+		$cnt = (int) $r_array['count'];
+		if ($cnt < 1) { $cnt = 1; }
+		$mob_spawnnum++;
+		$mob_count += $cnt;
+		$mob_normals++;
+		$mob_normalt += $cnt;
+
+		if (!$map_array)
 		{
-			if (($r_array['loc_x'] <> 0) || ($r_array['loc_y'] <> 0) || ($r_array['loc_z'] <> 0))
-			{
-				$mob_spawnnum += $minion_spawns;
-				$mob_count += $minion_spawn_min;
-				$mob_normals += $minion_spawn_min;
-				$mob_normalt += $minion_spawns;
-				$locat_x = $r_array['loc_x'];
-				$locat_y = $r_array['loc_y'];
-				$locat_z = $r_array['loc_z'];
-				if (!$map_array)
-				{	
-					$map_array = array(array($locat_x, $locat_y, 0));	
-					$map_locs = array(array($locat_x, $locat_y, $locat_z));	
-				}
-				else
-				{	
-					array_push($map_array, array($locat_x, $locat_y, 0));	
-					array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
-				}
-			}
+			$map_array = array(array($r_array['locx'], $r_array['locy'], 2));
+			$map_locs = array(array($r_array['locx'], $r_array['locy'], $r_array['locz']));
 		}
-		$result3 = mysql_query("select locx, locy, locz from spawnlist where npc_templateid = $boss_id union select locx, locy, locz from custom_spawnlist where npc_templateid = $boss_id",$con);
-		while ($r_array = mysql_fetch_assoc($result3))		// ... or if the raidboss has been spawned using the standard spawnlist.
+		else
 		{
-			if (($r_array['locx'] <> 0) || ($r_array['locy'] <> 0) || ($r_array['locz'] <> 0))
+			array_push($map_array, array($r_array['locx'], $r_array['locy'], 2));
+			array_push($map_locs, array($r_array['locx'], $r_array['locy'], $r_array['locz']));
+		}
+
+		// Полигон зоны - для показа на полной карте контуром вместо точки.
+		if (!empty($r_array['loc_id']))
+		{
+			$resz = mysql_query("select points from knightspawnzone where zone = '" . mysql_real_escape_string($r_array['loc_id'],$con) . "'", $con);
+			if ($rowz = mysql_fetch_assoc($resz))
 			{
-				$mob_spawnnum += $minion_spawns;
-				$mob_count += $minion_spawn_min;
-				$mob_normals += $minion_spawn_min;
-				$mob_normalt += $minion_spawns;
-				$locat_x = $r_array['locx'];
-				$locat_y = $r_array['locy'];
-				$locat_z = $r_array['loc_z'];
-				if (!$map_array)
-				{	
-					$map_array = array(array($locat_x, $locat_y, 0));	
-					$map_locs = array(array($locat_x, $locat_y, $locat_z));	
+				$nodePairs = explode(';', $rowz['points']);
+				$poly = array();
+				foreach ($nodePairs as $pair)
+				{
+					$xy = explode(',', $pair);
+					if (count($xy) == 2)
+					{	$poly[] = array((int) $xy[0], (int) $xy[1]);	}
 				}
-				else
-				{	
-					array_push($map_array, array($locat_x, $locat_y, 0));	
-					array_push($map_locs, array($locat_x, $locat_y, $locat_z));	
+				if (count($poly) >= 3)
+				{
+					if (!$map_zones) { $map_zones = array(); }
+					array_push($map_zones, array('points' => $poly, 'color' => '#ffcc00'));
 				}
 			}
 		}
 	}
 
-	$result3 = mysql_query("select groupId from random_spawn where npcId = $mob_id",$con);
-	while ($r_array = mysql_fetch_assoc($result3))		
+	// Рейд-боссы: живая таблица, реальная текущая точка спавна (точнее, чем
+	// зона из датапака). amount почти всегда 1 для рейд-боссов.
+	$sql = "select loc_x, loc_y, loc_z, amount from raidboss_spawnlist where boss_id = '$mob_id'";
+	$result3 = mysql_query($sql,$con);
+	while ($r_array = mysql_fetch_assoc($result3))
 	{
-		$mob_group = $r_array['groupId'];
-		$count = 0;
-		$result4 = mysql_query("select x, y, z from random_spawn_loc where groupId = $mob_group",$con);
-		while ($r_array = mysql_fetch_assoc($result4))		
+		$cnt = (int) $r_array['amount'];
+		if ($cnt < 1) { $cnt = 1; }
+		$mob_spawnnum++;
+		$mob_count += $cnt;
+		$mob_normals++;
+		$mob_normalt += $cnt;
+		array_push($map_array, array($r_array['loc_x'], $r_array['loc_y'], 2));
+		array_push($map_locs, array($r_array['loc_x'], $r_array['loc_y'], $r_array['loc_z']));
+	}
+
+	// Грандовые боссы: тоже живая таблица, один конкретный босс = одна точка.
+	$sql = "select loc_x, loc_y, loc_z from grandboss_data where boss_id = '$mob_id'";
+	$result4 = mysql_query($sql,$con);
+	while ($r_array = mysql_fetch_assoc($result4))
+	{
+		$mob_spawnnum++;
+		$mob_count += 1;
+		$mob_normals++;
+		$mob_normalt += 1;
+		array_push($map_array, array($r_array['loc_x'], $r_array['loc_y'], 2));
+		array_push($map_locs, array($r_array['loc_x'], $r_array['loc_y'], $r_array['loc_z']));
+	}
+
+	// Случайные пулы спавна: npcId -> groupId -> список возможных точек.
+	// Бот спавнится в ОДНОЙ из точек группы, не во всех сразу - но для карты
+	// показываем все возможные точки (как и было в оригинале).
+	$sql = "select groupId, count from random_spawn where npcId = '$mob_id'";
+	$result5 = mysql_query($sql,$con);
+	while ($rs_array = mysql_fetch_assoc($result5))
+	{
+		$cnt = (int) $rs_array['count'];
+		if ($cnt < 1) { $cnt = 1; }
+		$sql2 = "select x, y, z from random_spawn_loc where groupId = '" . (int) $rs_array['groupId'] . "'";
+		$result6 = mysql_query($sql2,$con);
+		while ($rl_array = mysql_fetch_assoc($result6))
 		{
-			if (!$map_array)
-			{	
-				$map_array = array(array($r_array['x'], $r_array['y'], 0));	
-				$map_locs = array(array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			else
-			{
-				array_push($map_array, array($r_array['x'], $r_array['y'], 0));	
-				array_push($map_locs, array($r_array['x'], $r_array['y'], $r_array['z']));	
-			}
-			if ($count == 0)
-			{	
-				$mob_normals++;	
-				$mob_spawnnum++;	
-			}
-			$mob_normalt++;
-			$mob_count++;
-			$count = 1;
+			$mob_spawnnum++;
+			$mob_count += $cnt;
+			$mob_normals++;
+			$mob_normalt += $cnt;
+			array_push($map_array, array($rl_array['x'], $rl_array['y'], 2));
+			array_push($map_locs, array($rl_array['x'], $rl_array['y'], $rl_array['z']));
 		}
 	}
+
 	$mob_spawn = array($mob_count, $mob_spawnnum, $mob_days, $mob_dayt, $mob_nights, $mob_nightt, $mob_normals, $mob_normalt, $map_locs);
 	return $mob_spawn;
 }
-
-
-// works out the difference between two numbers, regardless of whether one, other or both, are negative.
-// used in the map calculations.
 
 function difnums($small, $big)
 {
@@ -824,13 +723,13 @@ function delete_char($character, $db_location, $db_user, $db_psswd, $db_l2jdb, $
 	$result = mysql_query("select charId from characters where char_name = '$character'",$con);
 	$char_id = mysql_result($result,0,"charId");
 
-	$result = mysql_query("DELETE FROM pets WHERE item_charId IN (SELECT object_id FROM items where owner_id = '$char_id')",$con);
-	$result = mysql_query("DELETE FROM character_friends WHERE char_id = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items where owner_id = '$char_id')",$con);
+	$result = mysql_query("DELETE FROM character_friends WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_subclasses WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_hennas WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_macroses WHERE charId  = '$char_id'",$con);
-	$result = mysql_query("DELETE FROM character_quests WHERE char_id  = '$char_id'",$con);
-	$result = mysql_query("DELETE FROM character_recipebook WHERE char_id  = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM character_quests WHERE charId  = '$char_id'",$con);
+	$result = mysql_query("DELETE FROM character_recipebook WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_shortcuts WHERE charId = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_skills WHERE charId  = '$char_id'",$con);
 	$result = mysql_query("DELETE FROM character_skills_save WHERE charId = '$char_id'",$con);
@@ -877,7 +776,8 @@ function gethexid($server_dir, $svr_dir_delimit)
 {
 	$return_value = "";
 	$file_loc = $server_dir . 'config' . $svr_dir_delimit . 'hexid.txt';
-	$lines = file($file_loc);
+	$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 	$line_nums = count($lines);
 	foreach ($lines as $line_num => $line) 
 	{
@@ -899,7 +799,7 @@ function gethexid($server_dir, $svr_dir_delimit)
 function iptonum($ip)
 {
 	$ip_num = 0;
-	$ip_list = split('[.]', $ip);
+	$ip_list = preg_split('/[.]/', $ip);
 	$ip_num = $ip_list[3];
 	$ip_num = $ip_num + ($ip_list[2] * 256);
 	$ip_num = $ip_num + ($ip_list[1] * 65536);
@@ -933,23 +833,23 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 	$result = mysql_query("select account_name, char_name from characters where (maxhp > 50000) or (maxmp > 50000)",$con);
 	while ($r_array = mysql_fetch_assoc($result))
 	{	$char = $r_array['char_name'];
-		$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+		$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 		if($usetelnet)
 		{
 			$give_string = 'announce ' . $char . ' being kicked and deleted for botting.';
-			fputs($usetelnet, $telnet_password);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, $give_string);
-			fputs($usetelnet, "\r\n");
-			fclose($usetelnet);
+			telnet_write($usetelnet, $telnet_password);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, $give_string);
+			telnet_write($usetelnet, "\r\n");
+			telnet_close($usetelnet);
 			sleep(5);
-			$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-			fputs($usetelnet, $telnet_password);
+			$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+			telnet_write($usetelnet, $telnet_password);
 			$give_string = 'kick ' . $char ;
-			fputs($usetelnet, $give_string);
-			fputs($usetelnet, "\r\n");
-			fputs($usetelnet, "exit\r\n");
-			fclose($usetelnet);
+			telnet_write($usetelnet, $give_string);
+			telnet_write($usetelnet, "\r\n");
+			telnet_write($usetelnet, "exit\r\n");
+			telnet_close($usetelnet);
 		}
 		delete_char($char, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb);
 	}
@@ -972,24 +872,24 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 			{
 				while ($r_array = mysql_fetch_assoc($result2))
 				{
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 					if($usetelnet)
 					{
 						$charname = $r_array['char_name'];
 						$give_string = 'announce ' . $charname . ' being kicked and banned for access violation.';
-						fputs($usetelnet, $telnet_password);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $telnet_password);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_close($usetelnet);
 						sleep(5);
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-						fputs($usetelnet, $telnet_password);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						telnet_write($usetelnet, $telnet_password);
 						$give_string = 'kick ' . $charname ;
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, "exit\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, "exit\r\n");
+						telnet_close($usetelnet);
 					}
 				}
 			}
@@ -1030,24 +930,24 @@ function bot_scan($username, $token, $db_location, $db_user, $db_psswd, $db_l2jd
 			$result2 = mysql_query("select char_name from characters where account_name = '$accname' and online = 1",$con);
 			while ($r_array = mysql_fetch_assoc($result2))
 			{
-				$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+				$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 				if($usetelnet)
 				{
 					$charname = $r_array['char_name'];
 					$give_string = 'announce ' . $charname . ' being kicked and banned for access violation.';
-					fputs($usetelnet, $telnet_password);
-					fputs($usetelnet, "\r\n");
-					fputs($usetelnet, $give_string);
-					fputs($usetelnet, "\r\n");
-					fclose($usetelnet);
+					telnet_write($usetelnet, $telnet_password);
+					telnet_write($usetelnet, "\r\n");
+					telnet_write($usetelnet, $give_string);
+					telnet_write($usetelnet, "\r\n");
+					telnet_close($usetelnet);
 					sleep(5);
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
-					fputs($usetelnet, $telnet_password);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					telnet_write($usetelnet, $telnet_password);
 					$give_string = 'kick ' . $charname ;
-					fputs($usetelnet, $give_string);
-					fputs($usetelnet, "\r\n");
-					fputs($usetelnet, "exit\r\n");
-					fclose($usetelnet);
+					telnet_write($usetelnet, $give_string);
+					telnet_write($usetelnet, "\r\n");
+					telnet_write($usetelnet, "exit\r\n");
+					telnet_close($usetelnet);
 				}
 			}
 			// Ban the account
@@ -1099,13 +999,94 @@ function item_check($skill, $i_id, $use_duplicate, $db_location, $db_user, $db_p
 	return $i_id;
 }
 
-function checkport($ip, $port, $timeout) 
+// ---------------------------------------------------------------------
+// Server status lamps and telnet (L2JMobius has no telnet console)
+// ---------------------------------------------------------------------
+
+// Plain TCP connect: is something listening on ip:port. Needs no telnet.
+function checkport($ip, $port, $timeout)
 {
-		$sock = @fsockopen($ip, $port, $errno, $errstr, (float)$timeout);
-		$online = ($sock>0);
- 		if ($sock) @fclose($sock);
- 		return $online;
+	if (trim((string) $ip) === '' || (int) $port < 1)
+	{	return false;	}
+	$sock = @fsockopen($ip, (int) $port, $errno, $errstr, (float) $timeout);
+	if ($sock)
+	{	@fclose($sock);	return true;	}
+	return false;
 }
+
+// Seconds to wait per server for the lamp. Old configs only have log_telnet_timeout.
+function status_timeout()
+{
+	$t = $GLOBALS['status_timeout'] ?? ($GLOBALS['log_telnet_timeout'] ?? 2);
+	return (float) $t;
+}
+
+// Host for the game server lamp: gameservers[i][13], else the telnet ip [9], else the DB host [1].
+function gameserver_status_host($i)
+{
+	$s = $GLOBALS['gameservers'][$i] ?? array();
+	foreach (array(13, 9, 1) as $k)
+	{
+		if (isset($s[$k]) && trim((string) $s[$k]) !== '')
+		{	return trim($s[$k]);	}
+	}
+	return 'localhost';
+}
+
+function logserver_status_host()
+{
+	foreach (array('logsvr_status_host', 'log_telnet_host', 'logsvr_location') as $v)
+	{
+		if (!empty($GLOBALS[$v]))
+		{	return $GLOBALS[$v];	}
+	}
+	return 'localhost';
+}
+
+function gameserver_online($i)
+{
+	return checkport(gameserver_status_host($i), $GLOBALS['gameservers'][$i][7] ?? 0, status_timeout());
+}
+
+function logserver_online()
+{
+	return checkport(logserver_status_host(), $GLOBALS['dblog_port'] ?? 2106, status_timeout());
+}
+
+// Telnet is off unless config sets $telnet_enabled = true (old l2jserver only).
+function telnet_enabled()
+{
+	return !empty($GLOBALS['telnet_enabled']);
+}
+
+// Like fsockopen(), but fails at once when telnet is disabled - no timeout, no attempt.
+function telnet_open($host, $port, &$errno, &$errstr, $timeout)
+{
+	if (!telnet_enabled())
+	{
+		$errno = 0;
+		$errstr = "telnet is disabled (L2JMobius has no telnet console)";
+		return false;
+	}
+	return @fsockopen($host, $port, $errno, $errstr, (float) $timeout);
+}
+
+// Safe on a failed connection (fputs(false) is a fatal TypeError in PHP 8).
+function telnet_write($h, $s)
+{	return $h ? fputs($h, $s) : false;	}
+
+function telnet_gets($h, $len = null)
+{
+	if (!$h)
+	{	return false;	}
+	return ($len === null) ? fgets($h) : fgets($h, $len);
+}
+
+function telnet_eof($h)
+{	return $h ? feof($h) : true;	}
+
+function telnet_close($h)
+{	if ($h) { @fclose($h); }	}
 
 function onlinetime($onlinetime)
 {
@@ -1157,89 +1138,39 @@ if (!function_exists("stripos"))
 // Return a location string for a given shop mob
 function shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown)
 {
+	// PHP8/L2JMobius fix: tablitsy zone (goroda) i teleport (blizhayshie
+	// tochki) v L2JMobius net. Teper: koordinaty NPC beryotsya iz knightspawnlist,
+	// a nazvanie rayona - kak blizhayshaya zapis iz knightloc (spisok imenovannykh
+	// lokatsiy, kotoryy vedyot sam DropCalc). Esli knightloc pust - "unknown".
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	if (!$con)
 	{
 		echo "Could Not Connect";
 		die('Could not connect: ' . mysql_error());
-	}		
+	}
 	if (!mysql_select_db("$db_l2jdb",$con))
 	{
 		die('Could not change to L2J database: ' . mysql_error());
 	}
-	$sql = "select locx, locy from spawnlist where npc_templateid = '$shop_loc'";
-	$result6 = mysql_query($sql,$con);
-	$count_locs = 0;
 	$shop_location = $lang_unknown;
-	while ($r_array = mysql_fetch_assoc($result6)) 
+	$shop_loc = (int) $shop_loc;
+	$result6 = mysql_query("select locx, locy from knightspawnlist where npc_templateid = '$shop_loc' limit 1", $con);
+	if ($result6 && ($r_array = mysql_fetch_assoc($result6)))
 	{
-		$lx = $r_array[locx];
-		$ly = $r_array[locy];
+		$lx = $r_array['locx'];
+		$ly = $r_array['locy'];
 		$closest = 100000000;
-		$location_name = $lang_unknown;
-		$i_area_name = $lang_unknown;
-		$result7 = mysql_query("select name, x1, y1, x2, y2 from zone where type = 'Town'",$con);
-		while ($r_array = @mysql_fetch_assoc($result7)) 
+		$result8 = mysql_query("select x, y, name from knightloc", $con);
+		while ($result8 && ($l_array = mysql_fetch_assoc($result8)))
 		{
-			$x1 = $r_array['x1'];
-			$x2 = $r_array['x2'];
-			$y1 = $r_array['y1'];
-			$y2 = $r_array['y2'];
-			$ar_name = $r_array['name'];
-			if ($x1 > $x2)
+			$distx1 = $lx - $l_array['x'];
+			$disty1 = $ly - $l_array['y'];
+			$pythag = sqrt(($distx1 * $distx1) + ($disty1 * $disty1));
+			if ($pythag < $closest)
 			{
-				$temp = $x1;
-				$x1 = $x2;
-				$x2 = $temp;
+				$closest = $pythag;
+				$shop_location = $l_array['name'];
 			}
-			if ($y1 > $y2)
-			{
-				$temp = $y1;
-				$y1 = $y2;
-				$y2 = $temp;
-			}
-			if (($lx >= $x1) && ($lx <= $x2) && ($ly >= $y1) && ($ly <= $y2))
-			{
-				if ($count_locs == 0)
-				{	$i_area_name = "";	}
-				if ($count_locs)
-				{	$i_area_name = $i_area_name . ', ';	}
-				$i_area_name = $i_area_name . $ar_name;
-				$count_locs = 1;
-			}
-		}
-		if ($i_area_name == $lang_unknown)
-		{
-			$closest = 100000000;
-			$result8 = mysql_query("select loc_x,loc_y,description from teleport",$con);
-			while ($r_array = @mysql_fetch_assoc($result8)) 
-			{	
-				$x_pos1 = $r_array['loc_x'];	
-				$y_pos1 = $r_array['loc_y'];	
-				$name1 = $r_array['description'];
-				$spos = strpos($name1, '-> ') + 3;
-				if ($spos > 3)
-				{	$name1 = substr($name1, $spos, (strlen($name1)-$spos));		}
-				$distx1 = $lx - $x_pos1;
-				if ($distx1 < 0) 
-				{	$distx1 = -$distx1;	}
-				$disty1 = $ly - $y_pos1;
-				if ($disty1 < 0) 
-				{	$disty1 = -$disty1;	}
-				$pythag = sqrt(($distx1 * $distx1) + ($disty1 * $disty1));
-				if ($pythag < $closest)
-				{
-					$closest = $pythag;
-					$location_name = $name1;
-				}
-			}
-												
-			if ($location_name == "out)")
-			{	$location_name = "Oren Castle";	}
-			if (strpos($location_name, "vory Tower") > 0)
-			{	$location_name = "Ivory Tower";	}
-			if (strlen($location_name) > 0)
-			{ $shop_location = $location_name;	}
 		}
 	}
 	return $shop_location;
@@ -1365,7 +1296,7 @@ function item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb)
 
 
 // Goes through an input string and returns a string parsed for characters potentially used for hacking.
-function input_check($str, $level) 
+function input_check($str, $level)
 {
 	if ($level == 1)
 	{	$str = preg_replace('/[&%$\/\\\|@<#�]/','',$str);	}
@@ -1373,27 +1304,28 @@ function input_check($str, $level)
 	{	$str = preg_replace('/[&%$\/\\\|<>#�]/','',$str);	}
 	if ($level == 2)
 	$str = preg_replace('/[^0-9]/','',$str);
-	$str = preg_replace('/\'/','\\\'',$str);
+	// PHP8 fix: addslashes() vmesto naivnogo ekranirovaniya odnoy kavychki.
+	// Simvol '\\' uzhe vyrezan regexpom vyshe, poetomu dvoynogo ekranirovaniya net.
+	$str = addslashes($str);
   $str = preg_replace('/mysql./i','',$str);
-//  $str = preg_replace('/\'/','\\\'',$str);
   $count_match = 0;
-  if (stripos($str, 'union ') > 0)
+  if (stripos($str, 'union ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'select ') > 0)
+  if (stripos($str, 'select ') !== false)
   {	$count_match++;	}
-  if (stripos($str, ' where ') > 0)
+  if (stripos($str, ' where ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'update ') > 0)
+  if (stripos($str, 'update ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'delete ') > 0)
+  if (stripos($str, 'delete ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'insert ') > 0)
+  if (stripos($str, 'insert ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'drop ') > 0)
+  if (stripos($str, 'drop ') !== false)
   {	$count_match++;	}
-  if (stripos($str, 'mysql.user') > 0)
+  if (stripos($str, 'mysql.user') !== false)
   {	$count_match = $count_match+2;	}
-  if (stripos($str, 'knightdrop') > 0)
+  if (stripos($str, 'knightdrop') !== false)
   {	$count_match = $count_match+2;	}
   if ($count_match > 1)
   {	$str = "";	}

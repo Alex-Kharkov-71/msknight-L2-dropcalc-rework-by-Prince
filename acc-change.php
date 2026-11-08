@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -84,7 +84,7 @@ if ($evaluser)
 		// If there is a change to the map time, then record it.
 		if ($action == "maptime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{	$newtime = time() + ($newtime * 86400);	}	// If it is not 0 (off) or maximum, then take it as a number of days from this clock point.
 			$result = mysql_query("update $dblog_l2jdb.knightdrop set mapaccess = '$newtime' where name = '$accountname'",$con2);
 			if (!$result)
@@ -94,7 +94,7 @@ if ($evaluser)
 		// If there is a change to the character access time, then record it.
 		if ($action == "chartime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{	$newtime = time() + ($newtime * 86400);	}	// If it is not 0 (off) or maximum, then take it as a number of days from this clock point.
 			$result = mysql_query("update $dblog_l2jdb.knightdrop set characcess = '$newtime' where name = '$accountname'",$con2);
 			if (!$result)
@@ -104,7 +104,7 @@ if ($evaluser)
 		// If there is a change to the recipe access time, then record it.
 		if ($action == "rectime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{	$newtime = time() + ($newtime * 86400);	}	// If it is not 0 (off) or maximum, then take it as a number of days from this clock point.
 			$result = mysql_query("update $dblog_l2jdb.knightdrop set recipeaccess = '$newtime' where name = '$accountname'",$con2);
 			if (!$result)
@@ -114,7 +114,7 @@ if ($evaluser)
 		// If there is a change to the GD access time, then record it.
 		if ($action == "gdtime")
 		{
-			if (($newtime > 0) && ($newtime < 999999999999999999))
+			if (($newtime > 0) && ($newtime < 2147483647))
 			{	$newtime = time() + ($newtime * 86400);	}	// If it is not 0 (off) or maximum, then take it as a number of days from this clock point.
 			$result = mysql_query("update $dblog_l2jdb.knightdrop set gdaccess = '$newtime' where name = '$accountname'",$con2);
 			if (!$result)
@@ -198,7 +198,7 @@ if ($evaluser)
 		$map_exp = mysql_result($result2,0,"mapaccess");
 		if ( $map_exp < 1 )
 		{ 	$map_exp_time = "<font color=$red_code>Dissabled</font>";	}
-		elseif ( $map_exp == 999999999999999999 )
+		elseif ( $map_exp == 2147483647 )
 		{ 	$map_exp_time = "<font color=$green_code>Unlimited</font>";	}
 		elseif ($map_exp < time())
 		{ 	$map_exp_time = "<font color=$red_code>" . date('dS F Y \- h:iA T',$map_exp) . "</font>";	}
@@ -206,7 +206,7 @@ if ($evaluser)
 		{ 	$map_exp_time = "<font color=$green_code>" . date('dS F Y \- h:iA T',$map_exp) . "</font>";	}
 		echo "$map_exp_time</strong></p></td></tr><tr>\n";
 		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=maptime&number=0\"><input value=\" Disable Maps \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
-		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=maptime&number=999999999999999999\"><input value=\" Unlimited Maps \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
+		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=maptime&number=2147483647\"><input value=\" Unlimited Maps \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
 		echo "</tr><tr>\n";
 		echo "<form method=\"post\" action=\"acc-change.php\"><td class=\"blanktab\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"accountname\" type=\"hidden\" value=\"$accountname\"><input name=\"action\" type=\"hidden\" value=\"maptime\"><input name=\"number\" type=\"text\" value=\"33\" maxlength=\"6\" size=\"6\"></td><td class=\"blanktab\"><input value=\"<- Give number of days\" type=\"submit\" class=\"bigbut2\"></td></form>\n";
 		echo "</tr><tr>\n";
@@ -219,7 +219,7 @@ if ($evaluser)
 		$char_exp = mysql_result($result2,0,"characcess");
 		if ( $char_exp < 1 )
 		{ 	$char_exp_time = "<font color=$red_code>Dissabled</font>";	}
-		elseif ( $char_exp == 999999999999999999 )
+		elseif ( $char_exp == 2147483647 )
 		{ 	$char_exp_time = "<font color=$green_code>Unlimited</font>";	}
 		elseif ($char_exp < time())
 		{ 	$char_exp_time = "<font color=$red_code>" . date('dS F Y \- h:iA T',$char_exp) . "</font>";	}
@@ -227,7 +227,7 @@ if ($evaluser)
 		{ 	$char_exp_time = "<font color=$green_code>" . date('dS F Y \- h:iA T',$char_exp) . "</font>";	}
 		echo "$char_exp_time</strong></p></td></tr><tr>\n";
 		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=chartime&number=0\"><input value=\" Disable Change \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
-		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=chartime&number=999999999999999999\"><input value=\" Unlimited Change \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
+		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=chartime&number=2147483647\"><input value=\" Unlimited Change \" type=\"submit\" class=\"bigbut2\"></form></td>\n";
 		echo "</tr><tr>\n";
 		echo "<form method=\"post\" action=\"acc-change.php\"><td class=\"blanktab\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"accountname\" type=\"hidden\" value=\"$accountname\"><input name=\"action\" type=\"hidden\" value=\"chartime\"><input name=\"number\" type=\"text\" value=\"33\" maxlength=\"6\" size=\"6\"></td><td class=\"blanktab\"><input value=\"<- Give number of days\" type=\"submit\" class=\"bigbut2\"></td></form>\n";
 		echo "</tr><tr>\n";
@@ -240,7 +240,7 @@ if ($evaluser)
 		$rec_exp = mysql_result($result2,0,"recipeaccess");
 		if ( $rec_exp < 1 )
 		{ 	$rec_exp_time = "<font color=$red_code>Dissabled</font>";	}
-		elseif ( $rec_exp == 999999999999999999 )
+		elseif ( $rec_exp == 2147483647 )
 		{ 	$rec_exp_time = "<font color=$green_code>Unlimited</font>";	}
 		elseif ($rec_exp < time())
 		{ 	$rec_exp_time = "<font color=$red_code>" . date('dS F Y \- h:iA T',$rec_exp) . "</font>";	}
@@ -248,7 +248,7 @@ if ($evaluser)
 		{ 	$rec_exp_time = "<font color=$green_code>" . date('dS F Y \- h:iA T',$rec_exp) . "</font>";	}
 		echo "$rec_exp_time</strong></p></td></tr><tr>\n";
 		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=rectime&number=0\"><input value=\" Disable Calc \" type=\"submit\" class=\"bigbut2\"></form></td>";
-		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=rectime&number=999999999999999999\"><input value=\" Unlimited Calc \" type=\"submit\" class=\"bigbut2\"></form></td>";
+		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=rectime&number=2147483647\"><input value=\" Unlimited Calc \" type=\"submit\" class=\"bigbut2\"></form></td>";
 		echo "</tr><tr>\n";
 		echo "<form method=\"post\" action=\"acc-change.php\"><td class=\"blanktab\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"accountname\" type=\"hidden\" value=\"$accountname\"><input name=\"action\" type=\"hidden\" value=\"rectime\"><input name=\"number\" type=\"text\" value=\"33\" maxlength=\"6\" size=\"6\"></td><td class=\"blanktab\"><input value=\"<- Give number of days\" type=\"submit\" class=\"bigbut2\"></td></form>";
 		echo "</tr><tr>\n";
@@ -278,7 +278,7 @@ if ($evaluser)
 		$gd_exp = mysql_result($result2,0,"gdaccess");
 		if ( $gd_exp < 1 )
 		{ 	$gd_exp_time = "<font color=$red_code>Dissabled</font>";	}
-		elseif ( $gd_exp == 999999999999999999 )
+		elseif ( $gd_exp == 2147483647 )
 		{ 	$gd_exp_time = "<font color=$green_code>Unlimited</font>";	}
 		elseif ($gd_exp < time())
 		{ 	$gd_exp_time = "<font color=$red_code>" . date('dS F Y \- h:iA T',$gd_exp) . "</font>";	}
@@ -286,7 +286,7 @@ if ($evaluser)
 		{ 	$gd_exp_time = "<font color=$green_code>" . date('dS F Y \- h:iA T',$gd_exp) . "</font>";	}
 		echo "$gd_exp_time</strong></p></td></tr><tr>\n";
 		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=gdtime&number=0\"><input value=\" Disable GD \" type=\"submit\" class=\"bigbut2\"></form></td>";
-		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=gdtime&number=999999999999999999\"><input value=\" Unlimited GD \" type=\"submit\" class=\"bigbut2\"></form></td>";
+		echo "<td class=\"blanktab\"><form method=\"post\" action=\"acc-change.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&accountname=$accountname&action=gdtime&number=2147483647\"><input value=\" Unlimited GD \" type=\"submit\" class=\"bigbut2\"></form></td>";
 		echo "</tr><tr>\n";
 		echo "<form method=\"post\" action=\"acc-change.php\"><td class=\"blanktab\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"accountname\" type=\"hidden\" value=\"$accountname\"><input name=\"action\" type=\"hidden\" value=\"gdtime\"><input name=\"number\" type=\"text\" value=\"33\" maxlength=\"6\" size=\"6\"></td><td class=\"blanktab\"><input value=\"<- Give number of days\" type=\"submit\" class=\"bigbut2\"></td></form>";
 		echo "</tr><tr>\n";

@@ -157,4 +157,8 @@ $lang_erasename = "Удалить имя";
 $lang_server = "Сервер";
 $lang_skin = "Скин";
 $lang_fame = "Fame";
+$lang_shops_spawn = "Магазины со спавном";
+$lang_shops_nospawn = "Без спавна";
+$lang_shops_all = "Все магазины";
+$lang_shops_nonpc = "Список без NPC";
 ?>

@@ -1,5 +1,6 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+require_once(__DIR__ . '/dc_install_lib.php');
+error_reporting(E_ERROR | E_PARSE);
 
 include($skin_dir . $svr_dir_delimit . "skincols.php");
 
@@ -62,11 +63,10 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 		die('Wrap_start could not change to gameserver database: ' . mysql_error());
 	}
 	
-	$sql = "select * from $core_db_l2jdb.knightsettings";
-	$result_set = mysql_query($sql,$con3);
+	$result_set = dc_read_settings($con3, "$core_db_l2jdb.knightsettings");
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	$hide_language = mysql_result($result_set,0,"hide_language");
 	$hide_server = mysql_result($result_set,0,"hide_server");
@@ -83,12 +83,14 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$result_set = mysql_query($sql,$con2);
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	if (mysql_num_rows($result_set)> 0 )
 	{	$access_lvl = mysql_result($result_set,0,"accessLevel");	}
 	else
 	{	$access_lvl = 0;	}
+	if (dc_is_installer($username))
+	{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	if ($access_lvl < $sec_inc_gmlevel)
 	{
 		if ($force_default_skin)
@@ -122,25 +124,29 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$server_string = "<form name=\"server\" action=\"$in\">";
 	$skin_string = "<form name=\"skin\" action=\"$in\">";
 	$add_string = "";
-	reset($HTTP_GET_VARS);
-	while (list ($key, $val) = each ($HTTP_GET_VARS)) {
+	reset($_GET);
+	while (($key = key($_GET)) !== null) {
+		$val = $_GET[$key];
 		if ($key == "password")
 		{	
 			$key = "token";	
 			$val = $token;
 		}
 		if (($key <> "langval") && ($val <> "logoff") && ($key <> "server_id") && ($key <> "skin_id") && ($key <> "username") && ($key <> "token") && ($key <> "action") && ($key <> "password"))
-		{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" .$key . "\" value=\"" . $val . "\">";	}
+		{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" . htmlspecialchars($key) . "\" value=\"" . htmlspecialchars($val) . "\">";	}
+		next($_GET);
 	}
-	reset($HTTP_POST_VARS);
-	while (list ($key, $val) = each ($HTTP_POST_VARS)) {
+	reset($_POST);
+	while (($key = key($_POST)) !== null) {
+		$val = $_POST[$key];
 		if ($key == "password")
 		{	
 			$key = "token";	
 			$val = $token;
 		}
 		if (($key <> "langval") && ($val <> "logoff") && ($key <> "server_id") && ($key <> "skin_id") && ($key <> "username") && ($key <> "token") && ($key <> "action") && ($key <> "password"))
-		{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" .$key . "\" value=\"" . $val . "\">";	}
+		{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" . htmlspecialchars($key) . "\" value=\"" . htmlspecialchars($val) . "\">";	}
+		next($_POST);
 	}
 	$language_string = $language_string . $add_string . "<input type=\"hidden\" name=\"username\" value=\"$username\"><input type=\"hidden\" name=\"token\" value=\"$token\"><input type=\"hidden\" name=\"server_id\" value=\"$server_id\"><input type=\"hidden\" name=\"skin_id\" value=\"$skin_id\"><select name=\"langval\" OnChange=\"submit()\" class=\"field2\">";
 	$server_string = $server_string . $add_string . "<input type=\"hidden\" name=\"username\" value=\"$username\"><input type=\"hidden\" name=\"token\" value=\"$token\"><input type=\"hidden\" name=\"langval\" value=\"$langval\"><input type=\"hidden\" name=\"skin_id\" value=\"$skin_id\"><select name=\"server_id\" OnChange=\"submit()\" class=\"field2\">";
@@ -232,6 +238,8 @@ function wrap_it($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, 
 	$lang_file = $language_array[$langval][1];
 	include($lang_file);		// Import language variables.
 	include($skin_dir . $svr_dir_delimit . $wrapfile);
+	if (strpos($wrapfile, "wrapopen") === 0)
+	{	dc_installer_banner($username);	}
 
 }
 
@@ -277,11 +285,10 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 		die('Wrap_start could not change to gameserver database: ' . mysql_error());
 	}
 	
-	$sql = "select * from $core_db_l2jdb.knightsettings";
-	$result_set = mysql_query($sql,$con3);
+	$result_set = dc_read_settings($con3, "$core_db_l2jdb.knightsettings");
 	if (!$result_set)
 	{	
-		echo "<p class=\"popup\">Couldn't read the knightsettings table!!!</p>";
+		echo "<p class=\"popup\">Couldn't read the knightsettings table!!! " . htmlspecialchars((string) mysql_error()) . "</p>";
 	}
 	$hide_language = mysql_result($result_set,0,"hide_language");
 	$hide_server = mysql_result($result_set,0,"hide_server");
@@ -317,23 +324,27 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 	$server_string = "<form name=\"server\" action=\"$in\">";
 	$skin_string = "<form name=\"skin\" action=\"$in\">";
 	$add_string = "";
-	reset($HTTP_GET_VARS);
-	while (list ($key, $val) = each ($HTTP_GET_VARS)) {
+	reset($_GET);
+	while (($key = key($_GET)) !== null) {
+	$val = $_GET[$key];
 	if ($key == "password")
 	{	$key = "token";	
 		$val = $token;
 	}
 	if (($key <> "langval") && ($val <> "logoff") && ($key <> "server_id") && ($key <> "skin_id") && ($key <> "password"))
-	{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" .$key . "\" value=\"" . $val . "\">";	}
+	{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" . htmlspecialchars($key) . "\" value=\"" . htmlspecialchars($val) . "\">";	}
+	next($_GET);
 	}
-	reset($HTTP_POST_VARS);
-	while (list ($key, $val) = each ($HTTP_POST_VARS)) {
+	reset($_POST);
+	while (($key = key($_POST)) !== null) {
+	$val = $_POST[$key];
 	if ($key == "password")
 	{	$key = "token";	
 		$val = $token;
 	}
 	if (($key <> "langval") && ($val <> "logoff") && ($key <> "server_id") && ($key <> "skin_id") && ($key <> "password"))
-	{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" .$key . "\" value=\"" . $val . "\">";	}
+	{	$add_string = $add_string .  "<input type=\"hidden\" name=\"" . htmlspecialchars($key) . "\" value=\"" . htmlspecialchars($val) . "\">";	}
+	next($_POST);
 	}
 	$language_string = $language_string . $add_string . "<input type=\"hidden\" name=\"server_id\" value=\"$server_id\"><input type=\"hidden\" name=\"skin_id\" value=\"$skin_id\"><select name=\"langval\" OnChange=\"submit()\" class=\"field2\">";
 	$server_string = $server_string . $add_string . "<input type=\"hidden\" name=\"langval\" value=\"$langval\"><input type=\"hidden\" name=\"skin_id\" value=\"$skin_id\"><select name=\"server_id\" OnChange=\"submit()\" class=\"field2\">";
@@ -408,6 +419,8 @@ function wrap_it_dummy($wrapfile, $username, $token, $HTTP_GET_VARS, $HTTP_POST_
 	$lang_file = $language_array[$langval][1];
 	include($lang_file);		// Import language variables.
 	include($skin_dir . $svr_dir_delimit . $wrapfile);
+	if (strpos($wrapfile, "wrapopen") === 0)
+	{	dc_installer_banner($username);	}
 
 }
 

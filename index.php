@@ -1,6 +1,6 @@
 
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -22,6 +22,7 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 	mysql_query("SET NAMES 'utf8'", $con2);
 	if (!mysql_select_db("$dblog_l2jdb",$con2))
 	{	die('Wrap_start could not change to logserver database: ' . mysql_error());}
+	dc_ensure_login_tables($con2);
 
 	$con = mysql_connect($db_location,$db_user,$db_psswd);
 	mysql_query("SET NAMES 'utf8'", $con);
@@ -40,6 +41,9 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 
 	// Query for user name
 	$encrypt_pass = base64_encode(pack("H*", sha1(utf8_encode($password))));
+	// Public mirror: hashes in the copied accounts table are re-hashed with a secret (see docs/PUBLIC_MIRROR_RU.md).
+	if (!empty($password_pepper))
+	{	$encrypt_pass = base64_encode(hash('sha256', $password_pepper . $encrypt_pass, true));	}
 	if (!$result = mysql_query("select password, accessLevel from $dblog_l2jdb.accounts where login = '$username'",$con2))
 	{	die('Could not retrieve from logon database: ' . mysql_error());	}
 	// If return array empty, then username not found.
@@ -52,9 +56,10 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 	{	return 0;	}
 
 	// Generate random token
-	$token = "";
-	for ($i=1; $i<=10; $i++)
-	{  $token = ($token * 10) + rand()%9;	}
+	// PHP8: "" * 10 is a TypeError now; random_int() instead of the predictable rand().
+	$token = (string) random_int(1, 9);
+	for ($i=2; $i<=10; $i++)
+	{  $token .= random_int(0, 9);	}
 	$usr_access = mysql_result($result,0,"accessLevel");
 
 	// If the user is in the gametables and the password checks, but the user isn't in the knightdrop 
@@ -70,11 +75,11 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 		$default_recipe = '0';
 		$default_character = '0';
 		if ($all_newusers_maps)
-		{	$default_maps = '999999999999999999';	}
+		{	$default_maps = '2147483647';	}
 		if ($all_newusers_recipe)
-		{	$default_recipe = '999999999999999999';	}
+		{	$default_recipe = '2147483647';	}
 		if ($all_newusers_character)
-		{	$default_character = '999999999999999999';	}
+		{	$default_character = '2147483647';	}
 		if (!mysql_query("insert into $dblog_l2jdb.knightdrop (name, lastaction, token, mapaccess, recipeaccess, characcess, lastheard, ipaddr, access_level) values ('$username', 0, 0, '$default_maps', '$default_recipe', '$default_character', '$timeofday' ,'$ipaddr' ,'$usr_access')",$con2))
 		{	echo "<h2 class=\"dropmain\">Error - Couldn't insert user into knightdrop table.<br>" . mysql_error() . "</h2>";	}
 	}
@@ -119,6 +124,7 @@ $con2 = mysql_connect($dblog_location,$dblog_user,$dblog_psswd);
 mysql_query("SET NAMES 'utf8'", $con2);
 if (!mysql_select_db("$dblog_l2jdb",$con2))
 {	die('Wrap_start could not change to logserver database: ' . mysql_error());	}
+	dc_ensure_login_tables($con2);
 	
 if ($action == 'logoff')
 {

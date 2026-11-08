@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -30,8 +30,8 @@ $usrname = input_check($_REQUEST['usrname'],1);
 $langval = input_check($_REQUEST['langval'],2);
 $password1 = input_check($_REQUEST['psswd1'],0);
 $password2 = input_check($_REQUEST['psswd2'],0);
-$email1 = preg_replace('/[&%$\/\\\|<>#£]/','',$_REQUEST['email1']);
-$email2 = preg_replace('/[&%$\/\\\|<>#£]/','',$_REQUEST['email2']);
+$email1 = input_check($_REQUEST['email1'],0);
+$email2 = input_check($_REQUEST['email2'],0);
 $passwordchk = $_REQUEST['psswd1'];
 $usrnamechk = $_REQUEST['usrname'];
 $ipaddr = $_SERVER["REMOTE_ADDR"];
@@ -163,11 +163,11 @@ if ($usrname)
 				$default_recipe = 0;
 				$default_character = 0;
 				if ($all_newusers_maps)
-				{	$default_maps = 999999999999999999;	}
+				{	$default_maps = 2147483647;	}
 				if ($all_newusers_recipe)
-				{	$default_recipe = 999999999999999999;	}
+				{	$default_recipe = 2147483647;	}
 				if ($all_newusers_character)
-				{	$default_character = 999999999999999999;	}
+				{	$default_character = 2147483647;	}
 				$timeofday = intval(time() / 60);
 				if (($allowpassreset) && ($emailcheck))
 				{	

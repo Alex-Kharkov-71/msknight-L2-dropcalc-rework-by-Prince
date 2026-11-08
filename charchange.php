@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -106,7 +106,7 @@ if ($evaluser)
 			
 			if ($action == "hair")
 			{	
-				$hair_vars = split('[-]', $number);
+				$hair_vars = preg_split('/[-]/', $number);
 				$char_colour = $hair_vars[0];
 				$char_hair = $hair_vars[1];
 			}

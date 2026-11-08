@@ -39,6 +39,8 @@ function submitForm(){
 	if(document.pressed == 'items')
 	{
 		document.searchform.action = \"i-search.php\";
+		if (function_exists('dc_is_installer') && dc_is_installer($username) && isset($sec_inc_admin))
+		{	$access_lvl = max((int) $access_lvl, (int) $sec_inc_admin);	}
 	}
 	if(document.pressed == 'location')
 	{
@@ -161,14 +163,14 @@ if ($show_online > 1)
 {
 	echo "<tr><td width=\"100%\" colspan=\"3\"><img src=\"$skin_dir/blank.gif\" alt=\"\" width=\"1\" height=\"8\" border=\"0\"></td></tr>
 			<tr><td width=\"100%\" colspan=\"3\" style=\"background: url('$skin_dir/bronzethin.jpg');\"><table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><img src=\"$skin_dir/blank.gif\" alt=\"\" width=\"1\" height=\"25\" border=\"0\"></td>";
-	echo "<td><p class=\"whitetop\">&nbsp;Login&nbsp;Server&nbsp;-&nbsp;</p></td><td>".(checkport($log_telnet_host, $dblog_port, $log_telnet_timeout) ? "<img src=\"" . $images_dir . "online.gif\">" : "<img src=\"" . $images_dir . "offline.gif\">")."&nbsp;</td><td><img src=\"$skin_dir/brassbar.gif\" alt=\"\" width=\"6\" height=\"24\" border=\"0\"></td>\n";
+	echo "<td><p class=\"whitetop\">&nbsp;Login&nbsp;Server&nbsp;-&nbsp;</p></td><td>".(logserver_online() ? "<img src=\"" . $images_dir . "online.gif\">" : "<img src=\"" . $images_dir . "offline.gif\">")."&nbsp;</td><td><img src=\"$skin_dir/brassbar.gif\" alt=\"\" width=\"6\" height=\"24\" border=\"0\"></td>\n";
 	$i = 0;
 	while ($i < $g_array_count)
 	{
 		$g_name = $gameservers[$i][0];
 		$g_ip = $gameservers[$i][9];
 		$g_port = $gameservers[$i][7];
-		echo "<td><p class=\"whitetop\">&nbsp;$g_name&nbsp;-</p></td><td>&nbsp;".(checkport($g_ip, $g_port, $log_telnet_timeout) ? "<img src=\"" . $images_dir . "online.gif\">" : "<img src=\"" . $images_dir . "offline.gif\">")."&nbsp;</td><td><img src=\"$skin_dir/brassbar.gif\" alt=\"\" width=\"6\" height=\"24\" border=\"0\"></td>\n";
+		echo "<td><p class=\"whitetop\">&nbsp;$g_name&nbsp;-</p></td><td>&nbsp;".(gameserver_online($i) ? "<img src=\"" . $images_dir . "online.gif\">" : "<img src=\"" . $images_dir . "offline.gif\">")."&nbsp;</td><td><img src=\"$skin_dir/brassbar.gif\" alt=\"\" width=\"6\" height=\"24\" border=\"0\"></td>\n";
 		$i++;
 	}
 	echo "<td width=\"100%\"></td></tr></table></td></tr>\n";

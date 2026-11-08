@@ -157,4 +157,8 @@ $lang_erasename = "Name l&ouml;schen";
 $lang_server = "Server";
 $lang_skin = "Skin";
 $lang_fame = "Ruhm";
+$lang_shops_spawn = "Shops mit Spawn";
+$lang_shops_nospawn = "Ohne Spawn";
+$lang_shops_all = "Alle Shops";
+$lang_shops_nonpc = "Shopliste ohne NPC";
 ?>

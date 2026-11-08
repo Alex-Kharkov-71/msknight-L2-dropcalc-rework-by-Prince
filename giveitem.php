@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -131,17 +131,17 @@ if ($evaluser)
 					// Try and find the details on the object from each of the three content databases.
 					// Looking simply for the name and crystal type.
 					$obj_name = item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb);
-					$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+					$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 					if($usetelnet)
 					{
 						$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-						fputs($usetelnet, $telnet_password);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, $give_string);
-						fputs($usetelnet, "\r\n");
-						fputs($usetelnet, "msg ".utf82lang ($touser)." Admin gave you this: ".$qty." ".$obj_name."\r");
-						fputs($usetelnet, "exit\r\n");
-						fclose($usetelnet);
+						telnet_write($usetelnet, $telnet_password);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, $give_string);
+						telnet_write($usetelnet, "\r\n");
+						telnet_write($usetelnet, "msg ".utf82lang ($touser)." Admin gave you this: ".$qty." ".$obj_name."\r");
+						telnet_write($usetelnet, "exit\r\n");
+						telnet_close($usetelnet);
 					}
 					else
 					{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -173,6 +173,7 @@ if ($evaluser)
 			echo "<p class=\"popup\">Full set for class given to $touser.</p>";
 			$itemid = "";
 		}
+		if ($itemid == "setgive2") { echo "<p class=\"popup\">Not available on L2JMobius (armorsets table - armor sets are in the XML datapack).</p>"; $itemid = ""; }
 		if ($itemid == "setgive2")
 		{
 			$sql = "select * from armorsets where id = $settogive";
@@ -222,18 +223,18 @@ if ($evaluser)
 						// Try and find the details on the object from each of the three content databases.
 						// Looking simply for the name and crystal type.
 						$obj_name = item_name($itemid, $db_location, $db_user, $db_psswd, $db_l2jdb);
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 						if($usetelnet)
 						{
 							$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "msg ".utf82lang ($touser)." admin gave you this: ".$qty." ".$obj_name);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "exit\r\n");
-							fclose($usetelnet);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "msg ".utf82lang ($touser)." admin gave you this: ".$qty." ".$obj_name);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "exit\r\n");
+							telnet_close($usetelnet);
 						}
 						else
 						{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}
@@ -272,7 +273,7 @@ if ($evaluser)
 				$itemid = $itms[$i2];
 				if ($itemid > 0)
 				{
-					$sql = "select name, level from skill_trees where skill_id = '$itemid' order by level desc limit 1";
+					$sql = "select name, levels as level from knightskills where skill_id = '$itemid'";
 					$skill_result = mysql_query($sql,$con);
 					if ($skill_result)
 					{
@@ -309,7 +310,7 @@ if ($evaluser)
 							$char_id = mysql_result($char_result,0,"charId");
 							$sql = "delete from character_skills where charId = '$userid' and skill_id = '$itemid'";
 							$skill_result = mysql_query($sql,$con);
-							$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) values ('$userid', '$itemid', '$skill_max', '$skill_name', '0')";
+							$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) values ('$userid', '$itemid', '$skill_max', '0')";
 							$skill_result = mysql_query($sql,$con);
 							echo "Skill $skill_name level $qty given";
 						}
@@ -342,6 +343,7 @@ if ($evaluser)
 			echo "</center></body></html>";
 			return 0;
 		}
+		if ($itemid == "pet") { echo "<p class=\"popup\">Not available on L2JMobius (pets_stats table - pet data is in the XML datapack).</p>"; $itemid = ""; }
 		if ($itemid == "pet")
 		{
 			$sql = "select distinct type from pets_stats";
@@ -487,17 +489,17 @@ if ($evaluser)
 					if ($useronline)
 					{
 						
-						$usetelnet = fsockopen($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
+						$usetelnet = telnet_open($telnet_host, $telnet_port, $errno, $errstr, $telnet_timeout);
 						if($usetelnet)
 						{
 							$give_string = 'give ' . utf82lang ($touser) . ' ' . $itemid . ' ' . $qty;
-							fputs($usetelnet, $telnet_password);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, $give_string);
-							fputs($usetelnet, "\r\n");
-							fputs($usetelnet, "msg ".utf82lang ($touser)." admin gave you : ".$qty." ".$obj_name."\r");
-							fputs($usetelnet, "exit\r\n");
-							fclose($usetelnet);
+							telnet_write($usetelnet, $telnet_password);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, $give_string);
+							telnet_write($usetelnet, "\r\n");
+							telnet_write($usetelnet, "msg ".utf82lang ($touser)." admin gave you : ".$qty." ".$obj_name."\r");
+							telnet_write($usetelnet, "exit\r\n");
+							telnet_close($usetelnet);
 						}
 						else
 						{	echo "<p class=\"popup\">Couldn't connect to telnet</p>";	}

@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -196,7 +196,7 @@ if ($evaluser)
 		$count_res = 0;
 		$c_access = 0;
 		$c_onl = 0;
-		$a_num = count($result2);
+		$a_num = mysql_num_rows($result2);
 		while ($r_array = mysql_fetch_assoc($result2))  // Go through the characters accounts and total the number of character access levels and if any are online.
 		{
 			$c_alvl = $r_array['accesslevel'];
@@ -294,7 +294,7 @@ if ($evaluser)
 				{ echo "<td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Acc Lvl</strong></p></td>"; }
 				echo "</tr>\n";
 			}
-			$a_num = count($result2);
+			$a_num = mysql_num_rows($result2);
 			while ($r_array = mysql_fetch_assoc($result2))  // Go through the characters accounts for each that matches the player account.
 			{
 				$c_num = $r_array['charId'];
@@ -316,7 +316,7 @@ if ($evaluser)
 				$c_race_n = "$lang_unknown";
 				$c_class_n = "$lang_unknown";
 				$c_class_s = "Unkonwn";
-				$result_class = mysql_query("select class_name from class_list where id = $c_class",$con);
+				$result_class = mysql_query("select class_name from knightclass where id = $c_class",$con);
 				$class_count =  mysql_num_rows($result_class);
 				if ($class_count >0)
 				{	$c_class_s = mysql_result($result_class,0,"class_name");	}
@@ -355,7 +355,7 @@ if ($evaluser)
 				else
 				{
 					$result_clan = mysql_query("select clan_id, clan_name from clan_data where clan_id = $c_clanid",$con);
-					if (!result_clan)
+					if (!$result_clan || !mysql_num_rows($result_clan))
 					{	$c_clan_n = "$lang_unknown"; }
 					else 
 					{ $c_clan_n = mysql_result($result_clan,0,"clan_name"); }

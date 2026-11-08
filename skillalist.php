@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 5.0.0
@@ -19,15 +19,15 @@ include('skin.php');
 include('common.php');
 
 // Retrieve environment variables
-$username = input_check($_REQUEST['username']);
-$token = input_check($_REQUEST['token']);
-$langval = input_check($_REQUEST['langval']);
+$username = input_check($_REQUEST['username'],1);
+$token = input_check($_REQUEST['token'],0);
+$langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
-$file = input_check($_REQUEST['file']);
+$file = input_check($_REQUEST['file'],0);
 
 $langfile = $language_array[$langval][1];
 include($langfile);		// Import language variables.
-$file2 = $file + 1;
+$file2 = intval($file) + 1;
 echo "<html class=\"popup\">
 <head>
 <title>Michelle's Generic Drop Calc</title>";
@@ -89,7 +89,8 @@ if ($evaluser)
 		echo "<p class=\"popup\">&nbsp;</p><p class=\"popup\">Performing on skill set $file.</p>";
 		$out_handle = fopen($file_out, "w");
 		$skill_on = 99999;
-		$lines = file($file_loc);
+		$lines = @file($file_loc);
+		if (!is_array($lines)) {	$lines = array();	}
 		foreach ($lines as $line_num => $line) 
 		{
 			$pos = strpos($line, "skill id=");

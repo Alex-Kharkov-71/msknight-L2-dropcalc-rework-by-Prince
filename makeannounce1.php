@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -25,7 +25,7 @@ $username = input_check($_REQUEST['username'],1);
 $token = input_check($_REQUEST['token'],0);
 $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
-$sendchat = $_REQUEST['sendchat'];
+$sendchat = input_check($_REQUEST['sendchat'],0);
 
 $langfile = $language_array[$langval][1];
 include($langfile);		// Import language variables.

@@ -1,5 +1,5 @@
 <?php 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 /*
 Michelle Knight's Drop Calc - Version 3
@@ -87,6 +87,11 @@ if ($evaluser)
 	}
 	else
 	{
+		// PHP8/L2JMobius fix: instrument opiraetsya na tablitsy, kotorykh v L2JMobius net (access_levels table - access levels are in the XML config) -
+		// otklyuchen, chtoby ne pisat musor v bazu servera.
+		echo "<p class=\"popup\">This GM tool is not available on L2JMobius (access_levels table - access levels are in the XML config).</p>";
+		echo "</center></body></html>";
+		return 0;
 
 		if ($action)
 		{
@@ -102,27 +107,27 @@ if ($evaluser)
 			$result = mysql_query($sql,$con2);
 			$sql = "update characters set accesslevel = '$entry_level' where accesslevel < 1 and charId = '$userid'";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4322, 1, 'Wind Walk', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4322, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4323, 1, 'Shield', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4323, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4324, 1, 'Bless The Body', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4324, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4325, 1, 'Vampiric Rage', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4325, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4326, 1, 'Regeneration', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4326, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4327, 1, 'Haste', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4327, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4328, 1, 'Bless The Soul', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4328, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4329, 1, 'Acumen', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4329, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4330, 1, 'Concentration', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4330, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4331, 1, 'Empower', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4331, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4338, 1, 'Life Cubic', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4338, 1, 0)";
 			$result = mysql_query($sql,$con);
 
 			$sql = "delete from character_shortcuts where charId = '$userid' and page = '9'";
@@ -149,15 +154,15 @@ if ($evaluser)
 			$result = mysql_query($sql,$con);
 
 
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 4, 2, 'Dash', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 4, 2, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 239, 4, 'Expertise S', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 239, 4, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 268, 1, 'Song Of Wind', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 268, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 298, 1, 'Totem Spirit Rabbit', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 298, 1, 0)";
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 7029, 4, 'Super Haste', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 7029, 4, 0)";
 			$result = mysql_query($sql,$con);
 			$sql = "delete from character_shortcuts where charId = '$userid' and page = '0' and slot = '7'";
 			$result = mysql_query($sql,$con);
@@ -166,7 +171,7 @@ if ($evaluser)
 
 			$sql = "delete from character_skills where charId = '$userid' and skill_id = '150'";		// remove weight limit before adding, in case a lower limit already exists.
 			$result = mysql_query($sql,$con);
-			$sql = "insert into character_skills (charId, skill_id, skill_level, skill_name, class_index) VALUES ($userid, 150, 3, 'Weight Limit 3', 0)";
+			$sql = "insert into character_skills (charId, skill_id, skill_level, class_index) VALUES ($userid, 150, 3, 0)";
 			$result = mysql_query($sql,$con);
 
 			$sql = "select id from character_macroses where charId = '$userid' and acronym = '9AKF'";
