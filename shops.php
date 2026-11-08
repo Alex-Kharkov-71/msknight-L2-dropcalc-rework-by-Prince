@@ -97,13 +97,13 @@ if ($evaluser)
 		if (!$shopid)
 		{
 			$vl = array('' => ($lang_shops_spawn ?? 'Shops with a spawn'), 'nospawn' => ($lang_shops_nospawn ?? 'Without a spawn'), 'all' => ($lang_shops_all ?? 'All shops'));
-			echo "<table class=\"blanktab\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\"><tr>";
+			echo "<center><table class=\"blanktab\" cellpadding=\"5\" class=\"dropmain\"><tr>";
 			foreach ($vl as $vk => $vt)
 			{
-				$sel = ($vk == $view) ? " style=\"font-weight:bold;text-decoration:underline\"" : "";
-				echo "<td class=\"noborderback\"><form method=\"get\" action=\"shops.php\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" type=\"hidden\" value=\"$server_id\"><input name=\"skin_id\" type=\"hidden\" value=\"$skin_id\"><input name=\"view\" type=\"hidden\" value=\"$vk\"><input value=\"$vt\" type=\"submit\" class=\"bigbut2\"$sel></form></td>";
+				$vt_btn = ($vk == $view) ? " * $vt * " : " - $vt - ";
+				echo "<td class=\"noborder\"><form method=\"post\" action=\"shops.php\"><input value=\"$vt_btn\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"view\" type=\"hidden\" value=\"$vk\"></form></td>";
 			}
-			echo "<td class=\"noborderback\"><p class=\"dropmain\">&nbsp;($count)</p></td></tr></table>";
+			echo "</tr></table></center><p class=\"dropmain\" align=\"center\">($count)</p>";
 			echo "<table class=\"blanktab\" width=\"100%\"><tr><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Location</strong></p></td></tr>";
 			$i=0;
 			$target = intval($count / 4) + 1;
