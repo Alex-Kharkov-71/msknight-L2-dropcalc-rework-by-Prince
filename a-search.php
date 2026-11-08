@@ -355,7 +355,7 @@ if ($evaluser)
 				else
 				{
 					$result_clan = mysql_query("select clan_id, clan_name from clan_data where clan_id = $c_clanid",$con);
-					if (!result_clan)
+					if (!$result_clan || !mysql_num_rows($result_clan))
 					{	$c_clan_n = "$lang_unknown"; }
 					else 
 					{ $c_clan_n = mysql_result($result_clan,0,"clan_name"); }
