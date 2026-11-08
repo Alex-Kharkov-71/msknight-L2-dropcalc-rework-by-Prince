@@ -46,5 +46,13 @@ sync_db() {            # $1 = home db, $2 = public db, $3 = "login" for the acco
 
 rc=0
 IFS=: read -r s p <<<"$LOGIN_PAIR";  sync_db "$s" "$p" login || rc=1
-for pair in "${GAME_PAIRS[@]}"; do IFS=: read -r s p <<<"$pair"; sync_db "$s" "$p" game || rc=1; done
+# game databases are independent of each other: load them in parallel (PARALLEL=1 for the old sequential behaviour)
+pids=()
+for pair in "${GAME_PAIRS[@]}"; do
+  IFS=: read -r s p <<<"$pair"
+  sync_db "$s" "$p" game &
+  pids+=($!)
+  while [ "$(jobs -rp | wc -l)" -ge "${PARALLEL:-3}" ]; do sleep 1; done
+done
+for pid in "${pids[@]}"; do wait "$pid" || rc=1; done
 exit $rc
