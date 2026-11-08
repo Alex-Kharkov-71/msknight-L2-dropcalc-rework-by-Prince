@@ -97,6 +97,7 @@ if ($evaluser)
 			die('Could not change to L2J database: ' . mysql_error());
 			}
 		$result = mysql_query("CREATE TABLE IF NOT EXISTS `knightquestrun` (`quest_id` int(4) NOT NULL default '0',`type` int(1) NOT NULL default '0',`target_id` int(11) NOT NULL default '0', KEY `qiest_id` (`quest_id`), UNIQUE quest_id (quest_id,type,target_id))",$con);
+		mysql_query("alter table knightquests modify `name` varchar(120) default NULL",$con);
 		$ix = mysql_query("show index from knightquestrun where Key_name = 'quest_id' and Column_name = 'type'",$con);
 		if ($ix && mysql_num_rows($ix) == 0)
 		{
