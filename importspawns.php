@@ -94,26 +94,41 @@ if ($evaluser)
 					foreach ($terr->node as $node)
 					{	$xs[] = (int) $node['x']; $ys[] = (int) $node['y'];	}
 				}
-				if (empty($xs)) continue;
-				$cx = (int) round(array_sum($xs) / count($xs));
-				$cy = (int) round(array_sum($ys) / count($ys));
-				$cz = ($minZ !== null && $maxZ !== null) ? (int) round(($minZ + $maxZ) / 2) : 0;
+				$hasZone = !empty($xs);
+				if ($hasZone)
+				{
+					$cx = (int) round(array_sum($xs) / count($xs));
+					$cy = (int) round(array_sum($ys) / count($ys));
+					$cz = ($minZ !== null && $maxZ !== null) ? (int) round(($minZ + $maxZ) / 2) : 0;
 
-				$pointsStr = [];
-				foreach ($xs as $i => $x)
-				{	$pointsStr[] = $x . ',' . $ys[$i];	}
-				$pointsStr = implode(';', $pointsStr);
-				xip_q("replace into knightspawnzone (zone,minZ,maxZ,points) values (
-					'" . mysql_real_escape_string($zone,$con) . "', " . ($minZ ?? 0) . ", " . ($maxZ ?? 0) . ",
-					'" . mysql_real_escape_string($pointsStr,$con) . "')", $con);
+					$pointsStr = [];
+					foreach ($xs as $i => $x)
+					{	$pointsStr[] = $x . ',' . $ys[$i];	}
+					$pointsStr = implode(';', $pointsStr);
+					xip_q("replace into knightspawnzone (zone,minZ,maxZ,points) values (
+						'" . mysql_real_escape_string($zone,$con) . "', " . ($minZ ?? 0) . ", " . ($maxZ ?? 0) . ",
+						'" . mysql_real_escape_string($pointsStr,$con) . "')", $con);
+				}
 
-				foreach ($spawn->npc as $npc)
+				// npc may sit directly in <spawn> or inside <group>; either with its own x/y/z (point spawn,
+				// e.g. town merchants) or without (random inside the territory of the spawn).
+				foreach ($spawn->xpath('.//npc') as $npc)
 				{
 					$npcId = (int) $npc['id'];
 					$cnt = (int) ($npc['count'] ?? 1);
-					xip_q("insert into knightspawnlist (npc_templateid,locx,locy,locz,count,loc_id,is_approximate)
-						values ($npcId, $cx, $cy, $cz, $cnt, '" . mysql_real_escape_string($zone,$con) . "', 1)", $con);
-					$count++;
+					if (isset($npc['x']) && isset($npc['y']))
+					{
+						$px = (int) $npc['x']; $py = (int) $npc['y']; $pz = (int) ($npc['z'] ?? 0);
+						xip_q("insert into knightspawnlist (npc_templateid,locx,locy,locz,count,loc_id,is_approximate)
+							values ($npcId, $px, $py, $pz, $cnt, '', 0)", $con);
+						$count++;
+					}
+					elseif ($hasZone)
+					{
+						xip_q("insert into knightspawnlist (npc_templateid,locx,locy,locz,count,loc_id,is_approximate)
+							values ($npcId, $cx, $cy, $cz, $cnt, '" . mysql_real_escape_string($zone,$con) . "', 1)", $con);
+						$count++;
+					}
 				}
 			}
 		}
