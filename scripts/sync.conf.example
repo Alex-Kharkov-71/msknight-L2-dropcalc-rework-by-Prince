@@ -6,5 +6,5 @@ REMOTE_PORT=3306
 PEPPER=CHANGE_ME_openssl_rand_hex_32   # same value as $password_pepper in the public config.php
 LOGIN_PAIR="l2login:pub_login"          # home db : public db
 GAME_PAIRS=("l2temp:pub_l2temp" "l2s1:pub_l2s1" "l2pvp:pub_l2pvp")
-# Big log tables you do not want on the public side (db.table):
+# Tables you do not want on the public side (db.table), e.g. the biggest one: "l2s1.items" (player inventories, ~190k rows)
 EXCLUDE=()
