@@ -70,6 +70,29 @@ if ($evaluser)
 		$files = xip_listXmlFiles($dir);
 		$count = 0;
 
+		// Shops without <npcs> in their file are opened from NPC dialogs ("Buy <id>").
+		// html file name = NPC id (13128.htm, 30001-1.htm), so we can learn which NPC sells which buylist.
+		$html_map = array();
+		$html_dir = $server_dir . 'data' . $svr_dir_delimit . 'html';
+		if (is_dir($html_dir))
+		{
+			$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($html_dir, FilesystemIterator::SKIP_DOTS));
+			foreach ($it as $hf)
+			{
+				if (!$hf->isFile()) continue;
+				if (!preg_match('/^(\d+)(?:-\d+)?\.html?$/i', $hf->getFilename(), $mn)) continue;
+				$npcFromHtml = (int) $mn[1];
+				$txt = @file_get_contents($hf->getPathname());
+				if ($txt === false) continue;
+				if (preg_match_all('/Buy\s+(\d+)/i', $txt, $mb))
+				{
+					foreach ($mb[1] as $bid)
+					{	$html_map[(int) $bid][$npcFromHtml] = $npcFromHtml;	}
+				}
+			}
+		}
+		$from_html = 0;
+
 		foreach ($files as $path)
 		{
 			$xml = xip_loadXml($path);
@@ -78,7 +101,13 @@ if ($evaluser)
 			foreach ($xml->npcs->npc ?? [] as $npc)
 			{	$npcIds[] = (int) $npc;	}
 			if (empty($npcIds))
-			{	$npcIds[] = (int) basename($path, '.xml');	}
+			{
+				$bid = (int) basename($path, '.xml');
+				if (!empty($html_map[$bid]))
+				{	$npcIds = array_values($html_map[$bid]);	$from_html++;	}
+				else
+				{	$npcIds[] = $bid;	}
+			}
 			foreach ($xml->item as $item)
 			{
 				$itemId = (int) $item['id'];
@@ -90,7 +119,7 @@ if ($evaluser)
 				}
 			}
 		}
-		echo "<p>Импортировано строк магазинов: $count (файлов обработано: " . count($files) . ")</p>";
+		echo "<p>NPC found via dialogs for shops without <npcs>: $from_html</p><p>Импортировано строк магазинов: $count (файлов обработано: " . count($files) . ")</p>";
 		xip_stat_flush($con, 'buylists');
 		xip_stat_report($con, 'buylists');
 	}
