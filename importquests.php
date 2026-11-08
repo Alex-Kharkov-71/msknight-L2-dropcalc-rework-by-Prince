@@ -19,6 +19,36 @@ include('config.php');
 include('config-read.php');
 include('skin.php');
 include('common.php');
+include_once('xmlparse_common.php');
+
+// Parses a Mobius Java quest: returns array(1 => item ids given, 2 => npc ids involved).
+function dc_parse_quest_java($src)
+{
+	$src = preg_replace('~//[^\n]*|/\*.*?\*/~s', '', $src);
+	$const = array();
+	if (preg_match_all('/\bint\s+(\w+)\s*=\s*(\d+)\s*;/', $src, $mm, PREG_SET_ORDER))
+	{	foreach ($mm as $x) { $const[$x[1]] = array((int) $x[2]); }	}
+	if (preg_match_all('/\bint\s*\[\]\s*(\w+)\s*=\s*(?:new\s+int\s*\[\]\s*)?\{([^}]*)\}/', $src, $mm, PREG_SET_ORDER))
+	{	foreach ($mm as $x) { $const[$x[1]] = array_map('intval', preg_split('/\s*,\s*/', trim($x[2]))); }	}
+	$resolve = function ($args, $skip) use ($const) {
+		$out = array();
+		$parts = array_slice(array_map('trim', explode(',', $args)), $skip);
+		foreach ($parts as $p)
+		{
+			if (preg_match('/^\d+$/', $p)) { $out[] = (int) $p; }
+			elseif (isset($const[$p])) { $out = array_merge($out, $const[$p]); }
+		}
+		return $out;
+	};
+	$items = array(); $npcs = array();
+	if (preg_match_all('/\b(?:giveItems|rewardItems)\s*\(\s*[^,()]+,\s*([^,()]+)/', $src, $mm))
+	{	foreach ($mm[1] as $a) { $items = array_merge($items, $resolve($a, 0)); }	}
+	if (preg_match_all('/\b(?:addStartNpc|addTalkId|addFirstTalkId|addKillId|addSpawnId)\s*\(([^;]*)\)\s*;/', $src, $mm))
+	{	foreach ($mm[1] as $a) { $npcs = array_merge($npcs, $resolve($a, 0)); }	}
+	$items = array_values(array_unique(array_filter($items, function ($v) { return $v > 0; })));
+	$npcs = array_values(array_unique(array_filter($npcs, function ($v) { return $v > 0; })));
+	return array(1 => $items, 2 => $npcs);
+}
 
 // Retrieve environment variables
 $username = input_check($_REQUEST['username'],1);
@@ -66,95 +96,46 @@ if ($evaluser)
 			{
 			die('Could not change to L2J database: ' . mysql_error());
 			}
-		$result = mysql_query("CREATE TABLE IF NOT EXISTS `knightquestrun` (`quest_id` int(4) NOT NULL default '0',`type` int(1) NOT NULL default '0',`target_id` int(11) NOT NULL default '0', KEY `qiest_id` (`quest_id`), UNIQUE quest_id (quest_id,target_id))",$con);
+		$result = mysql_query("CREATE TABLE IF NOT EXISTS `knightquestrun` (`quest_id` int(4) NOT NULL default '0',`type` int(1) NOT NULL default '0',`target_id` int(11) NOT NULL default '0', KEY `qiest_id` (`quest_id`), UNIQUE quest_id (quest_id,type,target_id))",$con);
+		$ix = mysql_query("show index from knightquestrun where Key_name = 'quest_id' and Column_name = 'type'",$con);
+		if ($ix && mysql_num_rows($ix) == 0)
+		{
+			mysql_query("truncate table knightquestrun",$con);
+			mysql_query("alter table knightquestrun drop index quest_id, add unique quest_id (quest_id,type,target_id)",$con);
+		}
 		$result = mysql_query("CREATE TABLE IF NOT EXISTS `knightquests` (`quest_id` int(4) NOT NULL default '0', `name` varchar(50) default NULL, KEY `quest_id` (`quest_id`))",$con);
-		$file_loc = $server_dir . 'data' . $svr_dir_delimit;
-		if ($next == 1)
-		{
-			$sql = "truncate table knightquests";	
-			$result = mysql_query($sql,$con);
-			$sql = "truncate table knightquestrun";	
-			$result = mysql_query($sql,$con);
-		}
-		$in_file = $file_loc . 'scripts.cfg';
-		$lines = @file($in_file);
-		if (!is_array($lines)) {	$lines = array();	}
-		$line_nums = count($lines);
-		$found = 0;
-		$run_with = "";
-		foreach ($lines as $line_num => $line) 
-		{
-			if(substr($line,0,7) == "quests/")
-			{
-				$found++;
-				if ($found == $next)
-				{	
-					$run_with = substr($line,7);
-					$run_with = substr($run_with,0,strpos($run_with,"/"));
-				}
-			}
-		}
-		if (strlen($run_with) > 0)
-		{
-			echo "<META content=\"2;url=importquests.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";
-			echo "<LINK rel=\"stylesheet\" type=\"text/css\" href=\"$skin_dir/style.css\">
-				</head>
-				<body topmargin=\"0\" leftmargin=\"0\" marginwidth=\"0\" marginheight=\"0\" class=\"popup\">
-				<center>";
-			echo "<p>Importing quest $run_with</p>";
-			$quest_name = substr($run_with,strpos($run_with,'_')+1);
-			$quest_number = substr($run_with,0,strpos($run_with,'_'));
-			$result = mysql_query("insert into knightquests (quest_id, name) values ('$quest_number', '$quest_name')",$con);
-			$file_name = $file_loc . 'scripts' . $svr_dir_delimit . 'quests' . $svr_dir_delimit . $run_with . $svr_dir_delimit . '__init__.py';
-			if (file_exists($file_name))
-			{
- 				$lines = @file($file_name);
-		if (!is_array($lines)) {	$lines = array();	}
-				$line_nums = count($lines);
-				$stage = 0;
-				$itm_array = ARRAY();
-				foreach ($lines as $line_num => $line) 
-				{
-					$line = trim($line);
-					if (substr($line,0,6) == "class ")
-					{	$stage = 2;	}
-					if (($stage == 1) && (strpos($line,'=') > 0))
-					{
-						$left = trim(substr($line,0,strpos($line,'=')-1));
-						$right = trim(substr($line,strpos($line,'=')+2));
-						$itm_array["$left"] = $right;
-					}
-					if (substr($line,0,5) == "qn = ")
-					{	$stage = 1;	}
-					if (substr($line,0,12) == 'st.giveItems')
-					{
-						$middle = substr($line,strpos($line,'(')+1);
-						$middle = substr($middle,0,strpos($middle,','));
-						$value = $itm_array["$middle"]; 
-						if (intval($value) > 0)
-						{	$result = mysql_query("insert ignore into knightquestrun (quest_id, type, target_id) values ('$quest_number', 1, '$value')",$con);	}
-					}
-					if (strpos($line,"npcId == ") > 0)
-					{
-						$middle = trim(substr($line,strpos($line,'npcId ==')+8));
-						$middle = substr($middle,0,strpos($middle,' '));
-						if (intval($middle) > 0)
-						{	$value = $middle;	}
-						else
-						{	$value = $itm_array["$middle"]; }
-						if (intval($value) > 0)
-						{	$result = mysql_query("insert ignore into knightquestrun (quest_id, type, target_id) values ('$quest_number', 2, '$value')",$con);	}
-					}
-				}
-			}
-			else
-			{	echo "<p>No ini.py found for this quest.</p>";	}
-		}
+		$qdir = $server_dir . 'data' . $svr_dir_delimit . 'scripts' . $svr_dir_delimit . 'quests' . $svr_dir_delimit;
+		echo "<LINK rel=\"stylesheet\" type=\"text/css\" href=\"$skin_dir/style.css\">
+			</head>
+			<body topmargin=\"0\" leftmargin=\"0\" marginwidth=\"0\" marginheight=\"0\" class=\"popup\">
+			<center>";
+		xip_stat_reset($con, 'quests');
+		mysql_query("truncate table knightquests",$con);
+		mysql_query("truncate table knightquestrun",$con);
+		$dirs = @glob($qdir . 'Q[0-9]*', GLOB_ONLYDIR);
+		if (!is_array($dirs) || !count($dirs))
+		{	echo "<p style=\"color:red\">Quest folders not found: " . htmlspecialchars($qdir) . "</p>";	}
 		else
-		{	echo "<LINK rel=\"stylesheet\" type=\"text/css\" href=\"$skin_dir/style.css\">
-				</head>
-				<body topmargin=\"0\" leftmargin=\"0\" marginwidth=\"0\" marginheight=\"0\" class=\"popup\">
-				<center><p>Importing ended. $next quests imported.</p>";
+		{
+			sort($dirs);
+			$noitems = 0;
+			foreach ($dirs as $dir)
+			{
+				$base = basename($dir);
+				if (!preg_match('/^Q0*(\d+)_(.+)$/', $base, $m)) { continue; }
+				$quest_number = (int) $m[1];
+				$quest_name = mysql_real_escape_string(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $m[2]), $con);
+				xip_q("insert into knightquests (quest_id, name) values ('$quest_number', '$quest_name')",$con);
+				$src = @file_get_contents($dir . $svr_dir_delimit . $base . '.java');
+				if ($src === false) { continue; }
+				$res = dc_parse_quest_java($src);
+				if (!count($res[1])) { $noitems++; }
+				foreach ($res[1] as $id) { xip_q("insert ignore into knightquestrun (quest_id, type, target_id) values ('$quest_number', 1, '$id')",$con); }
+				foreach ($res[2] as $id) { xip_q("insert ignore into knightquestrun (quest_id, type, target_id) values ('$quest_number', 2, '$id')",$con); }
+			}
+			xip_stat_flush($con, 'quests');
+			echo "<p>Importing ended. Quests without detected items: $noitems</p>";
+			xip_stat_report($con, 'quests');
 		}
 	}
 }
