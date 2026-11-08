@@ -293,7 +293,10 @@ if ($evaluser)
 		if ($user_access_lvl >= $sec_inc_admin)
 		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importspawns.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','150');\"><input value=\"Import Spawns\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
 		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		echo "<td class=\"noborderback\">&nbsp;</td><td class=\"noborderback\">&nbsp;</td>";
+		if ($user_access_lvl >= $sec_inc_admin)
+		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importloc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','250');\"><input value=\"Import Locations\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
+		else	{	echo "<td class=\"noborderback\">&nbsp;</td>";	}
+		echo "<td class=\"noborderback\">&nbsp;</td>";
 
 		echo "</tr><tr>";
 		if ($user_access_lvl >= $sec_inc_admin)
