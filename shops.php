@@ -111,6 +111,9 @@ if ($evaluser)
 					if ($shop_loc < 10000)
 					{	$shop_loc = 1000000 + $shop_loc;	}
 					$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
+					$chk_npc = mysql_query("select 1 from knightnpc where id = '" . intval($shop_owner) . "'", $con);
+					if ($chk_npc && !mysql_num_rows($chk_npc))
+					{	$shop_location = "Buylist without NPC";	}
 							
 				}
 				echo "<tr><td class=\"dropmain\">$shop_id</td><td class=\"dropmain\"><a href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&shopid=$shop_id\" class=\"dropmain\">$shop_owner</a></td><td class=\"dropmain\">$shop_location</td></tr>";
@@ -137,6 +140,9 @@ if ($evaluser)
 				if ($shop_loc < 10000)
 				{	$shop_loc = 1000000 + $shop_loc;	}
 				$shop_location = shop_loc($shop_loc, $db_location, $db_user, $db_psswd, $db_l2jdb, $lang_unknown);
+				$chk_npc = mysql_query("select 1 from knightnpc where id = '" . intval($shop_owner) . "'", $con);
+				if ($chk_npc && !mysql_num_rows($chk_npc))
+				{	$shop_location = "Buylist without NPC";	}
 			}
 			$sql = "select name from knightnpc where id = '$shop_owner'";
 			$result2 = mysql_query($sql,$con);
