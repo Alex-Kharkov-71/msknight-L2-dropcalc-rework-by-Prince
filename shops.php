@@ -28,6 +28,9 @@ $langval = input_check($_REQUEST['langval'],2);
 $ipaddr = $_SERVER["REMOTE_ADDR"];
 $action = input_check($_REQUEST['action'],0);
 $shopid = input_check($_REQUEST['shopid'],0);
+$view = input_check($_REQUEST['view'] ?? '',0);
+if (($view != 'nospawn') && ($view != 'all'))
+{	$view = '';	}
 $itemid = input_check($_REQUEST['itemid'],0);
 $price = input_check($_REQUEST['price'],0);
 
@@ -82,12 +85,27 @@ if ($evaluser)
 		if ($action != "")
 		{	echo "<h2 class=\"dropmain\">Editing shops from here is not possible: L2JMobius keeps shops in the XML datapack (data/buylists). Edit the XML and re-run Server Utilities - Import Buylists.</h2>";	}
 
-		$sql = "select distinct shop_id, shop_id as npc_id from knightbuylist order by shop_id";
+		$view_where = "";
+		if ($view == '')
+		{	$view_where = "where shop_id in (select npc_templateid from knightspawnlist)";	}
+		elseif ($view == 'nospawn')
+		{	$view_where = "where shop_id not in (select npc_templateid from knightspawnlist)";	}
+		$sql = "select distinct shop_id, shop_id as npc_id from knightbuylist $view_where order by shop_id";
 		$result = mysql_query($sql,$con);
 		$count = mysql_num_rows($result);
 
 		if (!$shopid)
 		{
+			$vl = array('' => 'Shops with a spawn (normal)', 'nospawn' => 'Without a spawn', 'all' => 'All shops');
+			echo "<p class=\"dropmain\">";
+			foreach ($vl as $vk => $vt)
+			{
+				if ($vk == $view)
+				{	echo "<strong class=\"dropmain\">[ $vt ]</strong>&nbsp;&nbsp;";	}
+				else
+				{	echo "<a class=\"dropmain\" href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&view=$vk\">$vt</a>&nbsp;&nbsp;";	}
+			}
+			echo " &nbsp; ($count)</p>";
 			echo "<table class=\"blanktab\" width=\"100%\"><tr><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Location</strong></p></td></tr>";
 			$i=0;
 			$target = intval($count / 4) + 1;
@@ -153,23 +171,12 @@ if ($evaluser)
 			}
 			echo "<h2 class=\"dropmain\">ID $shop_id - $shop_owner - $shop_location</h2>";
 
-			echo "<center><table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"lefthead\" colspan=\"5\"><p class=\"dropmain\"><strong class=\"dropmain\">Add Item - </strong></p></td></tr><tr>";
-			echo "<form method=\"post\" action=\"shops.php\">
-			<input name=\"username\" type=\"hidden\" value=\"$username\">
-			<input name=\"token\" type=\"hidden\" value=\"$token\">
-			<input name=\"shopid\" type=\"hidden\" value=\"$shop_id\">
-			<input name=\"action\" type=\"hidden\" value=\"add\">
-			<td class=\"blanktab\"><p class=\"dropmain\">&nbsp;&nbsp;&nbsp;Item&nbsp;-&nbsp;</p></td><td class=\"blanktab\">
-			<input name=\"itemid\" type=\"text\" value=\"0\" maxlength=\"6\" size=\"6\"></td><td class=\"blanktab\"><p class=\"dropmain\">&nbsp;&nbsp;&nbsp;Price&nbsp;-&nbsp;</p></td><td class=\"blanktab\">
-			<input name=\"price\" type=\"text\" value=\"0\" maxlength=\"10\" size=\"10\"></td><td class=\"blanktab\"><input value=\"<- Add\" type=\"submit\" class=\"bigbut2\"></td></form>";
-			echo "</tr></table></center>";
-			echo "<p>&nbsp</p>";
 
 			$sql = "select item_id, price, 0 as `order` from knightbuylist where shop_id = '$shop_id'";
 
 			$result = mysql_query($sql,$con);
 			$count = mysql_num_rows($result);
-			echo "<table class=\"blanktab\" width=\"100%\"><tr><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\">&nbsp;</td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Grade</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Price</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Delete?</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Move</strong></p></td></tr>";
+			echo "<table class=\"blanktab\" width=\"100%\"><tr><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\">&nbsp;</td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Grade</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Price</strong></p></td></tr>";
 			$i = 0;
 			$target = intval($count / 2);
 			if (($target * 2) < $count)
@@ -225,41 +232,12 @@ if ($evaluser)
 				else
 				{ echo "&nbsp;"; }
 				echo "</td><td class=\"dropmain\">";
-				echo "<form><form action=\"shops.php\">
-					<input name=\"username\" type=\"hidden\" value=\"$username\">
-					<input name=\"token\" type=\"hidden\" value=\"$token\">
-					<input name=\"langval\" value=\"$langval\" type=\"hidden\">
-					<input name=\"server_id\" value=\"$server_id\" type=\"hidden\">
-					<input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\">
-					<input name=\"action\" type=\"hidden\" value=\"change\">
-					<input name=\"shopid\" type=\"hidden\" value=\"$shop_id\">
-					<input name=\"itemid\" type=\"hidden\" value=\"$item_id\">
-					<table class=\"blanktab\" border=\"0\" cellpadding=\"0\" cellspacing = \"0\"><tr><td class=\"noborderback\" valign=\"top\">
-					<input name=\"price\" type=\"text\" value=\"$item_price\" maxlength=\"10\" size=\"10\">
-					</td><td class=\"noborderback\" valign=\"top\">
-					<input value=\"<-\" onclick=\"submit\" height=\"9\" type=\"submit\"></form></td>
-					</td></td></table>";
-				echo "<td class=\"dropmain\"><form action=\"shops.php\">
-					<input name=\"username\" type=\"hidden\" value=\"$username\">
-					<input name=\"token\" type=\"hidden\" value=\"$token\">
-					<input name=\"langval\" value=\"$langval\" type=\"hidden\">
-					<input name=\"server_id\" value=\"$server_id\" type=\"hidden\">
-					<input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\">
-					<input name=\"action\" type=\"hidden\" value=\"delete\">
-					<input name=\"shopid\" type=\"hidden\" value=\"$shop_id\">
-					<input name=\"itemid\" type=\"hidden\" value=\"$item_id\">
-					<input value=\"D\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"popupcentre\"></form></td><td class=\"dropmain\"><table class=\"blanktab\" border=\"0\" cellpadding=\"0\" cellspacing = \"0\"><tr><td class=\"noborderback\">";
-				$order_num = $i+1;
-				if ($i > 0)
-				{	echo "<a href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&action=up&shopid=$shop_id&itemid=$order_num\" border=\"0\"><img src=\"" . $images_dir . "sortbutup.gif\"></a>";	}
-				if ($i < ($count-1))
-				{	echo "<a href=\"shops.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&action=down&shopid=$shop_id&itemid=$order_num\" border=\"0\"><img src=\"" . $images_dir . "sortbut.gif\"></a>";	}
-				echo "</td></tr></table></td></tr>";
+				echo $item_price . "</td></tr>";
 				$i++;
 				$count2++;
 				if (($count2 >= $target) && ($i < $count))
 				{
-					echo "</tr></table></center></td><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\">&nbsp;</td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Grade</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Price</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Delete?</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Move</strong></p></td></tr>";
+					echo "</tr></table></center></td><td class=\"noborderback\" valign=\"top\"><center><table border=\"0\" cellpadding=\"5\" cellspacing = \"0\" class=\"dropmain\"><tr><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">ID</strong></p></td><td class=\"drophead\">&nbsp;</td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">$lang_name</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Grade</strong></p></td><td class=\"drophead\"><p class=\"dropmain\"><strong class=\"dropmain\">Price</strong></p></td></tr>";
 					$count2 = 0;
 				}
 			}
