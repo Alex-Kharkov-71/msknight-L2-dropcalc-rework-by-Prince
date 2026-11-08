@@ -41,6 +41,9 @@ function evalUserPass($username, $password, $ipaddr, $db_location, $db_user, $db
 
 	// Query for user name
 	$encrypt_pass = base64_encode(pack("H*", sha1(utf8_encode($password))));
+	// Public mirror: hashes in the copied accounts table are re-hashed with a secret (see docs/PUBLIC_MIRROR_RU.md).
+	if (!empty($password_pepper))
+	{	$encrypt_pass = base64_encode(hash('sha256', $password_pepper . $encrypt_pass, true));	}
 	if (!$result = mysql_query("select password, accessLevel from $dblog_l2jdb.accounts where login = '$username'",$con2))
 	{	die('Could not retrieve from logon database: ' . mysql_error());	}
 	// If return array empty, then username not found.

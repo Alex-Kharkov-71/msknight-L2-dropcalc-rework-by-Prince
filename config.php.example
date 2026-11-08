@@ -65,6 +65,12 @@ $telnet_enabled = false;
 // before DropCalc has any admin. Put your own account here for the first install, then use
 // sql/make_admin.sql to make real admins and clear the list.
 $install_admins = array();   // e.g. array("yourlogin")
+
+// Public mirror only (leave empty on the home/primary site!).
+// Secret used by scripts/sync-to-public.sh to re-hash copied account passwords:
+// stored = base64(sha256(secret . base64(sha1(password)))). Generate with: openssl rand -hex 32
+// Must be identical in sync.conf (PEPPER) and here. Never commit the real value.
+$password_pepper = "";
 // Online lamps in the page header (login server + game servers): plain TCP connect to the
 // port. This does not need telnet. Seconds to wait per server before showing "offline":
 $status_timeout = 2;
