@@ -47,3 +47,32 @@ location ~ ^/(install|import[a-z]*|servertools|settings2?|dbutils|delete|cpasswd
 
 ## Что считать риском
 Хеши паролей на внешнем сервере защищены секретом: без `PEPPER` (он лежит в конфиге контейнера и в `/etc/dropcalc-sync.conf` дома) дамп базы подбирать нельзя. Если секрет и дамп утекут вместе — защита пропадает. Почта и IP игроков в копии обнулены.
+
+## 7. Контейнер (nginx + php-fpm), файлы в `docker/`
+Образ собирается из `docker/Dockerfile` (Alpine, nginx и php-fpm в одном контейнере, работает от непривилегированного пользователя, корневая ФС только для чтения, без capabilities). Код и `config.php` монтируются с хоста, поэтому обновление кода — это `git pull`, пересборка не нужна.
+
+1. Скопируйте `docker/docker-compose.example.yml`, поправьте пути (чекаут репозитория и файл `config.public.php`).
+2. Публичный `config.public.php` — это копия `config.php.example` с вашими данными: БД `l2login`, `l2s1`, `l2s2`, `l2s3`, адрес MariaDB `172.28.0.1` (шлюз сети контейнера), пользователь `dropcalc`, `$password_pepper`, `$install_admins = array();`.
+3. Права в MariaDB привяжите к фиксированному адресу контейнера: `'dropcalc'@'172.28.0.10'`. `bind-address` MariaDB должен включать `172.28.0.1` (проще `0.0.0.0` плюс firewall, закрывающий 3306 снаружи).
+4. Запуск: `docker compose up -d --build`.
+
+### nginx на хосте (TLS) → контейнер
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;   # DropCalc привязывает токен к IP клиента
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+### Изоляция сети контейнера (если взломают DropCalc)
+Контейнеру нужен только MariaDB. Запретите ему всё остальное, особенно туннель и домашнюю сеть:
+```bash
+iptables -I DOCKER-USER -s 172.28.0.0/24 -j DROP
+iptables -I DOCKER-USER -s 172.28.0.0/24 -d 172.28.0.1 -p tcp --dport 3306 -j ACCEPT
+iptables -I DOCKER-USER -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+```
+(порядок вставки `-I` обратный: последняя команда оказывается первым правилом). Правила `INPUT` хоста для трафика из `172.28.0.0/24` тоже ограничьте портом 3306.
+
+Файлы контейнера проверены только по синтаксису (nginx, php-fpm, YAML); сборка образа на живом Docker не проверялась.
