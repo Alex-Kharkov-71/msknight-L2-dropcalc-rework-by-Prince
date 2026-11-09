@@ -1,0 +1,4 @@
+# Keep release archives (Download ZIP / releases) free of repository service files.
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
