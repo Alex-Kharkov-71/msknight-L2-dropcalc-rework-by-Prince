@@ -39,10 +39,10 @@ function dc_read_settings($con, $table)
 	{	return $r;	}
 	$GLOBALS['dc_not_installed'] = 1;
 	$defaults = dc_settings_defaults();
-	// Safe start: nobody is GM or admin, no registration, no guests. (The table default
-	// 0 would make every player an admin.)
-	$defaults['sec_inc_gmlevel'] = 256;
-	$defaults['sec_inc_admin'] = 256;
+	// Safe start: GM level 99 / admin level 100 (the L2JMobius full-access level), no
+	// registration, no guests. (The table default 0 would make every player an admin.)
+	$defaults['sec_inc_gmlevel'] = 99;
+	$defaults['sec_inc_admin'] = 100;
 	$defaults['register_allow'] = 0;
 	$defaults['guest_allow'] = 0;
 	$cols = array();

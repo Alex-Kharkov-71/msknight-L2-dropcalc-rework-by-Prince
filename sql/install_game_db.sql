@@ -234,12 +234,13 @@ CREATE TABLE IF NOT EXISTS `knightquestrun` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- One settings row is required (all other columns have defaults, drop rates 1.00).
--- SAFE START: nobody is a GM/admin until you decide. sec_inc_gmlevel / sec_inc_admin are the
--- minimum accounts.accessLevel of the LOGIN server that counts as DropCalc GM / admin. The dump
--- default 0 would make every player an admin. 256 is above any accessLevel (tinyint, max 255).
+-- SAFE START: sec_inc_gmlevel / sec_inc_admin are the minimum accounts.accessLevel of the LOGIN
+-- server that counts as DropCalc GM / admin. Defaults: GM 99, admin 100 (level 100 = full access
+-- in the stock L2JMobius AccessLevels.xml); all GM tools default to 100. The dump default 0 would
+-- make every player an admin. Change them on the Settings page if your levels differ.
 -- Registration of new game accounts through the web (register_allow) and guests stay off.
 -- Create the first admin later with sql/make_admin.sql.
-INSERT INTO `knightsettings` (`drop_chance_adena`, `sec_inc_gmlevel`, `sec_inc_admin`, `db_tokenexp`, `sec_giveandtake`, `sec_takeskill`, `sec_chatto`, `adjust_anounce`, `kick_player`, `adjust_trust`, `reboot_server`, `adjust_shop`, `adjust_drops`, `sec_adj_notes`) SELECT 1.00, 256, 256, 60, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
+INSERT INTO `knightsettings` (`drop_chance_adena`, `sec_inc_gmlevel`, `sec_inc_admin`, `db_tokenexp`, `sec_giveandtake`, `sec_takeskill`, `sec_chatto`, `sec_enchant`, `adjust_anounce`, `kick_player`, `adjust_trust`, `reboot_server`, `adjust_shop`, `adjust_drops`, `sec_adj_notes`) SELECT 1.00, 99, 100, 60, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `knightsettings`);
 
 -- ===== tables of this port, filled by Server Utilities -> Import =====
 CREATE TABLE IF NOT EXISTS `knightnpc` (
