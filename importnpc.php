@@ -166,14 +166,26 @@ if ($evaluser)
 					if (isset($npc->dropLists))
 					{
 						$cat = 0;
-						foreach ($npc->dropLists->drop->group ?? [] as $group)
+						foreach ($npc->dropLists->drop ?? [] as $dropNode)
 						{
-							$groupChance = (float) $group['chance'];
-							foreach ($group->item as $it)
+							foreach ($dropNode->group ?? [] as $group)
+							{
+								$groupChance = (float) $group['chance'];
+								foreach ($group->item as $it)
+								{
+									$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
+									xip_q("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
+										values ($id,$iid,$min,$max,$chance,$groupChance,0,$cat)", $con);
+									$drop_count++;
+								}
+								$cat++;
+							}
+							// Items directly inside <drop> (no <group>): each rolls on its own, chance is the final percent.
+							foreach ($dropNode->item ?? [] as $it)
 							{
 								$iid=(int)$it['id']; $min=(int)$it['min']; $max=(int)$it['max']; $chance=(float)$it['chance'];
 								xip_q("insert into knightdroplist (mobid,itemid,min,max,chance,group_chance,sweep,category)
-									values ($id,$iid,$min,$max,$chance,$groupChance,0,$cat)", $con);
+									values ($id,$iid,$min,$max,$chance,NULL,0,$cat)", $con);
 								$drop_count++;
 							}
 							$cat++;
