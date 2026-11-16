@@ -813,7 +813,7 @@ if ($evaluser)
 						{ echo "<td class=\"dropmain\">$itm_id</td>"; }
 						$itm_id2 = item_check(0, $itm_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$itm_id2.gif\"></td><td class=\"dropmain\"><p class=\"dropmain\"><strong class=\"dropmain\">$i_count</strong></p></td>";
-						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$i_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>";
+						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$i_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>" . dc_item_desc_html($con, $itm_id);
 						$result3 = mysql_query("select * from item_elementals where itemId = $i_objid",$con);
 						$e_count = 0;
 						while ($r_array = mysql_fetch_assoc($result3))
@@ -960,7 +960,7 @@ if ($evaluser)
 						{ echo "<td class=\"dropmain\">$itm_id</td>"; }
 						$itm_id2 = item_check(0, $itm_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$itm_id2.gif\"></td><td class=\"dropmain\"><p class=\"dropmain\"><strong class=\"dropmain\">$i_count</strong></p></td>";
-						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$itm_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>";
+						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$itm_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>" . dc_item_desc_html($con, $itm_id);
 						$result3 = mysql_query("select * from item_elementals where itemId = $i_objid",$con);
 						$e_count = 0;
 						while ($r_array = mysql_fetch_assoc($result3))
@@ -1096,7 +1096,7 @@ if ($evaluser)
 							{ echo "<td class=\"dropmain\"><p class=\"dropmain\">$itm_id</p></td>"; }
 						$itm_id2 = item_check(0, $itm_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$itm_id2.gif\"></td><td class=\"dropmain\"><p class=\"dropmain\"><strong class=\"dropmain\">$i_count</strong></p></td>";
-						echo "<td class=\"left\" colspan=\"3\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$itm_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>";
+						echo "<td class=\"left\" colspan=\"3\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$itm_name&itemid=$item_id&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$itm_id\" class=\"dropmain\">$itm_name</a>" . dc_item_desc_html($con, $itm_id);
 						$result3 = mysql_query("select * from item_elementals where itemId = $i_objid",$con);
 						$e_count = 0;
 						while ($r_array = mysql_fetch_assoc($result3))
