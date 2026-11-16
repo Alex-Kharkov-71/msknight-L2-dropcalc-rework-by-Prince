@@ -1343,7 +1343,6 @@ function utf82lang ($s)
 {
 return utf8_encode($s);
 }
-?>
 
 // Small gray description line under an item name (knightitemdesc, filled by importitems.php).
 function dc_item_desc_html($con, $item_id)
@@ -1355,3 +1354,4 @@ function dc_item_desc_html($con, $item_id)
 	if ($d === null || $d === '') { return ''; }
 	return '<br><span style="font-size:smaller;font-weight:normal;color:#555">' . htmlspecialchars($d, ENT_QUOTES, 'UTF-8') . '</span>';
 }
+?>
