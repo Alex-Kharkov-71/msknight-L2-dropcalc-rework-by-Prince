@@ -146,7 +146,7 @@ if ($evaluser)
 				{ echo "<td class=\"dropmain\">$i_id</td>"; }
 			$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 			echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-			echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$i_name&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+			echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?$itemname=$i_name&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 			check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 			echo "</p></td>";
 			echo "<td class=\"dropmain\">";
@@ -260,7 +260,7 @@ if ($evaluser)
 					{ echo "<td class=\"dropmain\"><p class=\"dropmain\">$i_id</p></td>"; }
 				$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 				echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-				echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+				echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 				check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 				echo "</p></td>";
 				echo "<td class=\"dropmain\">";
@@ -355,7 +355,7 @@ if ($evaluser)
 						{ echo "<td class=\"dropmain\"><p class=\"dropmain\">$i_id</p></td>"; }
 					$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 					echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-					echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+					echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 					check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 					echo "</p></td>";
 					echo "<td class=\"dropmain\">";
@@ -950,7 +950,7 @@ if ($evaluser)
 						
 						$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 						check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 						echo "</p></td>";
 						echo "<td class=\"dropmain\">";
@@ -1099,7 +1099,7 @@ if ($evaluser)
 							{ echo "<td class=\"dropmain\"><p class=\"dropmain\">$i_id</p></td>"; }
 						$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 						check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 						echo "</p></td>";
 						echo "<td class=\"dropmain\">";
@@ -1229,7 +1229,7 @@ if ($evaluser)
 							{ echo "<td class=\"dropmain\"><p class=\"dropmain\">$i_id</p></td>"; }
 						$i_id2 = item_check(0, $i_id, $use_duplicate, $db_location, $db_user, $db_psswd, $db_l2jdb);
 						echo "<td class=\"dropmain\"><img src=\"" . $images_dir . "items/$i_id2.gif\"></td>";
-						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>";
+						echo "<td class=\"left\"><p class=\"dropmain\"><a href=\"i-search.php?itemid=&username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&itemid=$i_id\" class=\"dropmain\">$i_name</a>" . dc_item_desc_html($con, $i_id);
 						check_item($i_id, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $langval, $language_array);
 						echo "</p></td>";
 						echo "<td class=\"dropmain\">";

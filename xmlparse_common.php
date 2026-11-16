@@ -147,3 +147,18 @@ function xip_stat_report($con, $kind)
         echo '<p style="color:green">Ошибок нет.</p>';
     }
 }
+
+// Item descriptions live in an XML comment right after <item ...> (Mobius datapack): id => text.
+function dc_item_comments($path)
+{
+    $txt = @file_get_contents($path);
+    $out = array();
+    if ($txt === false) { return $out; }
+    if (preg_match_all('/<item\s+id="(\d+)"[^>]*>\s*<!--(.*?)-->/s', $txt, $mm, PREG_SET_ORDER)) {
+        foreach ($mm as $m) {
+            $t = trim(preg_replace('/\s+/', ' ', $m[2]));
+            if ($t !== '') { $out[(int) $m[1]] = $t; }
+        }
+    }
+    return $out;
+}
