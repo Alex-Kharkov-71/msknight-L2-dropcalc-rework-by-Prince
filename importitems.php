@@ -154,6 +154,8 @@ if ($evaluser)
   PRIMARY KEY (`item_id`))",$con);
 		if ($next == 1)
 		{
+			mysql_query("CREATE TABLE IF NOT EXISTS `knightitemdesc` (`item_id` INT NOT NULL, `description` TEXT, PRIMARY KEY (`item_id`))",$con);
+			mysql_query("truncate table knightitemdesc",$con);
 			$sql = "truncate table knightetcitem";	
 			$result = mysql_query($sql,$con);
 			$sql = "truncate table knightweapon";	
@@ -177,11 +179,13 @@ if ($evaluser)
 			{	echo "<META content=\"5;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 
 			$xml = xip_loadXml($file_loc);
+			$item_descs = dc_item_comments($file_loc);
 			if ($xml)
 			{
 				foreach ($xml->item as $item)
 				{
 					$item_id = (int) $item['id'];
+					if (isset($item_descs[$item_id])) { mysql_query("replace into knightitemdesc (item_id, description) values ($item_id, '" . mysql_real_escape_string($item_descs[$item_id], $con) . "')", $con); }
 					$item_type = strtolower((string) $item['type']);
 					$item_name = (string) $item['name'];
 					$sets = xip_readSets($item);
