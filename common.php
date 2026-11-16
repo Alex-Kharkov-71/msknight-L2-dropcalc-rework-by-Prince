@@ -1348,7 +1348,7 @@ return utf8_encode($s);
 function dc_item_desc_html($con, $item_id)
 {
 	$item_id = (int) $item_id;
-	$r = @mysql_query("select description from knightitemdesc where item_id = $item_id", $con);
+	$r = @mysql_query("select description from knightitemdesc where id = $item_id and language = 1 limit 1", $con);
 	if (!$r || !mysql_num_rows($r)) { return ''; }
 	$d = mysql_result($r, 0, 'description');
 	if ($d === null || $d === '') { return ''; }

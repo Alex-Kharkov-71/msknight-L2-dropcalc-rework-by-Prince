@@ -154,8 +154,8 @@ if ($evaluser)
   PRIMARY KEY (`item_id`))",$con);
 		if ($next == 1)
 		{
-			mysql_query("CREATE TABLE IF NOT EXISTS `knightitemdesc` (`item_id` INT NOT NULL, `description` TEXT, PRIMARY KEY (`item_id`))",$con);
-			mysql_query("truncate table knightitemdesc",$con);
+			mysql_query("CREATE TABLE IF NOT EXISTS `knightitemdesc` (`id` int(11) NOT NULL DEFAULT 0, `language` int(11) NOT NULL DEFAULT 1, `description` text, KEY `id` (`id`))",$con);
+			mysql_query("delete from knightitemdesc where language = 1",$con);
 			$sql = "truncate table knightetcitem";	
 			$result = mysql_query($sql,$con);
 			$sql = "truncate table knightweapon";	
@@ -185,7 +185,7 @@ if ($evaluser)
 				foreach ($xml->item as $item)
 				{
 					$item_id = (int) $item['id'];
-					if (isset($item_descs[$item_id])) { mysql_query("replace into knightitemdesc (item_id, description) values ($item_id, '" . mysql_real_escape_string($item_descs[$item_id], $con) . "')", $con); }
+					if (isset($item_descs[$item_id])) { mysql_query("insert into knightitemdesc (id, language, description) values ($item_id, 1, '" . mysql_real_escape_string($item_descs[$item_id], $con) . "')", $con); }
 					$item_type = strtolower((string) $item['type']);
 					$item_name = (string) $item['name'];
 					$sets = xip_readSets($item);
