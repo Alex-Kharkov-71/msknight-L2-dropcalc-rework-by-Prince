@@ -104,8 +104,6 @@ if ($evaluser)
 
 		if (file_exists($file_loc))
 		{
-			if ($next < 1000)
-			{	echo "<META content=\"5;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 
 			$xml = xip_loadXml($file_loc);
 			if ($xml)
@@ -202,6 +200,8 @@ if ($evaluser)
 			}
 			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count</p>";
 			xip_stat_flush($con, 'npc');
+			if ($next < 1000)
+			{	echo "<META content=\"1;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		else
 		{

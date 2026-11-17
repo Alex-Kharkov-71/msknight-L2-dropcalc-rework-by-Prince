@@ -175,8 +175,6 @@ if ($evaluser)
 		echo "<p>Item Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
 		if (file_exists($file_loc))
 		{
-			if ($next < 1000)
-			{	echo "<META content=\"5;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 
 			$xml = xip_loadXml($file_loc);
 			$item_descs = dc_item_comments($file_loc);
@@ -252,6 +250,8 @@ if ($evaluser)
 			}
 			echo "<p>Импортировано предметов: $item_count</p>";
 			xip_stat_flush($con, 'items');
+			if ($next < 1000)
+			{	echo "<META content=\"1;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		else
 		{
