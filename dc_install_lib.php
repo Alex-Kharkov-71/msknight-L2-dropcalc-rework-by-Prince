@@ -156,9 +156,9 @@ function dc_install_menu_row($username, $style)
 	$link = htmlspecialchars($link);
 	$sd = $g['skin_dir'] ?? '';
 	if ($style == 2)
-	{	return "<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"$link\" class=\"whitetop\">Install tables</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$sd/bronzethin.jpg');\"><img src=\"$sd/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>";	}
+	{	return "<td><p class=\"whitetop\">&nbsp;&nbsp;&nbsp;<a href=\"$link\" class=\"whitetop\">" . xip_t('Install tables') . "</a>&nbsp;&nbsp;&nbsp;</p></td><td style=\"background: url('$sd/bronzethin.jpg');\"><img src=\"$sd/whitebar.jpg\" alt=\"\" width=\"8\" height=\"20\" border=\"0\"></td>";	}
 	$bg = ($style == 1) ? "background: url('$sd/bg_sideback.jpg') no-repeat top left;" : "background:#000000 url('$sd/bg_sideback.jpg') repeat-x top right;";
-	return "</tr><tr><td class=\"menuside\" style=\"$bg\"><a href=\"$link\" class=\"igotitleft\">&nbsp;Install tables</a></td>";
+	return "</tr><tr><td class=\"menuside\" style=\"$bg\"><a href=\"$link\" class=\"igotitleft\">&nbsp;" . xip_t('Install tables') . "</a></td>";
 }
 
 // Line under the page header: a link to install.php for installers, a notice for everybody
@@ -172,10 +172,10 @@ function dc_installer_banner($username)
 	if ($is_inst)
 	{
 		$link = "install.php?username=" . urlencode($username) . "&token=" . urlencode($GLOBALS['token'] ?? '') . "&langval=" . (int) ($GLOBALS['langval'] ?? 0) . "&server_id=" . (int) ($GLOBALS['server_id'] ?? 0) . "&skin_id=" . (int) ($GLOBALS['skin_id'] ?? 0);
-		echo "<p class=\"dropmain\"><a href=\"" . htmlspecialchars($link) . "\" class=\"dropmain\"><strong>[ Install DropCalc tables ]</strong></a>" . ($not_inst ? " &nbsp;DropCalc is not installed on this server yet." : "") . "</p>";
+		echo "<p class=\"dropmain\"><a href=\"" . htmlspecialchars($link) . "\" class=\"dropmain\"><strong>[ " . xip_t('Install DropCalc tables') . " ]</strong></a>" . ($not_inst ? " &nbsp;" . xip_t('DropCalc is not installed on this server yet.') : "") . "</p>";
 	}
 	else
-	{	echo "<p class=\"dropmain\">DropCalc is not set up yet. An administrator has to install its tables after logging in.</p>";	}
+	{	echo "<p class=\"dropmain\">" . xip_t('DropCalc is not set up yet. An administrator has to install its tables after logging in.') . "</p>";	}
 }
 
 } // DC_INSTALL_LIB

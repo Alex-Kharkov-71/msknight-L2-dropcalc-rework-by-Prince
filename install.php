@@ -66,7 +66,7 @@ if ($evaluser)
 				$c = @mysql_connect($t['host'], $t['user'], $t['pass']);
 				if (!$c || !@mysql_select_db($t['db'], $c))
 				{
-					$messages[] = array('bad', $t['title'] . ": cannot open database " . h($t['db']) . " - " . h(mysql_error($c ? $c : null)));
+					$messages[] = array('bad', xip_t('%1$s: cannot open database %2$s - %3$s', $t['title'], h($t['db']), h(mysql_error($c ? $c : null))));
 					break;
 				}
 				@mysql_query("SET NAMES 'utf8'", $c);
@@ -74,29 +74,29 @@ if ($evaluser)
 				{
 					if ($confirm != "1")
 					{
-						$messages[] = array('bad', $t['title'] . ": nothing was done - tick the confirmation box to recreate the tables from scratch.");
+						$messages[] = array('bad', xip_t('%1$s: nothing was done - tick the confirmation box to recreate the tables from scratch.', $t['title']));
 						break;
 					}
 					dc_drop_tables($c, $names);
 				}
 				$err = dc_exec_sql_file($c, $t['file']);
 				if ($err != '')
-				{	$messages[] = array('bad', $t['title'] . ": the install stopped with an error - " . h($err) . " (the database user needs CREATE and, for a recreate, DROP rights).");	}
+				{	$messages[] = array('bad', xip_t('%1$s: the install stopped with an error - %2$s (the database user needs CREATE and, for a recreate, DROP rights).', $t['title'], h($err)));	}
 				else
-				{	$messages[] = array('good', $t['title'] . ": tables " . ($action == "recreate" ? "recreated from scratch." : "installed.") . ($t['key'] === 'login' && $action == "recreate" ? " All DropCalc users were recreated from the login server accounts, so you have to log in again." : ""));	}
+				{	$messages[] = array('good', xip_t($action == "recreate" ? '%1$s: tables recreated from scratch.' : '%1$s: tables installed.', $t['title']) . ($t['key'] === 'login' && $action == "recreate" ? xip_t(' All DropCalc users were recreated from the login server accounts, so you have to log in again.') : ""));	}
 				break;
 			}
 		}
 
-		echo "<center><h2 class=\"dropmain\">Install DropCalc tables</h2>";
+		echo "<center><h2 class=\"dropmain\">" . xip_t('Install DropCalc tables') . "</h2>";
 		if (!empty($dc_not_installed))
-		{	echo "<p class=\"dropmain\">DropCalc is not installed on the first server's database yet, built-in default settings are in use.</p>";	}
-		echo "<p class=\"dropmain\">Install the <strong>login database</strong> and then each server. The first server's database also holds the interface settings shared by all servers, so install it first.<br>Only the DropCalc tables (<strong>knight*</strong>) are touched, never the game's own tables.</p>";
+		{	echo "<p class=\"dropmain\">" . xip_t('DropCalc is not installed on the first server\'s database yet, built-in default settings are in use.') . "</p>";	}
+		echo "<p class=\"dropmain\">" . xip_t('Install the <strong>login database</strong> and then each server. The first server\'s database also holds the interface settings shared by all servers, so install it first.<br>Only the DropCalc tables (<strong>knight*</strong>) are touched, never the game\'s own tables.') . "</p>";
 		foreach ($messages as $m)
 		{	echo "<p class=\"dropmain\"><strong><font color=\"" . ($m[0] == 'good' ? '#00aa00' : '#cc0000') . "\">" . $m[1] . "</font></strong></p>";	}
 
 		echo "<table class=\"dropmain\" border=\"0\" cellpadding=\"4\" cellspacing=\"0\">";
-		echo "<tr><td class=\"drophead\"><strong class=\"dropmain\">Database</strong></td><td class=\"drophead\"><strong class=\"dropmain\">State</strong></td><td class=\"drophead\"><strong class=\"dropmain\">Action</strong></td></tr>";
+		echo "<tr><td class=\"drophead\"><strong class=\"dropmain\">" . xip_t('Database') . "</strong></td><td class=\"drophead\"><strong class=\"dropmain\">" . xip_t('State') . "</strong></td><td class=\"drophead\"><strong class=\"dropmain\">" . xip_t('Action') . "</strong></td></tr>";
 		foreach ($targets as $t)
 		{
 			$names = dc_sql_file_tables($t['file']);
@@ -104,9 +104,9 @@ if ($evaluser)
 			$state = ""; $present = array(); $row_ok = true; $can_connect = false;
 			$c = @mysql_connect($t['host'], $t['user'], $t['pass']);
 			if (!$c)
-			{	$state = "<font color=\"#cc0000\">cannot connect to " . h($t['host']) . " - " . h(mysql_error()) . "</font>";	}
+			{	$state = "<font color=\"#cc0000\">" . xip_t('cannot connect to %1$s - %2$s', h($t['host']), h(mysql_error())) . "</font>";	}
 			elseif (!@mysql_select_db($t['db'], $c))
-			{	$state = "<font color=\"#cc0000\">database " . h($t['db']) . " not found - " . h(mysql_error($c)) . "</font>";	}
+			{	$state = "<font color=\"#cc0000\">" . xip_t('database %1$s not found - %2$s', h($t['db']), h(mysql_error($c))) . "</font>";	}
 			else
 			{
 				$can_connect = true;
@@ -117,11 +117,11 @@ if ($evaluser)
 					$row_ok = ($rs && mysql_result($rs, 0, "n") > 0);
 				}
 				if (count($present) == 0)
-				{	$state = "<font color=\"#cc0000\">not installed</font> (0 of $total tables)";	}
+				{	$state = "<font color=\"#cc0000\">" . xip_t('not installed') . "</font> (" . xip_t('%1$d of %2$d tables', 0, $total) . ")";	}
 				elseif (count($present) < $total || !$row_ok)
-				{	$state = "<font color=\"#cc8800\">partly installed</font> (" . count($present) . " of $total tables" . ($row_ok ? "" : ", settings row missing") . ")";	}
+				{	$state = "<font color=\"#cc8800\">" . xip_t('partly installed') . "</font> (" . xip_t('%1$d of %2$d tables', count($present), $total) . ($row_ok ? "" : ", " . xip_t('settings row missing')) . ")";	}
 				else
-				{	$state = "<font color=\"#00aa00\">installed</font> ($total tables)";	}
+				{	$state = "<font color=\"#00aa00\">" . xip_t('installed') . "</font> (" . xip_t('%1$d tables', $total) . ")";	}
 			}
 			$complete = $can_connect && count($present) == $total && $row_ok;
 			echo "<tr><td class=\"dropmain\"><strong class=\"dropmain\">" . h($t['title']) . "</strong><br>" . h($t['db']) . " @ " . h($t['host']) . "</td><td class=\"dropmain\">$state</td><td class=\"dropmain\">";
@@ -129,13 +129,13 @@ if ($evaluser)
 			{
 				$hidden = "<input type=\"hidden\" name=\"username\" value=\"" . h($username) . "\"><input type=\"hidden\" name=\"token\" value=\"" . h($token) . "\"><input type=\"hidden\" name=\"langval\" value=\"" . h($langval) . "\"><input type=\"hidden\" name=\"server_id\" value=\"" . h($server_id) . "\"><input type=\"hidden\" name=\"skin_id\" value=\"" . h($skin_id) . "\"><input type=\"hidden\" name=\"target\" value=\"" . h($t['key']) . "\">";
 				if ($complete)
-				{	echo "<input type=\"button\" value=\"Install tables\" disabled class=\"bigbut2\"> ";	}
+				{	echo "<input type=\"button\" value=\"" . xip_t('Install tables') . "\" disabled class=\"bigbut2\"> ";	}
 				else
-				{	echo "<form method=\"post\" action=\"install.php\" style=\"display:inline\">$hidden<input type=\"hidden\" name=\"action\" value=\"install\"><input type=\"submit\" value=\"" . (count($present) ? "Install missing tables" : "Install tables") . "\" class=\"bigbut2\"></form> ";	}
+				{	echo "<form method=\"post\" action=\"install.php\" style=\"display:inline\">$hidden<input type=\"hidden\" name=\"action\" value=\"install\"><input type=\"submit\" value=\"" . xip_t(count($present) ? 'Install missing tables' : 'Install tables') . "\" class=\"bigbut2\"></form> ";	}
 				if (count($present) > 0)
 				{
-					$warn = "This DELETES all DropCalc data in " . addslashes($t['db']) . " (" . ($t['key'] === 'login' ? "users, access times, e-mail addresses" : "settings, imported game data, trusted list, statistics") . ") and creates the tables from scratch. Continue?";
-					echo "<form method=\"post\" action=\"install.php\" style=\"display:inline\" onsubmit=\"return confirm('" . h($warn) . "');\">$hidden<input type=\"hidden\" name=\"action\" value=\"recreate\"><label><input type=\"checkbox\" name=\"confirm\" value=\"1\"> yes, delete and recreate</label> <input type=\"submit\" value=\"Recreate from scratch\" class=\"bigbut2\"></form>";
+					$warn = xip_t('This DELETES all DropCalc data in %1$s (%2$s) and creates the tables from scratch. Continue?', addslashes($t['db']), xip_t($t['key'] === 'login' ? 'users, access times, e-mail addresses' : 'settings, imported game data, trusted list, statistics'));
+					echo "<form method=\"post\" action=\"install.php\" style=\"display:inline\" onsubmit=\"return confirm('" . h($warn) . "');\">$hidden<input type=\"hidden\" name=\"action\" value=\"recreate\"><label><input type=\"checkbox\" name=\"confirm\" value=\"1\"> " . xip_t('yes, delete and recreate') . "</label> <input type=\"submit\" value=\"" . xip_t('Recreate from scratch') . "\" class=\"bigbut2\"></form>";
 				}
 			}
 			echo "</td></tr>";
