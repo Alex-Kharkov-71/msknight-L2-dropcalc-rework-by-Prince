@@ -1,4 +1,5 @@
-<?php 
+<?php
+register_shutdown_function(function () { echo '<p style="text-align:center;margin:18px 0"><input type="button" class="bigbut2" value=" Close " onclick="window.close();"></p>'; }); 
 error_reporting(E_ERROR | E_PARSE);
 
 /*
