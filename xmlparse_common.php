@@ -157,6 +157,7 @@ function dc_item_comments($path)
     if (preg_match_all('/<item\s+id="(\d+)"[^>]*>\s*<!--(.*?)-->/s', $txt, $mm, PREG_SET_ORDER)) {
         foreach ($mm as $m) {
             $t = trim(preg_replace('/\s+/', ' ', $m[2]));
+            $t = preg_replace('/<([^<>]*)>/', '[$1]', $t);   // pages print descriptions as raw HTML
             if ($t !== '') { $out[(int) $m[1]] = $t; }
         }
     }
