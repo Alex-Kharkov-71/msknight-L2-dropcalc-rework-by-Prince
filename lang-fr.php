@@ -161,4 +161,5 @@ $lang_shops_spawn = "Boutiques avec apparition";
 $lang_shops_nospawn = "Sans apparition";
 $lang_shops_all = "Toutes les boutiques";
 $lang_shops_nonpc = "Liste sans PNJ";
+$lang_close = "Fermer";
 ?>

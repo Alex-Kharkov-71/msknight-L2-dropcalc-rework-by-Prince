@@ -161,4 +161,5 @@ $lang_shops_spawn = "Магазины со спавном";
 $lang_shops_nospawn = "Без спавна";
 $lang_shops_all = "Все магазины";
 $lang_shops_nonpc = "Список без NPC";
+$lang_close = "Закрыть";
 ?>

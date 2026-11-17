@@ -161,4 +161,5 @@ $lang_shops_spawn = "Obchody se spawnem";
 $lang_shops_nospawn = "Bez spawnu";
 $lang_shops_all = "V&scaron;echny obchody";
 $lang_shops_nonpc = "Seznam obchodu bez NPC";
+$lang_close = "Zav&#345;&iacute;t";
 ?>

@@ -187,6 +187,19 @@ function dc_item_comments($path)
 // "Close" button under the output of every import popup; stays disabled while the page auto-continues to the next step (meta refresh).
 function xip_close_button()
 {
-    echo '<p style="text-align:center;margin:18px 0"><input type="button" id="xipclose" class="bigbut2" value=" Close " disabled onclick="window.close();"></p><script>(function(){var m=document.getElementsByTagName("meta");for(var i=0;i<m.length;i++){if((m[i].getAttribute("http-equiv")||"").toLowerCase()=="refresh"){return;}}document.getElementById("xipclose").disabled=false;})();</script>';
+    $g = $GLOBALS;
+    $label = isset($g['lang_close']) ? $g['lang_close'] : '';
+    if ($label === '' && isset($g['language_array'], $g['langval']) && isset($g['language_array'][$g['langval']][1]) && is_file($g['language_array'][$g['langval']][1])) {
+        include($g['language_array'][$g['langval']][1]);
+        $label = isset($lang_close) ? $lang_close : '';
+    }
+    if ($label === '') { $label = 'Close'; }
+    // window.close() only works for windows opened by script; otherwise go back to the import menu.
+    $back = 'import.php?username=' . urlencode(isset($g['username']) ? $g['username'] : '') . '&token=' . urlencode(isset($g['token']) ? $g['token'] : '')
+        . '&langval=' . (int) (isset($g['langval']) ? $g['langval'] : 0) . '&server_id=' . (int) (isset($g['server_id']) ? $g['server_id'] : 0)
+        . '&skin_id=' . (int) (isset($g['skin_id']) ? $g['skin_id'] : 0);
+    $back = json_encode($back);
+    echo '<p style="text-align:center;margin:18px 0"><input type="button" id="xipclose" class="bigbut2" value=" ' . $label . ' " disabled onclick="window.close();setTimeout(function(){if(!window.closed){location.href=' . htmlspecialchars($back, ENT_QUOTES) . ';}},300);"></p>'
+        . '<script>(function(){var m=document.getElementsByTagName("meta");for(var i=0;i<m.length;i++){if((m[i].getAttribute("http-equiv")||"").toLowerCase()=="refresh"){return;}}document.getElementById("xipclose").disabled=false;})();</script>';
 }
 register_shutdown_function('xip_close_button');

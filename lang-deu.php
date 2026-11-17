@@ -161,4 +161,5 @@ $lang_shops_spawn = "Shops mit Spawn";
 $lang_shops_nospawn = "Ohne Spawn";
 $lang_shops_all = "Alle Shops";
 $lang_shops_nonpc = "Shopliste ohne NPC";
+$lang_close = "Schlie&szlig;en";
 ?>
