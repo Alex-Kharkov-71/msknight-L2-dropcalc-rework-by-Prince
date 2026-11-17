@@ -84,7 +84,7 @@ if ($evaluser)
 			$result = mysql_query($sql,$con2);
 			$sql = "delete FROM clan_data WHERE clan_id NOT IN (SELECT distinct clanid FROM characters)";
 			$result = mysql_query($sql,$con);
-			$sql = "delete FROM items WHERE owner_id NOT IN (SELECT charId FROM characters) AND owner_id NOT IN (SELECT clan_id FROM clan_data)";
+			$sql = "delete FROM items WHERE owner_id > 0 AND owner_id NOT IN (SELECT charId FROM characters) AND owner_id NOT IN (SELECT clan_id FROM clan_data)";
 			$result = mysql_query($sql,$con);
 			$sql = "delete FROM character_friends WHERE charId NOT IN (SELECT charId FROM characters)";
 			$result = mysql_query($sql,$con);
@@ -147,7 +147,7 @@ if ($evaluser)
 		$count = mysql_num_rows($result);
 		echo "<p class=\"dropmainwhite\">Characters without accounts - $count</p>";
 
-		$sql = "select item_id FROM items WHERE owner_id NOT IN (SELECT charId FROM characters) AND owner_id NOT IN (SELECT clan_id FROM clan_data)";
+		$sql = "select item_id FROM items WHERE owner_id > 0 AND owner_id NOT IN (SELECT charId FROM characters) AND owner_id NOT IN (SELECT clan_id FROM clan_data)";
 		$result = mysql_query($sql,$con);
 		$count = mysql_num_rows($result);
 		echo "<p class=\"dropmainwhite\">Items without owners - $count</p>";
