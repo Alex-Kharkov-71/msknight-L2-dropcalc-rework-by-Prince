@@ -120,11 +120,11 @@ if ($evaluser)
 			{
 				if ($adminshow)
 				{
-					echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Hide Non-Spawned -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
+					echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Hide Non-Spawned')." -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
 				}
 				else
 				{
-					echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Show Non-Spawned -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
+					echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Show Non-Spawned')." -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
 				}
 			}
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr>";
@@ -232,11 +232,11 @@ if ($evaluser)
 				{
 					if ($adminshow)
 					{
-						echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Hide Non-Spawned -\" type=\"submit\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
+						echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Hide Non-Spawned')." -\" type=\"submit\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
 					}
 					else
 					{
-						echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Show Non-Spawned -\" type=\"submit\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
+						echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Show Non-Spawned')." -\" type=\"submit\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
 					}
 				}
 				echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr>";
@@ -328,11 +328,11 @@ if ($evaluser)
 					{
 						if ($adminshow)
 						{
-							echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Hide Non-Spawned -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
+							echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Hide Non-Spawned')." -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"></form></center>\n";
 						}
 						else
 						{
-							echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\" - Admin Show Non-Spawned -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
+							echo "<center><form method=\"post\" action=\"i-search.php\"><input name=\"itemname\" type=\"hidden\" value=\"$i_name\"><input value=\"- ".xip_t('Admin Show Non-Spawned')." -\" type=\"submit\" class=\"bigbut2\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"itemid\" type=\"hidden\" value=\"$i_id\"><input name=\"adminshow\" type=\"hidden\" value=\"yes\"></form></center>\n";
 						}
 					}
 					echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr>";

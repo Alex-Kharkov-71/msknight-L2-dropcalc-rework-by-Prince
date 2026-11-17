@@ -276,4 +276,11 @@ $lang_imp = $lang_imp + array(
 	'DropCalc is not installed on this server yet.' => 'DropCalc non è ancora installato su questo server.',
 	'DropCalc is not set up yet. An administrator has to install its tables after logging in.' => 'DropCalc non è ancora configurato. Un amministratore deve installare le tabelle dopo l\'accesso.',
 );
+$lang_imp = $lang_imp + array(
+	'Normal View' => 'Vista normale',
+	'Show Spawned and Non-Spawned' => 'Mostra con e senza spawn',
+	'Show Non-Spawned Only' => 'Mostra solo senza spawn',
+	'Admin Hide Non-Spawned' => 'Admin: nascondi senza spawn',
+	'Admin Show Non-Spawned' => 'Admin: mostra senza spawn',
+);
 ?>

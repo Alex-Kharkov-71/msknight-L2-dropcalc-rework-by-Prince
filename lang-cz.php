@@ -276,4 +276,11 @@ $lang_imp = $lang_imp + array(
 	'DropCalc is not installed on this server yet.' => 'DropCalc na tomto serveru zatím není nainstalován.',
 	'DropCalc is not set up yet. An administrator has to install its tables after logging in.' => 'DropCalc ještě není nastaven. Administrátor musí po přihlášení nainstalovat jeho tabulky.',
 );
+$lang_imp = $lang_imp + array(
+	'Normal View' => 'Normální zobrazení',
+	'Show Spawned and Non-Spawned' => 'Zobrazit se spawnem i bez',
+	'Show Non-Spawned Only' => 'Zobrazit jen bez spawnu',
+	'Admin Hide Non-Spawned' => 'Admin: skrýt bez spawnu',
+	'Admin Show Non-Spawned' => 'Admin: zobrazit bez spawnu',
+);
 ?>

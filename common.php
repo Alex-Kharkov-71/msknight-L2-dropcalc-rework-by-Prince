@@ -1345,6 +1345,11 @@ return utf8_encode($s);
 }
 
 // Translated text for the import pages (lang-*.php define $lang_imp; English is the fallback).
+function xip_act($on)
+{
+	return $on ? ' disabled style="font-weight:bold;text-decoration:underline"' : '';
+}
+
 function xip_t($key)
 {
 	static $def = array(
