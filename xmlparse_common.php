@@ -95,7 +95,7 @@ function xip_q($sql, $con)
         $xip_err[$tbl] = ($xip_err[$tbl] ?? 0) + 1;
         $text = (string) mysql_error() . ' | ' . substr(preg_replace('/\s+/', ' ', $sql), 0, 140);
         if (count($xip_msg) < 10) { $xip_msg[] = $text; }
-        if ($xip_shown < 5) { $xip_shown++; echo '<p style="color:red">NOT imported: ' . htmlspecialchars($text) . '</p>'; }
+        if ($xip_shown < 5) { $xip_shown++; echo '<p style="color:red">' . xip_t('st_notimp') . ' ' . htmlspecialchars($text) . '</p>'; }
     }
     return $r;
 }
@@ -133,18 +133,18 @@ function xip_stat_report($con, $kind)
 {
     xip_stat_table($con);
     $res = mysql_query("select tbl, ok, err, msgs from knightimportstat where kind = '" . mysql_real_escape_string($kind, $con) . "' order by tbl", $con);
-    echo '<table border="1" cellpadding="4" cellspacing="0"><tr><th>Таблица</th><th>Импортировано</th><th>Ошибок</th></tr>';
+    echo '<table border="1" cellpadding="4" cellspacing="0"><tr><th>' . xip_t('st_table') . '</th><th>' . xip_t('st_imported') . '</th><th>' . xip_t('st_errors') . '</th></tr>';
     $tot_ok = 0; $tot_err = 0; $all = '';
     while ($res && ($row = mysql_fetch_assoc($res))) {
         $tot_ok += $row['ok']; $tot_err += $row['err'];
         echo '<tr><td>' . htmlspecialchars($row['tbl']) . '</td><td align="right">' . (int) $row['ok'] . '</td><td align="right"' . ($row['err'] ? ' style="color:red"' : '') . '>' . (int) $row['err'] . '</td></tr>';
         if ($row['msgs'] !== null && $row['msgs'] !== '') { $all .= $row['msgs'] . "\n"; }
     }
-    echo '<tr><th>Итого</th><th align="right">' . $tot_ok . '</th><th align="right"' . ($tot_err ? ' style="color:red"' : '') . '>' . $tot_err . '</th></tr></table>';
+    echo '<tr><th>' . xip_t('st_total') . '</th><th align="right">' . $tot_ok . '</th><th align="right"' . ($tot_err ? ' style="color:red"' : '') . '>' . $tot_err . '</th></tr></table>';
     if ($tot_err && trim($all) !== '') {
-        echo '<p style="color:red">Первые ошибки:</p><pre>' . htmlspecialchars(trim($all)) . '</pre>';
+        echo '<p style="color:red">' . xip_t('st_first') . '</p><pre>' . htmlspecialchars(trim($all)) . '</pre>';
     } elseif (!$tot_err) {
-        echo '<p style="color:green">Ошибок нет.</p>';
+        echo '<p style="color:green">' . xip_t('st_none') . '</p>';
     }
 }
 

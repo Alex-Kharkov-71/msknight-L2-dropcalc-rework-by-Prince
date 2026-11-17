@@ -89,7 +89,7 @@ if ($evaluser)
 	mysql_query("SET character_set_results='utf8'", $con);
 		if (!$con)
 			{
-			echo "<p class=\"popup\">Could Not Connect</p>";
+			echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 			die('Could not connect: ' . mysql_error());
 			}		
 		if (!mysql_select_db("$db_l2jdb",$con))
@@ -115,7 +115,7 @@ if ($evaluser)
 		mysql_query("truncate table knightquestrun",$con);
 		$dirs = @glob($qdir . 'Q[0-9]*', GLOB_ONLYDIR);
 		if (!is_array($dirs) || !count($dirs))
-		{	echo "<p style=\"color:red\">Quest folders not found: " . htmlspecialchars($qdir) . "</p>";	}
+		{	echo "<p style=\"color:red\">" . xip_t('quests_nodir', htmlspecialchars($qdir)) . "</p>";	}
 		else
 		{
 			sort($dirs);
@@ -135,7 +135,7 @@ if ($evaluser)
 				foreach ($res[2] as $id) { xip_q("insert ignore into knightquestrun (quest_id, type, target_id) values ('$quest_number', 2, '$id')",$con); }
 			}
 			xip_stat_flush($con, 'quests');
-			echo "<p>Importing ended. Quests without detected items: $noitems</p>";
+			echo "<p>" . xip_t('quests_end', $noitems) . "</p>";
 			xip_stat_report($con, 'quests');
 		}
 	}

@@ -40,7 +40,7 @@ if ($evaluser)
 {
 	if ($user_access_lvl < $sec_inc_gmlevel)
 	{
-		echo "<p class=\"popup\">You don't have sufficient access.</p>";
+		echo "<p class=\"popup\">" . xip_t('no_access') . "</p>";
 		echo "</center></body></html>";
 		return 0;
 	}
@@ -53,7 +53,7 @@ if ($evaluser)
 		mysql_query("SET character_set_results='utf8'", $con);
 		if (!$con)
 			{
-			echo "<p class=\"popup\">Could Not Connect</p>";
+			echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 			die('Could not connect: ' . mysql_error());
 			}
 		if (!mysql_select_db("$db_l2jdb",$con))
@@ -132,7 +132,7 @@ if ($evaluser)
 				}
 			}
 		}
-		echo "<p>Импортировано строк спавна: $count (файлов обработано: " . count($files) . ")</p>";
+		echo "<p>" . xip_t('spawns', $count, count($files)) . "</p>";
 		xip_stat_flush($con, 'spawns');
 		xip_stat_report($con, 'spawns');
 	}

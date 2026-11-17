@@ -57,7 +57,7 @@ if ($evaluser)
 	mysql_query("SET NAMES 'utf8'", $con2);
 	if (!$con2)
 	{
-		echo "<p class=\"popup\">Could Not Connect</p>";
+		echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 		die('Wrap_start could not connect to logserver database: ' . mysql_error());
 	}		
 	if (!mysql_select_db("$dblog_l2jdb",$con2))
@@ -65,11 +65,11 @@ if ($evaluser)
 		die('Wrap_start could not change to logserver database: ' . mysql_error());
 	}
 
-	echo "<p class=\"popup\">About to import logon accounts</p>";	
+	echo "<p class=\"popup\">" . xip_t('acc_about') . "</p>";	
 
 	if ($user_access_lvl < $sec_inc_admin)
 	{
-		echo "<p class=\"popup\">You don't have sufficient access.</p>";
+		echo "<p class=\"popup\">" . xip_t('no_access') . "</p>";
 		echo "</center></body></html>";
 		return 0;
 	}
@@ -89,14 +89,14 @@ if ($evaluser)
 			$result_i = mysql_query($sql, $con2);
 			if (!$result_i)
 			{
-				echo "<p class=\"popup\">Couldn't import the accounts: " . htmlspecialchars((string) mysql_error()) . "</p>";
+				echo "<p class=\"popup\">" . xip_t('acc_fail', htmlspecialchars((string) mysql_error())) . "</p>";
 			}
 			else
 			{
 				$added = (int) mysql_affected_rows($con2);
 				$r1 = mysql_query("select count(*) from $dblog_l2jdb.knightdrop", $con2);
 				$after = $r1 ? (int) mysql_result($r1, 0, 0) : $before;
-				echo "<p class=\"popup\">Accounts imported O.K.: added $added new, already present $before, total $after.</p>";
+				echo "<p class=\"popup\">" . xip_t('acc_ok', $added, $before, $after) . "</p>";
 			}
 		}
 		else
@@ -110,7 +110,7 @@ if ($evaluser)
 			<input name=\"token\" type=\"hidden\" value=\"$token\">
 			<input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\">
 			<input name=\"go\" type=\"hidden\" value=\"yes\">";
-			echo "<input value=\"Click to import accounts\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"popupcentre\">";
+			echo "<input value=\"" . xip_t('acc_button') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"popupcentre\">";
 			echo "</form></td>
 			</tr></table>
 			";

@@ -39,7 +39,7 @@ if ($evaluser)
 {
 	if ($user_access_lvl < $sec_inc_gmlevel)
 	{
-		echo "<p class=\"popup\">You don't have sufficient access.</p>";
+		echo "<p class=\"popup\">" . xip_t('no_access') . "</p>";
 		echo "</center></body></html>";
 		return 0;
 	}
@@ -51,7 +51,7 @@ if ($evaluser)
 		mysql_query("SET character_set_results='utf8'", $con);
 		if (!$con)
 			{
-			echo "<p class=\"popup\">Could Not Connect</p>";
+			echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 			die('Could not connect: ' . mysql_error());
 			}
 		if (!mysql_select_db("$db_l2jdb",$con))
@@ -111,7 +111,7 @@ if ($evaluser)
 		}
 		$npc_count = 0;
 		$drop_count = 0;
-		echo "<p>NPC Import Routine</p><p>Processing - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
+		echo "<p>" . xip_t('npc_routine') . "</p><p>" . xip_t('processing') . " - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
 
 		if (file_exists($file_loc))
 		{
@@ -210,7 +210,7 @@ if ($evaluser)
 					}
 				}
 			}
-			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count</p>";
+			echo "<p>" . xip_t('npc_imported', $npc_count, $drop_count) . "</p>";
 			xip_stat_flush($con, 'npc');
 			if ($next < $end)
 			{	echo "<META content=\"1;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
@@ -221,7 +221,7 @@ if ($evaluser)
 			{	echo "<META content=\"0;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		if ($next >= $end)
-		{	echo "<p>NPC import complete.</p>";
+		{	echo "<p>" . xip_t('npc_complete') . "</p>";
 			require_once(__DIR__ . '/xmlparse_common.php');
 			xip_stat_report($con, 'npc');	}
 	}

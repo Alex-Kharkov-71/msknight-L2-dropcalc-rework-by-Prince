@@ -39,7 +39,7 @@ if ($evaluser)
 {
 	if ($user_access_lvl < $sec_inc_gmlevel)
 	{
-		echo "<p class=\"popup\">You don't have sufficient access.</p>";
+		echo "<p class=\"popup\">" . xip_t('no_access') . "</p>";
 		echo "</center></body></html>";
 		return 0;
 	}
@@ -52,7 +52,7 @@ if ($evaluser)
 		mysql_query("SET character_set_results='utf8'", $con);
 		if (!$con)
 			{
-			echo "<p class=\"popup\">Could Not Connect</p>";
+			echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 			die('Could not connect: ' . mysql_error());
 			}
 		if (!mysql_select_db("$db_l2jdb",$con))
@@ -119,7 +119,7 @@ if ($evaluser)
 				}
 			}
 		}
-		echo "<p>NPC found via dialogs for shops without <npcs>: $from_html</p><p>Импортировано строк магазинов: $count (файлов обработано: " . count($files) . ")</p>";
+		echo "<p>" . xip_t('shops_html', $from_html) . "</p><p>" . xip_t('shops', $count, count($files)) . "</p>";
 		xip_stat_flush($con, 'buylists');
 		xip_stat_report($con, 'buylists');
 	}

@@ -60,7 +60,7 @@ if ($evaluser)
 	mysql_query("SET character_set_results='utf8'", $con);
 		if (!$con)
 			{
-			echo "<p class=\"popup\">Could Not Connect</p>";
+			echo "<p class=\"popup\">" . xip_t('no_connect') . "</p>";
 			die('Could not connect: ' . mysql_error());
 			}		
 		if (!mysql_select_db("$db_l2jdb",$con))
@@ -183,7 +183,7 @@ if ($evaluser)
 			$name = xip_rangeName($ia);
 			$file_loc = ($ia >= 1000) ? ($custom_files[$ia - 1000] ?? "") : $file_loc_a . $name . "00-" . $name . "99.xml";
 		}
-		echo "<p>Item Import Routine</p><p>Processing - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
+		echo "<p>" . xip_t('item_routine') . "</p><p>" . xip_t('processing') . " - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
 		if (file_exists($file_loc))
 		{
 
@@ -260,7 +260,7 @@ if ($evaluser)
 					$item_count++;
 				}
 			}
-			echo "<p>Импортировано предметов: $item_count</p>";
+			echo "<p>" . xip_t('items_imported', $item_count) . "</p>";
 			xip_stat_flush($con, 'items');
 			if ($next < $end)
 			{	echo "<META content=\"1;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
@@ -271,7 +271,7 @@ if ($evaluser)
 			{	echo "<META content=\"0;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		if ($next >= $end)
-		{	echo "<p>Import Complete</p>";
+		{	echo "<p>" . xip_t('import_complete') . "</p>";
 			require_once(__DIR__ . '/xmlparse_common.php');
 			xip_stat_report($con, 'items');	}
 	}

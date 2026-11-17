@@ -1343,4 +1343,51 @@ function utf82lang ($s)
 {
 return utf8_encode($s);
 }
+
+// Translated text for the import pages (lang-*.php define $lang_imp; English is the fallback).
+function xip_t($key)
+{
+	static $def = array(
+		'item_routine' => 'Item import routine',
+		'npc_routine' => 'NPC import routine',
+		'processing' => 'Processing',
+		'items_imported' => 'Items imported: %1$d',
+		'npc_imported' => 'NPCs imported: %1$d, drop/spoil rows: %2$d',
+		'import_complete' => 'Import complete.',
+		'npc_complete' => 'NPC import complete.',
+		'skills_imported' => 'Skills imported: %1$d',
+		'custom_files' => 'Custom files: %1$d',
+		'recipes' => 'Recipes imported: %1$d (ingredients: %2$d). Duplicate recipe IDs skipped: %3$d.',
+		'file_bad' => 'File not found or cannot be parsed: %1$s',
+		'shops_html' => 'NPCs found via dialogs for shops without &lt;npcs&gt;: %1$d',
+		'shops' => 'Shop rows imported: %1$d (files processed: %2$d)',
+		'spawns' => 'Spawn rows imported: %1$d (files processed: %2$d)',
+		'locs' => 'Locations imported (TownZone): %1$d (files read: %2$d)',
+		'quests_end' => 'Import finished. Quests without detected items: %1$d',
+		'quests_nodir' => 'Quest folders not found: %1$s',
+		'st_table' => 'Table',
+		'st_imported' => 'Imported',
+		'st_errors' => 'Errors',
+		'st_total' => 'Total',
+		'st_first' => 'First errors:',
+		'st_none' => 'No errors.',
+		'st_notimp' => 'NOT imported:',
+		'no_access' => 'You don\'t have sufficient access.',
+		'no_connect' => 'Could not connect',
+		'acc_about' => 'About to import logon accounts',
+		'acc_fail' => 'Could not import the accounts: %1$s',
+		'acc_ok' => 'Accounts imported: %1$d added, %2$d already present, %3$d total.',
+		'acc_button' => 'Click to import accounts',
+	);
+	$lang = isset($GLOBALS['lang_imp']) ? $GLOBALS['lang_imp'] : null;
+	if ($lang === null && isset($GLOBALS['language_array'], $GLOBALS['langval']) && isset($GLOBALS['language_array'][$GLOBALS['langval']][1])
+		&& is_file($GLOBALS['language_array'][$GLOBALS['langval']][1]))
+	{
+		include($GLOBALS['language_array'][$GLOBALS['langval']][1]);
+		$lang = isset($lang_imp) ? $lang_imp : null;
+	}
+	$fmt = (is_array($lang) && isset($lang[$key])) ? $lang[$key] : (isset($def[$key]) ? $def[$key] : $key);
+	$args = array_slice(func_get_args(), 1);
+	return count($args) ? vsprintf($fmt, $args) : $fmt;
+}
 ?>
