@@ -170,16 +170,20 @@ if ($evaluser)
 		if ($next == 1)
 		{	xip_stat_reset($con, 'items');	}
 		$item_count = 0;
+		require_once(__DIR__ . '/xmlparse_common.php');
+		$custom_files = xip_custom_files($file_loc_a, xip_custom_enabled($server_dir, $svr_dir_delimit, 'CustomItemsLoad'));
+		$end = 1000 + count($custom_files);
+		$is_custom = ($ia >= 1000);
 		$name = xip_rangeName($ia);
-		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+		$file_loc = ($ia >= 1000) ? ($custom_files[$ia - 1000] ?? "") : $file_loc_a . $name . "00-" . $name . "99.xml";
 		// Skip ranges that have no XML file in one go (no page reload per empty range).
-		while (!file_exists($file_loc) && $next < 1000)
+		while (!file_exists($file_loc) && $next < $end)
 		{
-			$ia++; $next++;
+			$ia++; $next++; $is_custom = ($ia >= 1000);
 			$name = xip_rangeName($ia);
-			$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+			$file_loc = ($ia >= 1000) ? ($custom_files[$ia - 1000] ?? "") : $file_loc_a . $name . "00-" . $name . "99.xml";
 		}
-		echo "<p>Item Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
+		echo "<p>Item Import Routine</p><p>Processing - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
 		if (file_exists($file_loc))
 		{
 
@@ -190,6 +194,7 @@ if ($evaluser)
 				foreach ($xml->item as $item)
 				{
 					$item_id = (int) $item['id'];
+					if ($is_custom) { foreach (array("knightweapon","knightarmour","knightetcitem") as $t_) { mysql_query("delete from $t_ where item_id = $item_id",$con); } mysql_query("delete from knightitemdesc where id = $item_id and language = 1",$con); }
 					if (isset($item_descs[$item_id])) { mysql_query("insert into knightitemdesc (id, language, description) values ($item_id, 1, '" . mysql_real_escape_string($item_descs[$item_id], $con) . "')", $con); }
 					$item_type = strtolower((string) $item['type']);
 					$item_name = (string) $item['name'];
@@ -257,15 +262,15 @@ if ($evaluser)
 			}
 			echo "<p>Импортировано предметов: $item_count</p>";
 			xip_stat_flush($con, 'items');
-			if ($next < 1000)
+			if ($next < $end)
 			{	echo "<META content=\"1;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		else
 		{
-			if ($next < 1000)
+			if ($next < $end)
 			{	echo "<META content=\"0;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
-		if ($next == 1000)
+		if ($next >= $end)
 		{	echo "<p>Import Complete</p>";
 			require_once(__DIR__ . '/xmlparse_common.php');
 			xip_stat_report($con, 'items');	}

@@ -93,6 +93,22 @@ if ($evaluser)
 				}
 			}
 		}
+		$custom_files = xip_custom_files($file_loc_a, xip_custom_enabled($server_dir, $svr_dir_delimit, 'CustomSkillsLoad'));
+		foreach ($custom_files as $cf)
+		{
+			$xml = xip_loadXml($cf);
+			if ($xml)
+			{
+				foreach ($xml->skill as $skill)
+				{
+					$id = (int) $skill['id'];
+					$sname = (string) $skill['name'];
+						xip_q("replace into knightskills (skill_id,name,levels) values ($id, '" . mysql_real_escape_string($sname,$con) . "', " . (int) ($skill['levels'] ?? 1) . ")", $con);
+					$skill_count++;
+				}
+			}
+		}
+		if (count($custom_files)) { echo "<p>Custom files: " . count($custom_files) . "</p>"; }
 		echo "<p>$skill_count skills imported.</p>";
 		xip_stat_flush($con, 'skill');
 		xip_stat_report($con, 'skill');

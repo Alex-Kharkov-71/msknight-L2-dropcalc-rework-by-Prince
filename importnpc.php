@@ -96,18 +96,22 @@ if ($evaluser)
 		}
 
 		$file_loc_a = $server_dir . 'data' . $svr_dir_delimit . 'stats' . $svr_dir_delimit . 'npcs' . $svr_dir_delimit;
+		require_once(__DIR__ . '/xmlparse_common.php');
+		$custom_files = xip_custom_files($file_loc_a, xip_custom_enabled($server_dir, $svr_dir_delimit, 'CustomNpcData'));
+		$end = 1000 + count($custom_files);
+		$is_custom = ($ia >= 1000);
 		$name = xip_rangeName($ia);
-		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+		$file_loc = ($ia >= 1000) ? ($custom_files[$ia - 1000] ?? "") : $file_loc_a . $name . "00-" . $name . "99.xml";
 		// Skip ranges that have no XML file in one go (no page reload per empty range).
-		while (!file_exists($file_loc) && $next < 1000)
+		while (!file_exists($file_loc) && $next < $end)
 		{
-			$ia++; $next++;
+			$ia++; $next++; $is_custom = ($ia >= 1000);
 			$name = xip_rangeName($ia);
-			$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+			$file_loc = ($ia >= 1000) ? ($custom_files[$ia - 1000] ?? "") : $file_loc_a . $name . "00-" . $name . "99.xml";
 		}
 		$npc_count = 0;
 		$drop_count = 0;
-		echo "<p>NPC Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
+		echo "<p>NPC Import Routine</p><p>Processing - " . (($ia >= 1000) ? basename($file_loc) : $name . "00-" . $name . "99.xml") . "</p>";
 
 		if (file_exists($file_loc))
 		{
@@ -118,6 +122,7 @@ if ($evaluser)
 				foreach ($xml->npc as $npc)
 				{
 					$id = (int) $npc['id'];
+					if ($is_custom) { mysql_query("delete from knightnpc where id = $id",$con); mysql_query("delete from knightdroplist where mobid = $id",$con); mysql_query("delete from knightnpcskills where npcid = $id",$con); }
 					$level = (int) ($npc['level'] ?? 1);
 					$type = (string) $npc['type'];
 					$name_ = (string) ($npc['name'] ?? '');
@@ -207,15 +212,15 @@ if ($evaluser)
 			}
 			echo "<p>Импортировано NPC: $npc_count, строк дропа/спойла: $drop_count</p>";
 			xip_stat_flush($con, 'npc');
-			if ($next < 1000)
+			if ($next < $end)
 			{	echo "<META content=\"1;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		else
 		{
-			if ($next < 1000)
+			if ($next < $end)
 			{	echo "<META content=\"0;url=importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
-		if ($next == 1000)
+		if ($next >= $end)
 		{	echo "<p>NPC import complete.</p>";
 			require_once(__DIR__ . '/xmlparse_common.php');
 			xip_stat_report($con, 'npc');	}

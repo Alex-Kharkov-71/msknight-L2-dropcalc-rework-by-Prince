@@ -203,3 +203,20 @@ function xip_close_button()
         . '<script>(function(){var m=document.getElementsByTagName("meta");for(var i=0;i<m.length;i++){if((m[i].getAttribute("http-equiv")||"").toLowerCase()=="refresh"){return;}}document.getElementById("xipclose").disabled=false;})();</script>';
 }
 register_shutdown_function('xip_close_button');
+
+// Is a "custom data" switch of the server (config/General.ini) turned on?  e.g. CustomNpcData, CustomItemsLoad, CustomSkillsLoad
+function xip_custom_enabled($server_dir, $delim, $key)
+{
+    $ini = @file_get_contents($server_dir . 'config' . $delim . 'General.ini');
+    if ($ini === false) { return false; }
+    return (bool) preg_match('/^\s*' . preg_quote($key, '/') . '\s*=\s*true\b/mi', $ini);
+}
+// Files of the "custom" folder next to the numbered ranges (sorted), or an empty list when the server does not load them.
+function xip_custom_files($dir, $enabled)
+{
+    if (!$enabled) { return array(); }
+    $f = @glob($dir . 'custom' . DIRECTORY_SEPARATOR . '*.xml');
+    if (!is_array($f)) { return array(); }
+    sort($f);
+    return $f;
+}
