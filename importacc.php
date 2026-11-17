@@ -1,5 +1,5 @@
 <?php
-register_shutdown_function(function () { echo '<p style="text-align:center;margin:18px 0"><input type="button" class="bigbut2" value=" Close " onclick="window.close();"></p>'; }); 
+register_shutdown_function(function () { echo '<p style="text-align:center;margin:18px 0"><input type="button" id="xipclose" class="bigbut2" value=" Close " disabled onclick="window.close();"></p><script>(function(){var m=document.getElementsByTagName("meta");for(var i=0;i<m.length;i++){if((m[i].getAttribute("http-equiv")||"").toLowerCase()=="refresh"){return;}}document.getElementById("xipclose").disabled=false;})();</script>'; });
 error_reporting(E_ERROR | E_PARSE);
 
 /*

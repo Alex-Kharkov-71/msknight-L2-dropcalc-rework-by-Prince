@@ -184,9 +184,9 @@ function dc_item_comments($path)
     return $out;
 }
 
-// "Close" button under the output of every import popup (printed once the page is finished).
+// "Close" button under the output of every import popup; stays disabled while the page auto-continues to the next step (meta refresh).
 function xip_close_button()
 {
-    echo '<p style="text-align:center;margin:18px 0"><input type="button" class="bigbut2" value=" Close " onclick="window.close();"></p>';
+    echo '<p style="text-align:center;margin:18px 0"><input type="button" id="xipclose" class="bigbut2" value=" Close " disabled onclick="window.close();"></p><script>(function(){var m=document.getElementsByTagName("meta");for(var i=0;i<m.length;i++){if((m[i].getAttribute("http-equiv")||"").toLowerCase()=="refresh"){return;}}document.getElementById("xipclose").disabled=false;})();</script>';
 }
 register_shutdown_function('xip_close_button');
