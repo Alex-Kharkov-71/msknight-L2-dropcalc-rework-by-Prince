@@ -148,18 +148,38 @@ function xip_stat_report($con, $kind)
     }
 }
 
-// Item descriptions live in an XML comment right after <item ...> (Mobius datapack): id => text.
+// Item description = the XML comment right after <item ...> (Mobius datapack) plus the item's own
+// skills (<skills><skill id level type_chance type/> <!-- name -->). Returns id => text.
 function dc_item_comments($path)
 {
     $txt = @file_get_contents($path);
     $out = array();
     if ($txt === false) { return $out; }
-    if (preg_match_all('/<item\s+id="(\d+)"[^>]*>\s*<!--(.*?)-->/s', $txt, $mm, PREG_SET_ORDER)) {
-        foreach ($mm as $m) {
-            $t = trim(preg_replace('/\s+/', ' ', $m[2]));
+    $when = array('ON_MAGIC_SKILL' => 'on casting a magic skill', 'ON_CRIT' => 'on critical hit', 'ON_ATTACK' => 'on attack',
+        'ON_HIT' => 'on hit', 'ON_ATTACK_SPECIAL' => 'on special attack', 'ON_MAGIC_FINISH' => 'on magic finish', 'ON_EXIT' => 'on unequip', 'ON_START' => 'on equip');
+    if (!preg_match_all('/<item\s+id="(\d+)"[^>]*>(.*?)<\/item>/s', $txt, $blocks, PREG_SET_ORDER)) { return $out; }
+    foreach ($blocks as $b) {
+        $t = '';
+        if (preg_match('/^\s*<!--(.*?)-->/s', $b[2], $c)) {
+            $t = trim(preg_replace('/\s+/', ' ', $c[1]));
             $t = preg_replace('/<([^<>]*)>/', '[$1]', $t);   // pages print descriptions as raw HTML
-            if ($t !== '') { $out[(int) $m[1]] = $t; }
         }
+        if (preg_match_all('/<skill\s+([^>]*?)\/>\s*(?:<!--\s*(.*?)\s*-->)?/s', $b[2], $sk, PREG_SET_ORDER)) {
+            foreach ($sk as $k) {
+                if (!preg_match('/\bid="(\d+)"/', $k[1], $a) || !preg_match('/\blevel="(\d+)"/', $k[1], $l)) { continue; }
+                if (strpos($b[2], '<skills>') === false) { continue; }
+                // only skills inside <skills> ... </skills> (not the <set>/<stats> parts)
+                if (!preg_match('/<skills>.*?<skill\s+[^>]*\bid="' . $a[1] . '"/s', $b[2])) { continue; }
+                $name = isset($k[2]) && $k[2] !== '' ? $k[2] : 'Skill #' . $a[1];
+                $line = $name . ' Lv.' . $l[1];
+                $extra = array();
+                if (preg_match('/type_chance="([\d.]+)"/', $k[1], $q)) { $extra[] = $q[1] . '% chance'; }
+                if (preg_match('/\btype="(\w+)"/', $k[1], $q)) { $extra[] = isset($when[$q[1]]) ? $when[$q[1]] : strtolower(str_replace('_', ' ', $q[1])); }
+                if (count($extra)) { $line .= ' (' . implode(', ', $extra) . ')'; }
+                $t .= ($t === '' ? '' : ' ') . 'Skill: ' . $line . '.';
+            }
+        }
+        if ($t !== '') { $out[(int) $b[1]] = $t; }
     }
     return $out;
 }
