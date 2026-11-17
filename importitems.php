@@ -256,7 +256,7 @@ if ($evaluser)
 		else
 		{
 			if ($next < 1000)
-			{	echo "<META content=\"1;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
+			{	echo "<META content=\"0;url=importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=$next\" http-equiv=refresh >\n";	}
 		}
 		if ($next == 1000)
 		{	echo "<p>Import Complete</p>";
