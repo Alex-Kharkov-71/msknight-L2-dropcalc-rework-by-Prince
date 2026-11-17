@@ -172,6 +172,13 @@ if ($evaluser)
 		$item_count = 0;
 		$name = xip_rangeName($ia);
 		$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+		// Skip ranges that have no XML file in one go (no page reload per empty range).
+		while (!file_exists($file_loc) && $next < 1000)
+		{
+			$ia++; $next++;
+			$name = xip_rangeName($ia);
+			$file_loc = $file_loc_a . $name . "00-" . $name . "99.xml";
+		}
 		echo "<p>Item Import Routine</p><p>Processing - " . $name . "00-" . $name . "99.xml</p>";
 		if (file_exists($file_loc))
 		{
