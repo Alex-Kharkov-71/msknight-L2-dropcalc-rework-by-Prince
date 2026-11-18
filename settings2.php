@@ -844,7 +844,7 @@ if ($evaluser)
 		foreach ($l2names as $l2n => $l2t)
 		{	echo "<option value=\"$l2n\"" . (((int)$l2version == $l2n) ? " selected" : "") . ">$l2t</option>";	}
 		echo "</select>";
-		echo "</td><td class=\"dropmain\" valign=\"top\"><input value=\"<- Change\" type=\"submit\" class=\"bigbut2\"></p></td></form><td class=\"noborderback\" valign=\"top\"><p class=\"dropmainwhite\">Used by the character changer to know which hair and face sets to use.  Only "before Interlude" (Chronicle 1-5) and "Interlude and later" are told apart so far.</p></td></tr>";
+		echo "</td><td class=\"dropmain\" valign=\"top\"><input value=\"<- Change\" type=\"submit\" class=\"bigbut2\"></p></td></form><td class=\"noborderback\" valign=\"top\"><p class=\"dropmainwhite\">Used by the character changer to know which hair and face sets to use.  Only \"before Interlude\" (Chronicle 1-5) and \"Interlude and later\" are told apart so far.</p></td></tr>";
 		
 		// Token Expiry
 		echo "<tr><form method=\"post\" action=\"settings2.php#block6\"><td class=\"dropmain\" valign=\"top\"><p class=\"left\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"action\" type=\"hidden\" value=\"tokenexp\">Token Expiry</td><td class=\"dropmain\" valign=\"top\">";
