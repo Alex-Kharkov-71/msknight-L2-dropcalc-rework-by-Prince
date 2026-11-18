@@ -179,29 +179,14 @@ if ($evaluser)
 			$number = intval($number);
 			if ($number > 999)
 			{	$number = 999;	}
-			if ($number <= $sec_inc_gmlevel)
-			{	$number = $sec_inc_gmlevel+1;	}
-			if ($number <= $sec_giveandtake)
-			{	$number = $sec_giveandtake+1;	}
-			if ($number <= $sec_takeskill)
-			{	$number = $sec_takeskill+1;	}
-			if ($number <= $sec_chatto)
-			{	$number = $sec_chatto+1;	}
-			if ($number <= $adjust_anounce)
-			{	$number = $adjust_anounce+1;	}
-			if ($number <= $kick_player)
-			{	$number = $kick_player+1;	}
-			if ($number <= $adjust_trust)
-			{	$number = $adjust_trust+1;	}
-			if ($number <= $reboot_server)
-			{	$number = $reboot_server+1;	}
-			if ($number <= $adjust_shop)
-			{	$number = $adjust_shop+1;	}
-			if ($number <= $adjust_drops)
-			{	$number = $adjust_drops+1;	}
-			if ($number <= $sec_adj_notes)
-			{	$number = $sec_adj_notes+1;	}
-			$sql = "update knightsettings set sec_inc_admin = '$number'";
+			if ($number < 11)
+			{	$number = 11;	}
+			// Every other level that is not below the new admin level is reset to admin - 1
+			$lowcols = array("sec_inc_gmlevel","sec_giveandtake","sec_takeskill","sec_chatto","adjust_anounce","kick_player","adjust_trust","reboot_server","adjust_shop","adjust_drops","sec_adj_notes","sec_enchant");
+			$lowset = "";
+			foreach ($lowcols as $lowcol)
+			{	$lowset .= ", $lowcol = LEAST($lowcol, " . ($number - 1) . ")";	}
+			$sql = "update knightsettings set sec_inc_admin = '$number'$lowset";
 			$result = mysql_query($sql,$con);
 			if (!$result)
 			{
