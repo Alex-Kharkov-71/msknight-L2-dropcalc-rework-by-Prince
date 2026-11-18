@@ -81,7 +81,7 @@ return $line_out;
 
 // WRITE ERROR - Writes an error box text to the screen.
 
-function writeerror($errortext)
+function writeerror($errortext, $relog = true)
 {
 echo "
 	<p class=\"dropmain\">&nbsp;</p>
@@ -93,7 +93,7 @@ echo "
 		<p class=\"dropmain\">&nbsp;</p>
 		<h2 class=\"dropmainblack\">$errortext</h2>
 		<p class=\"dropmain\">&nbsp;</p>
-		<a href=\"index.php\"><h2 class=\"blue\">Please click here to log on again</h2></a>
+		".($relog ? "<a href=\"index.php\"><h2 class=\"blue\">Please click here to log on again</h2></a>" : "")."
 		<p class=\"dropmain\">&nbsp;</p>
 	</td>
 	</tr>

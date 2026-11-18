@@ -77,7 +77,7 @@ if ($evaluser)
 		$row = mysql_fetch_array($result);
 		if (!$row)
 		{
-				writeerror("Monster data not found!");
+				writeerror("Monster data not found!", false);
 				return 0;
 		}
 
@@ -516,7 +516,7 @@ if ($evaluser)
 			
 			if (!mysql_fetch_array($result))
 			{
-				writeerror("Sorry, no matching monsters found!");
+				writeerror("Sorry, no matching monsters found!", false);
 				return 0;
 			}
 			else

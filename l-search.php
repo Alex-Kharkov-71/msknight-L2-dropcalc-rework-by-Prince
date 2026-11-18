@@ -71,7 +71,7 @@ if ($evaluser)
 		{
 			// PHP8/L2JMobius fix: таблицы teleport в L2JMobius больше нет,
 			// замены не нашлось - knightloc остаётся единственным источником.
-			writeerror("Location data not found!");
+			writeerror("Location data not found!", false);
 			return 0;
 		}
 		echo "<p class=\"dropmain\">&nbsp;</p></p><h2 class=\"dropmain\">$row[0]</h2><center><table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";

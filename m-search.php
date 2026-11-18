@@ -92,7 +92,7 @@ if ($evaluser)
 		$row = mysql_fetch_array($result);
 		if (!$row)
 		{
-				writeerror("Monster data not found!");
+				writeerror("Monster data not found!", false);
 				return 0;
 		}
 
@@ -942,7 +942,7 @@ if ($evaluser)
 				
 				if (!mysql_fetch_array($result))
 				{
-					writeerror("Sorry, no monsters matching $itemname found!");
+					writeerror("Sorry, no monsters matching $itemname found!", false);
 					return 0;
 				}
 				else
