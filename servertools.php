@@ -280,41 +280,20 @@ if ($evaluser)
 		echo "<td class=\"noborderback\" colspan=\"3\"><hr><p class=\"dropmainwhite\"><strong class=\"dropmainst\">" . xip_t('Import Tools') . "</strong></p></td></tr><tr>";
 
 		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importitems.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=0','400','150');\"><input value=\"" . xip_t('Import Items') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importnpc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=0','400','150');\"><input value=\"" . xip_t('Import NPCs') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importbuylists.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','150');\"><input value=\"" . xip_t('Import Buylists') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-
-		echo "</tr><tr>";
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importspawns.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','150');\"><input value=\"" . xip_t('Import Spawns') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importloc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','400','250');\"><input value=\"" . xip_t('Import Locations') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>";	}
-		echo "<td class=\"noborderback\">&nbsp;</td>";
-
-		echo "</tr><tr>";
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importacc.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','470','180');\"><input value=\"" . xip_t('Import Logon Accounts') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importskill.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','500','200');\"><input value=\"" . xip_t('Import Skills.') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-		if ($user_access_lvl >= $sec_inc_admin)
-		{	echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importrec.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id','500','200');\"><input value=\"" . xip_t('Import Recipes') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";	}
-		else	{	echo "<td class=\"noborderback\">&nbsp;</td>"; }
-
+		{	$imp_steps = array(array('importitems.php','Import Items','400','150','&next=0'), array('importnpc.php','Import NPCs','400','150','&next=0'), array('importskill.php','Import Skills.','500','200',''), array('importrec.php','Import Recipes','500','200',''), array('importbuylists.php','Import Buylists','400','150',''), array('importspawns.php','Import Spawns','400','150',''), array('importloc.php','Import Locations','400','250',''), array('importquests.php','Import Quests','400','150','&next=0'), array('importacc.php','Import Logon Accounts','470','180',''));
+			echo "<td class=\"noborderback\" colspan=\"3\"><center>";
+			foreach ($imp_steps as $imp_k => $imp_st)
+			{	if ($imp_k)
+				{	echo " <span style=\"white-space:nowrap;font-size:18px;font-weight:bold;color:#c00;\">&rarr;</span> ";	}
+				echo "<form style=\"display:inline;white-space:nowrap\" method=\"post\" action=\"javascript:popit('{$imp_st[0]}?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id{$imp_st[4]}','{$imp_st[2]}','{$imp_st[3]}');\"><input value=\"" . ($imp_k + 1) . ". " . xip_t($imp_st[1]) . "\" type=\"submit\" class=\"bigbut2\"></form>";
+			}
+			echo "</center></td>";	}
+		else	{	echo "<td class=\"noborderback\" colspan=\"3\">&nbsp;</td>"; }
 		echo "</tr>";
 
 		if ($user_access_lvl >= $sec_inc_admin)
 		{	
-			echo "<tr><td class=\"noborderback\" colspan=\"2\"><center><p class=\"dropmain\"><form method=\"post\" enctype=\"multipart/form-data\" action=\"import.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\"><input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"500000\">Account Import: <input name=\"file\" type=\"file\"><input value=\"" . xip_t('Import File') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></p></center></td>";
-			echo "<td class=\"noborderback\"><center><form method=\"post\" action=\"javascript:popit('importquests.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id&next=0','400','150');\"><input value=\"" . xip_t('Import Quests') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></center></td>";
+			echo "<tr><td class=\"noborderback\" colspan=\"3\"><center><p class=\"dropmain\"><form method=\"post\" enctype=\"multipart/form-data\" action=\"import.php?username=$username&token=$token&langval=$langval&server_id=$server_id&skin_id=$skin_id\"><input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"500000\">Account Import: <input name=\"file\" type=\"file\"><input value=\"" . xip_t('Import File') . "\" onclick=\"submit\" height=\"9\" type=\"submit\" class=\"bigbut2\"></form></p></center></td>";
 			echo "</tr>";	}
 	
 		echo "<tr>";
