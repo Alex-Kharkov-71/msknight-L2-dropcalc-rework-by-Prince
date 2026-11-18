@@ -837,8 +837,14 @@ if ($evaluser)
 		
 		// L2 Version
 		echo "<tr><form method=\"post\" action=\"settings2.php#block6\"><td class=\"dropmain\" valign=\"top\"><p class=\"left\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"action\" type=\"hidden\" value=\"l2version\">L2 Version</td><td class=\"dropmain\" valign=\"top\">";
-		echo "<input type=\"text\" name=\"number\" maxlength=\"2\" size=\"2\" value=\"$l2version\">";
-		echo "</td><td class=\"dropmain\" valign=\"top\"><input value=\"<- Change\" type=\"submit\" class=\"bigbut2\"></p></td></form><td class=\"noborderback\" valign=\"top\"><p class=\"dropmainwhite\">Used by the character changer to know which hair and face sets to use.  L2-C5 is number 5.  No other numbers implemented yet.</p></td></tr>";
+		$l2names = array(1=>"Chronicle 1 (Prelude)",2=>"Chronicle 2 (Chronicle 2)",3=>"Chronicle 3 (Chronicle 3)",4=>"Chronicle 4 (Chronicle 4)",5=>"Chronicle 5 (Oath)",6=>"Interlude",7=>"Kamael",8=>"Hellbound",9=>"Gracia Part 1",10=>"Gracia Final",11=>"Gracia Epilogue",12=>"Freya",13=>"High Five");
+		echo "<select name=\"number\">";
+		if (!isset($l2names[(int)$l2version]))
+		{	echo "<option value=\"" . (int)$l2version . "\" selected>" . (int)$l2version . " (custom)</option>";	}
+		foreach ($l2names as $l2n => $l2t)
+		{	echo "<option value=\"$l2n\"" . (((int)$l2version == $l2n) ? " selected" : "") . ">$l2t</option>";	}
+		echo "</select>";
+		echo "</td><td class=\"dropmain\" valign=\"top\"><input value=\"<- Change\" type=\"submit\" class=\"bigbut2\"></p></td></form><td class=\"noborderback\" valign=\"top\"><p class=\"dropmainwhite\">Used by the character changer to know which hair and face sets to use.  Only "before Interlude" (Chronicle 1-5) and "Interlude and later" are told apart so far.</p></td></tr>";
 		
 		// Token Expiry
 		echo "<tr><form method=\"post\" action=\"settings2.php#block6\"><td class=\"dropmain\" valign=\"top\"><p class=\"left\"><input name=\"username\" type=\"hidden\" value=\"$username\"><input name=\"token\" type=\"hidden\" value=\"$token\"><input name=\"langval\" type=\"hidden\" value=\"$langval\"><input name=\"server_id\" value=\"$server_id\" type=\"hidden\"><input name=\"skin_id\" value=\"$skin_id\" type=\"hidden\"><input name=\"action\" type=\"hidden\" value=\"tokenexp\">Token Expiry</td><td class=\"dropmain\" valign=\"top\">";
