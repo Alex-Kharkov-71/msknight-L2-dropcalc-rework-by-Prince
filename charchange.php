@@ -38,6 +38,10 @@ include($langfile);		// Import language variables.
 
 if ($l2version < 6)
 {	$char_limits = array(array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,0,0,0,0,0,0), array(4,2,2,6,2,2,0,0,0,0,0,0));	}
+else
+{	// Interlude / Kamael / Gracia / Freya / High Five: male 0-4 hair styles, female 0-6, colours 0-3, faces 0-2 for every race;
+	// dwarves and Kamael have no mystic classes. Order: human, elf, dark elf, orc, dwarf, kamael.
+	$char_limits = array(array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,4,3,2,6,3,2), array(4,3,2,6,3,2,0,0,0,0,0,0), array(4,3,2,6,3,2,0,0,0,0,0,0));	}
 
 $evaluser = wrap_start($username, $token, $_GET, $_POST, $langval, $language_array, $top_ten, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $sec_inc_gmlevel, $sec_inc_admin, 0, "", 0, $ipaddr, $db_tokenexp, $guest_allow, $all_users_maps, $all_users_recipe, $guest_user_maps);
 if ($evaluser == 2)
