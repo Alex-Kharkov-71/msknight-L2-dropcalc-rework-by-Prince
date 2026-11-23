@@ -377,6 +377,7 @@ if ($evaluser)
 			$offset_y = 0;
 				
 			$map_file = $images_dir. "aden.jpg";
+			$map_file .= "?v=" . @filemtime($map_file);
 			
 			if ($map_right > $map_left)
 			{
@@ -474,6 +475,7 @@ if ($evaluser)
 			$graphic_width = 312;
 			$graphic_height = 1000;
 			$map_file = $images_dir. "gracia.jpg";
+			$map_file .= "?v=" . @filemtime($map_file);
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 			echo "\n<div style=\"position: relative;\"><img src=\"$map_file\" alt=\"\" width=\"$graphic_width\" height=\"$graphic_height\" border=\"0\"><div>";
 			$map_right = -166144;
@@ -665,6 +667,7 @@ if ($evaluser)
 			$graphic_width = 312;
 			$graphic_height = 1000;
 			$map_file = $images_dir. "gracia.jpg";
+			$map_file .= "?v=" . @filemtime($map_file);
 			echo "<center><table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"dropmain\"><tr><td class=\"dropmain\">";
 			echo "\n<div style=\"position: relative;\"><img src=\"$map_file\" alt=\"\" width=\"$graphic_width\" height=\"$graphic_height\" border=\"0\"><div>";
 			$map_right = -166144;

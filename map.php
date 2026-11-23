@@ -67,6 +67,7 @@ function map($points, $images_dir, $map_nudge, $map_num, $zones = [])
 	$offset_y = 0;
 
 	$map_file = $images_dir. $map_name. ".jpg";
+	$map_file .= "?v=" . @filemtime($map_file);
 
 	//--------------------------------------------------------
 
