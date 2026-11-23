@@ -371,7 +371,7 @@ if ($evaluser)
 			$map_bottom = 261000;
 						
 			$graphic_width = 750;
-			$graphic_height = 1084;
+			$graphic_height = 1000;
 				
 			$offset_x = 0;
 			$offset_y = 0;
