@@ -111,6 +111,16 @@ function map($points, $images_dir, $map_nudge, $map_num, $zones = [])
 	$x_scale = $x_scale / $graphic_width;
 	$y_scale = $y_scale / $graphic_height;
 
+	static $dc_zoom_js = false;
+	static $dc_map_n = 0;
+	$dc_map_n++;
+	if (!$dc_zoom_js)
+	{
+		$dc_zoom_js = true;
+		echo "<script>function dcZoom(id,z){var e=document.getElementById(id);if(!e)return;e.style.zoom=z;var b=e.parentNode.querySelectorAll('.dczb');for(var i=0;i<b.length;i++){b[i].disabled=(b[i].getAttribute('data-z')==z);}try{localStorage.setItem('dcmapzoom',z);}catch(x){}}</script>";
+	}
+	$dc_id = "dcmap" . $dc_map_n;
+	echo "<div style=\"max-width:100%;overflow:auto;max-height:90vh\"><p class=\"dropmain\" style=\"margin:2px\"><input type=\"button\" class=\"bigbut2 dczb\" data-z=\"1\" value=\"1x\" disabled onclick=\"dcZoom('$dc_id',1)\"> <input type=\"button\" class=\"bigbut2 dczb\" data-z=\"2\" value=\"2x\" onclick=\"dcZoom('$dc_id',2)\"></p><div id=\"$dc_id\" style=\"zoom:1\">";
 	echo "\n<div style=\"position: relative;\"><table><tr><td><img src=\"$map_file\" alt=\"\" width=\"$graphic_width\" height=\"$graphic_height\" border=\"0\"><div>";
 
 	if (!empty($zones))
@@ -223,7 +233,7 @@ function map($points, $images_dir, $map_nudge, $map_num, $zones = [])
 		}
 		$i++;
 	}
-	echo "</div></td></tr></table></div>\n";
+	echo "</div></td></tr></table></div></div></div>\n";
 	return 1;
 }
 
