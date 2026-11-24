@@ -110,6 +110,8 @@ return;
 
 function evalUser($username, $token, $ipaddr, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $db_tokenexp, $guest_allow, $all_users_maps, $all_users_recipe, $sec_inc_admin, $sec_inc_gmlevel, $guest_user_maps)
 {
+if (!empty($GLOBALS['dc_eval_failed']))
+{	return 0;	}	// an auth error was already shown on this page
 
 global $user_access_lvl;
 global $user_game_acc;
@@ -172,6 +174,7 @@ if (!$row)
 			$user_map_access = $guest_user_maps;
 			return 2;
 		}
+		$GLOBALS['dc_eval_failed'] = true;
 		writeerror("User account not found!");
 		return 0;
 	}
@@ -193,7 +196,8 @@ if ($email_check)
 		$user_map_access = $guest_user_maps;
 		return 2;
 	}
-	writeerror("Account not authenticated.<br>Use the reminder system to authenticate the account.");
+	$GLOBALS['dc_eval_failed'] = true;
+		writeerror("Account not authenticated.<br>Use the reminder system to authenticate the account.");
 	return 0;
 }
 
@@ -210,6 +214,7 @@ if (($row[0] != $token) || ($token == 0))
 			$user_map_access = $guest_user_maps;
 			return 2;
 		}
+		$GLOBALS['dc_eval_failed'] = true;
 		writeerror("Session token went out of synch.");
 		return 0;
 	}
@@ -231,7 +236,8 @@ if ($timeofday > $row[1])
 			$user_map_access = $guest_user_maps;
 			return 2;
 		}
-	writeerror("Session closed<br>Inactive for more than $db_tokenexp minutes.");
+	$GLOBALS['dc_eval_failed'] = true;
+		writeerror("Session closed<br>Inactive for more than $db_tokenexp minutes.");
 	return 0;
 }
 
@@ -256,7 +262,8 @@ if ($ipaddr != $user_ip)
 		$user_map_access = $guest_user_maps;
 		return 2;
 	}
-	writeerror("IP address does not match.");
+	$GLOBALS['dc_eval_failed'] = true;
+		writeerror("IP address does not match.");
 	return 0;
 }
 
