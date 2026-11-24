@@ -431,6 +431,10 @@ function wrap_start($username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, $langval
 	{	$username = "guest";	}
 	if ($result == 0)
 	{	$username = "";	}
+	static $dc_wrapped = false;
+	if ($result == 0 && $dc_wrapped)
+	{	return $result;	}	// error page header already drawn once
+	$dc_wrapped = true;
 	wrap_it("wrapopen.php", $username, $token, $HTTP_GET_VARS, $HTTP_POST_VARS, $langval, $language_array, $top_ten, $db_location, $db_user, $db_psswd, $db_l2jdb, $dblog_location, $dblog_user, $dblog_psswd, $dblog_l2jdb, $sec_inc_gmlevel, $sec_inc_admin, $refresh_timer, $refresh_string, $quality_level);
 	return $result;
 }
